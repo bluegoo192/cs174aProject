@@ -10,5 +10,9 @@ public abstract class DbQuery {
         this.query = query;
     }
 
+    public String getQuery() {
+        return this.query;
+    }
+
     public abstract void onComplete(ResultSet result);
 }
