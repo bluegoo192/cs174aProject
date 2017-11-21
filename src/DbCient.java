@@ -6,8 +6,8 @@ import java.sql.*;
 public class DbCient {
     Connection conn;
     // JDBC driver name and database URL
-    static final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
-    static final String DB_URL = "jdbc:mysql://cs174a.engr.ucsb.edu:3306/silversteinDB";
+    static final String JDBC_DRIVER = "com.mysql.cj.jdbc.Driver";
+    static final String DB_URL = "jdbc:mysql://cs174a.engr.ucsb.edu:3306/silversteinDB?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC";
 
     //  Database credentials
     static final String USER = "silverstein";
@@ -21,14 +21,20 @@ public class DbCient {
     private DbCient() {
     }
 
+    /**
+     * Connect to the database.
+     * @return Whether or not the connection was successful
+     */
     public boolean connect() {
         try {
-            Class.forName("com.mysql.jdbc.Driver");
+            System.out.println("Trying to connect");
+            Class.forName(JDBC_DRIVER);
             Connection connection = DriverManager.getConnection(DB_URL, USER, PASS);
             System.out.println("Connected to database");
             connection.close();
             return true;
         } catch (Exception e) {
+            e.printStackTrace();
             return false;
         }
     }
