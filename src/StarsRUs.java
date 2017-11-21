@@ -12,8 +12,7 @@ public class StarsRUs {
 
         //4. Size the frame.
         frame.pack();
-        boolean success = DbCient.getInstance().connect();
-        System.out.println(success);
+        DbCient.getInstance();
         //5. Show it.
         frame.setVisible(true);
     }
