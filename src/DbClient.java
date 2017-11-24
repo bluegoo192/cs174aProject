@@ -3,8 +3,17 @@ import java.sql.*;
 /**
  * Created by Arthur on 11/12/17.
  */
+<<<<<<< HEAD:src/DbCient.java
 public class DbCient {
     Connection conn;
+=======
+public class DbClient {
+
+    // Connection status
+    Connection connection;
+    boolean connected = false;
+
+>>>>>>> a84c4d6cadc3d984a6d133688dc9d820e99b203e:src/DbClient.java
     // JDBC driver name and database URL
     static final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
     static final String DB_URL = "jdbc:mysql://cs174a.engr.ucsb.edu";
