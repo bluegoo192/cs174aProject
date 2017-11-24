@@ -3,7 +3,7 @@ import java.sql.*;
 /**
  * Created by Arthur on 11/12/17.
  */
-public class DbCient {
+public class DbClient {
 
     // Connection status
     Connection connection;
