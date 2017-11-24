@@ -39,7 +39,7 @@ public class DbClient {
             conn = DriverManager.getConnection(DB_URL, USER, PASS);
             System.out.println("Connected");
             
-           //stmt = conn.createStatement();
+            createTables(conn);
             
 
             //stmt.close();
@@ -80,13 +80,21 @@ public class DbClient {
     				"	PRIMARY KEY (Username))";
     		
     		
-    		
+    		Statement make_customers = null;
     		try {
-    			Statement make_customers = conn.createStatement();
+    			make_customers = conn.createStatement();
     			make_customers.executeUpdate(customers);
     		}catch(SQLException se) {
     			System.out.println("Customers Table not created");
+    		}finally {
+    			try {
+    				if(make_customers != null)
+    					make_customers.close();
+    			}catch(SQLException se2) {
+    				se2.printStackTrace();
+    			}
     		}
+    		
     		String market_account = "CREATE TABLE IF NOT EXISTS Market_Account (" + 
     				"	AccountID CHAR(20)," + 
     				"	Balance REAL CHECK (Balance >= 0)," + 
@@ -95,11 +103,19 @@ public class DbClient {
     				"ON DELETE CASCADE ON UPDATE CASCADE," + 
     				"	PRIMARY KEY (AccountID) )";
     		
+    		Statement make_market_account = null;
     		try {
-    			Statement make_market_account = conn.createStatement();
+    			make_market_account = conn.createStatement();
     			make_market_account.executeUpdate(market_account);
     		}catch(SQLException se) {
-    			System.out.println("Market Account Table not created");
+    			System.out.println("market account Table not created");
+    		}finally {
+    			try {
+    				if(make_market_account != null)
+    					make_market_account.close();
+    			}catch(SQLException se2) {
+    				se2.printStackTrace();
+    			}
     		}
     		
     		String stock_account = "CREATE TABLE IF NOT EXISTS stock_account (" + 
@@ -109,11 +125,19 @@ public class DbClient {
     				"	FOREIGN KEY(username) REFERENCES Customers(username)" + 
     				"		ON DELETE CASCADE ON UPDATE CASCADE," + 
     				"	PRIMARY KEY (AccountID))\n" ;
+    		Statement make_stock_account = null;
     		try {
-    			Statement make_stock_account = conn.createStatement();
+    			make_stock_account = conn.createStatement();
     			make_stock_account.executeUpdate(stock_account);
     		}catch(SQLException se) {
-    			System.out.println("Stock Account Table not created");
+    			System.out.println("Stock account Table not created");
+    		}finally {
+    			try {
+    				if(make_stock_account != null)
+    					make_stock_account.close();
+    			}catch(SQLException se2) {
+    				se2.printStackTrace();
+    			}
     		}
     		
     		String deposit = "CREATE TABLE Deposit(" + 
@@ -126,11 +150,19 @@ public class DbClient {
     				"	FOREIGN KEY (accountID) REFERENCES Market_Account(AccountID) ON DELETE CASCADE ON UPDATE CASCADE," + 
     				"	PRIMARY KEY(DepositID)" + 
     				")";
+    		Statement make_deposit = null;
     		try {
-    			Statement make_deposit = conn.createStatement();
+    			make_deposit = conn.createStatement();
     			make_deposit.executeUpdate(deposit);
     		}catch(SQLException se) {
     			System.out.println("Deposit Table not created");
+    		}finally {
+    			try {
+    				if(make_deposit != null)
+    					make_deposit.close();
+    			}catch(SQLException se2) {
+    				se2.printStackTrace();
+    			}
     		}
     		
     		String withdraw = "CREATE TABLE Withdraw(" + 
@@ -143,11 +175,19 @@ public class DbClient {
     				"	FOREIGN KEY (accountID) REFERENCES Market_Account(AccountID) ON DELETE CASCADE ON UPDATE CASCADE," + 
     				"	PRIMARY KEY(WithdrawID)" + 
     				")";
+    		Statement make_withdraw = null;
     		try {
-    			Statement make_withdraw = conn.createStatement();
+    			make_withdraw = conn.createStatement();
     			make_withdraw.executeUpdate(withdraw);
     		}catch(SQLException se) {
     			System.out.println("Withdraw Table not created");
+    		}finally {
+    			try {
+    				if(make_withdraw != null)
+    					make_withdraw.close();
+    			}catch(SQLException se2) {
+    				se2.printStackTrace();
+    			}
     		}
     		
     		String actor_stock = "CREATE TABLE IF NOT EXISTS Actor_Stock (" + 
@@ -157,22 +197,38 @@ public class DbClient {
     				"	current_stock_price REAL," + 
     				"	closing_prices_log CLOB(10M)," + 
     				"	PRIMARY KEY (StockSymbol))";
+    		Statement make_actor_stock = null;
     		try {
-    			Statement make_actor_stock = conn.createStatement();
+    			make_actor_stock = conn.createStatement();
     			make_actor_stock.executeUpdate(actor_stock);
     		}catch(SQLException se) {
     			System.out.println("ActorStock Table not created");
+    		}finally {
+    			try {
+    				if(make_actor_stock != null)
+    					make_actor_stock.close();
+    			}catch(SQLException se2) {
+    				se2.printStackTrace();
+    			}
     		}
     		
     		String manager = "CREATE TABLE IF NOT EXISTS Manager (" + 
     				"	ManagerID CHAR(20)," + 
     				"	Password CHAR(20) NOT NULL," + 
     				"	PRIMARY KEY (ManagerID))";
+    		Statement make_manager = null;
     		try {
-    			Statement make_manager = conn.createStatement();
+    			make_manager = conn.createStatement();
     			make_manager.executeUpdate(manager);
     		}catch(SQLException se) {
     			System.out.println("Manager Table not created");
+    		}finally {
+    			try {
+    				if(make_manager != null)
+    					make_manager.close();
+    			}catch(SQLException se2) {
+    				se2.printStackTrace();
+    			}
     		}
     		
     		String accrue_interest = "CREATE TABLE IF NOT EXISTS Accrue_Interest(" + 
@@ -182,11 +238,19 @@ public class DbClient {
     				"	FOREIGN KEY (AccountID) REFERENCES Market_Account(AccountID) ON DELETE CASCADE ON UPDATE CASCADE," + 
     				"	PRIMARY KEY(AccountID, Month)" + 
     				")";
+    		Statement make_accrue_interest = null;
     		try {
-    			Statement make_accrue_interest = conn.createStatement();
+    			make_accrue_interest = conn.createStatement();
     			make_accrue_interest.executeUpdate(accrue_interest);
     		}catch(SQLException se) {
     			System.out.println("AccrueInterest Table not created");
+    		}finally {
+    			try {
+    				if(make_accrue_interest != null)
+    					make_accrue_interest.close();
+    			}catch(SQLException se2) {
+    				se2.printStackTrace();
+    			}
     		}
     		
     		String dter = "CREATE TABLE IF NOT EXISTS Dter (" + 
@@ -194,11 +258,19 @@ public class DbClient {
     				"	ManagerID CHAR(20)," + 
     				"	FOREIGN KEY ManagerID REFERENCES Manager ON DELETE SET NULL," + 
     				"	PRIMARY KEY (ReportID))";
+    		Statement make_dter = null;
     		try {
-    			Statement make_dter = conn.createStatement();
+    			make_dter = conn.createStatement();
     			make_dter.executeUpdate(dter);
     		}catch(SQLException se) {
     			System.out.println("DTER Table not created");
+    		}finally {
+    			try {
+    				if(make_dter != null)
+    					make_dter.close();
+    			}catch(SQLException se2) {
+    				se2.printStackTrace();
+    			}
     		}
     		
     		String report = "CREATE TABLE IF NOT EXISTS Report (" + 
@@ -211,11 +283,19 @@ public class DbClient {
     				"	FOREIGN KEY(managerID) REFERENCES Manager(ManagerID) ON DELETE SET " + 
     				"NULL," + 
     				"	PRIMARY KEY (ReportID))";
+    		Statement make_report = null;
     		try {
-    			Statement make_report = conn.createStatement();
+    			make_report = conn.createStatement();
     			make_report.executeUpdate(report);
     		}catch(SQLException se) {
     			System.out.println("Report Table not created");
+    		}finally {
+    			try {
+    				if(make_report != null)
+    					make_report.close();
+    			}catch(SQLException se2) {
+    				se2.printStackTrace();
+    			}
     		}
     		
     		String movie = "CREATE TABLE IF NOT EXISTS Movie (" + 
@@ -224,11 +304,19 @@ public class DbClient {
     				"	Year CHAR(4)," + 
     				"	PRIMARY KEY (MovieID)" + 
     				")";
+    		Statement make_movie = null;
     		try {
-    			Statement make_movie = conn.createStatement();
+    			make_movie = conn.createStatement();
     			make_movie.executeUpdate(movie);
     		}catch(SQLException se) {
     			System.out.println("Movie Table not created");
+    		}finally {
+    			try {
+    				if(make_movie != null)
+    					make_movie.close();
+    			}catch(SQLException se2) {
+    				se2.printStackTrace();
+    			}
     		}
     		
     		String movie_contract = "CREATE TABLE IF NOT EXISTS MovieContract(" + 
@@ -240,11 +328,19 @@ public class DbClient {
     				"	FOREIGN KEY(MovieID) REFERENCES Movie(MovieID) ON DELETE CASCADE ON UPDATE CASCADE," + 
     				"	PRIMARY KEY(StockSymbol, MovieID)" + 
     				")";
+    		Statement make_movie_contract = null;
     		try {
-    			Statement make_movie_contract = conn.createStatement();
+    			make_movie_contract = conn.createStatement();
     			make_movie_contract.executeUpdate(movie_contract);
     		}catch(SQLException se) {
     			System.out.println("MovieContract Table not created");
+    		}finally {
+    			try {
+    				if(make_movie_contract != null)
+    					make_movie_contract.close();
+    			}catch(SQLException se2) {
+    				se2.printStackTrace();
+    			}
     		}
     		
     		String buy_stock = "CREATE TABLE IF NOT EXISTS Buy_Stock(" + 
@@ -260,11 +356,19 @@ public class DbClient {
     				"	FOREIGN KEY StockID REFERENCES Stock_Account(AccountID) ON DELETE SET NULL," + 
     				"	PRIMARY KEY(BuyID)" + 
     				")";
+    		Statement make_buy_stock = null;
     		try {
-    			Statement make_buy_stock = conn.createStatement();
+    			make_buy_stock = conn.createStatement();
     			make_buy_stock.executeUpdate(buy_stock);
     		}catch(SQLException se) {
     			System.out.println("BuyStock Table not created");
+    		}finally {
+    			try {
+    				if(make_buy_stock != null)
+    					make_buy_stock.close();
+    			}catch(SQLException se2) {
+    				se2.printStackTrace();
+    			}
     		}
     		
     		String sell_stock  = "CREATE TABLE IF NOT EXISTS Sell_Stock(" + 
@@ -280,11 +384,19 @@ public class DbClient {
     				"	FOREIGN KEY StockID REFERENCES Stock_Account(AccountID) ON DELETE SET NULL," + 
     				"	PRIMARY KEY(SellID)" + 
     				")";
+    		Statement make_sell_stock = null;
     		try {
-    			Statement make_sell_stock = conn.createStatement();
+    			make_sell_stock = conn.createStatement();
     			make_sell_stock.executeUpdate(sell_stock);
     		}catch(SQLException se) {
     			System.out.println("SellStock Table not created");
+    		}finally {
+    			try {
+    				if(make_sell_stock != null)
+    					make_sell_stock.close();
+    			}catch(SQLException se2) {
+    				se2.printStackTrace();
+    			}
     		}
     		
     }
