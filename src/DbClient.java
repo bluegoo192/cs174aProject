@@ -3,17 +3,14 @@ import java.sql.*;
 /**
  * Created by Arthur on 11/12/17.
  */
-<<<<<<< HEAD:src/DbCient.java
-public class DbCient {
-    Connection conn;
-=======
+
+
 public class DbClient {
 
     // Connection status
-    Connection connection;
+    Connection conn;
     boolean connected = false;
 
->>>>>>> a84c4d6cadc3d984a6d133688dc9d820e99b203e:src/DbClient.java
     // JDBC driver name and database URL
     static final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
     static final String DB_URL = "jdbc:mysql://cs174a.engr.ucsb.edu";
@@ -21,13 +18,13 @@ public class DbClient {
     //  Database credentials
     static final String USER = "silverstein";
     static final String PASS = "954";
-    private static DbCient ourInstance = new DbCient();
+    private static DbClient ourInstance = new DbClient();
 
-    public static DbCient getInstance() {
+    public static DbClient getInstance() {
         return ourInstance;
     }
 
-    private DbCient() {
+    private DbClient() {
         Statement stmt = null;
         try{
             //STEP 2: Register JDBC driver

@@ -12,7 +12,7 @@ public class StarsRUs {
 
         //4. Size the frame.
         frame.pack();
-        DbCient.getInstance();
+        DbClient.getInstance();
         //5. Show it.
         frame.setVisible(true);
     }
