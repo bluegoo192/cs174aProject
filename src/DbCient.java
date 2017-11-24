@@ -22,14 +22,14 @@ public class DbCient {
         Statement stmt = null;
         try{
             //STEP 2: Register JDBC driver
-            Class.forName("com.mysql.cj.jdbc.Driver");
+            Class.forName("com.mysql.jdbc.Driver");
 
             //STEP 3: Open a connection
             System.out.println("Connecting to database...");
             conn = DriverManager.getConnection(DB_URL,USER,PASS);
             System.out.println("Connected");
 
-            stmt.close();
+            //stmt.close();
             conn.close();
         }catch(SQLException se){
             //Handle errors for JDBC
