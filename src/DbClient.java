@@ -420,6 +420,32 @@ public class DbClient {
     							
     }
     
+    //note that this function DOES NOT close the connection. That is up to the method that calls this function
+    public static Connection getConn() {
+    	Connection retval = null; 
+    	try{
+             //STEP 2: Register JDBC driver
+             Class.forName("com.mysql.jdbc.Driver");
+
+             //STEP 3: Open a connection
+            // System.out.println("Connecting to database...");
+             retval = DriverManager.getConnection(DB_URL, USER, PASS);
+             //System.out.println("Connected");
+             
+
+             //stmt.close();
+             //retval.close();
+         }catch(SQLException se){
+             //Handle errors for JDBC
+             se.printStackTrace();
+         }catch(Exception e){
+             //Handle errors for Class.forName
+             e.printStackTrace();
+         }
+    	
+    	return retval;
+    }
+    
     public void test() {
         System.out.println("tes");
     }
