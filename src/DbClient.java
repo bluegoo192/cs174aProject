@@ -1,7 +1,8 @@
 import java.sql.*;
 
-import com.mysql.jdbc.CommunicationsException;
+//import com.mysql.jdbc.CommunicationsException;
 import com.mysql.*;
+import com.mysql.cj.jdbc.exceptions.CommunicationsException;
 
 /**
  * Created by Arthur on 11/12/17.
