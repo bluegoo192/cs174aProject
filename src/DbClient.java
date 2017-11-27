@@ -1,7 +1,7 @@
 import java.sql.*;
 
-import com.mysql.jdbc.CommunicationsException;
-import com.mysql.*;
+//import java.sql.CommunicationsException;
+//import com.mysql.*;
 
 /**
  * Created by Arthur on 11/12/17.
@@ -44,9 +44,6 @@ public class DbClient {
 
             //stmt.close();
             conn.close();
-        }catch(CommunicationsException ce) {
-        		System.out.println("Communications Exception");
-    			ce.printStackTrace();
         }catch(SQLException se){
             //Handle errors for JDBC
             se.printStackTrace();
