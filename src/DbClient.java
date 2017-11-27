@@ -45,9 +45,6 @@ public class DbClient {
 
             //stmt.close();
             conn.close();
-        }catch(CommunicationsException ce) {
-        		System.out.println("Communications Exception");
-    			ce.printStackTrace();
         }catch(SQLException se){
             //Handle errors for JDBC
             se.printStackTrace();
