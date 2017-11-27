@@ -1,7 +1,10 @@
 import java.sql.*;
 
+<<<<<<< HEAD
 //import java.sql.CommunicationsException;
 //import com.mysql.*;
+=======
+>>>>>>> 93b84ca0ac33401507f6a4d4364bcd226625606d
 
 /**
  * Created by Arthur on 11/12/17.
