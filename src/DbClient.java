@@ -400,6 +400,26 @@ public class DbClient {
     		
     }
     
+    public void createEntryCustomers(String username, String password, String taxID, String state, String phone_number, String email_address) {
+    	
+    	
+    		String add_entry = "INSERT INTO Customers" + 
+    							"VALUES (" +
+    							username + ", " + state + ", " + email_address
+    							+", " + taxID + ", " + phone_number + ", " +
+    							password + ")";
+    		try {
+				Statement stat = conn.createStatement();
+				stat.executeUpdate(add_entry);
+				stat.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				
+			}
+    							
+    }
+    
     public void test() {
         System.out.println("tes");
     }
