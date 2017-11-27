@@ -14,6 +14,14 @@ public class SignUpPage {
 			"NM","NY","NC","ND","OH","OK","OR","PA","RI","SC","SD","TN","TX","UT","VT","VA",
 			"WA","WV","WI","WY"};
 	
+	static JTextField username;
+	static  JPasswordField password;
+    static JPasswordField password_confirm;
+    static JTextField name;
+    static JComboBox state_list;
+    static JTextField phone_number;
+    static JTextField email_address;
+	
 	public static void createSignUpPage() {
 		frame = new JFrame("SignUp");
 		frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
@@ -31,13 +39,13 @@ public class SignUpPage {
         JLabel email_address_label = new JLabel("Email:");
 
         
-        JTextField username = new JTextField(20);
-        JPasswordField password = new JPasswordField(20);
-        JPasswordField password_confirm = new JPasswordField(20);
-        JTextField name = new JTextField(20);
-        JComboBox state_list = new JComboBox(states);
-        JTextField phone_number = new JTextField(10);
-        JTextField email_address = new JTextField(30);
+        username = new JTextField(20);
+        password = new JPasswordField(20);
+        password_confirm = new JPasswordField(20);
+        name = new JTextField(20);
+        state_list = new JComboBox(states);
+        phone_number = new JTextField(10);
+        email_address = new JTextField(254);
         
         
         panel.add(username_label);
@@ -72,11 +80,26 @@ public class SignUpPage {
 
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
-			// check that username and password are good
+			// check that password and password confirm are the same
+			if(! password.getText().equals(password_confirm.getText())){
+				JOptionPane.showMessageDialog(null, "PASSWORD AND PASSWORD CONFIRM DO NOT MATCH", "Error Message", 0);
+				return;
+			}
+			
+			if(phone_number.getText().length() != 10 || !phone_number.getText().matches("[0-9]+")) {
+				JOptionPane.showMessageDialog(null, "Phone number hould be length 10 and contain only digits", "Error Message", 0);
+				return;
+			}
+			
+			//check that username is unique (SQL query here)
+			
+			
+			//after confirming validity of the entered information, create new account in sql
 			
 			//go to new page
 			frame.setVisible(false);
 			frame.dispose();
+			
 			
 		}
 		

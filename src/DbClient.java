@@ -74,7 +74,7 @@ public class DbClient {
     				"	State CHAR(2)," + 
     				"	Email CHAR(254) UNIQUE," + 
     				"	TaxID CHAR(9) UNIQUE," + 
-    				"	Phone CHAR(15)," + 
+    				"	Phone CHAR(10)," + 
     				"	Password CHAR(20)," + 
     				"	PRIMARY KEY (Username))";
     		
