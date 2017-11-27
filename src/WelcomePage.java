@@ -31,7 +31,7 @@ public class WelcomePage{
          Dimension button_size = new Dimension(20, 20);
          WelcomePage wel= new WelcomePage();
          JButton signUpButton = new JButton("Sign Up");
-         signUpButton.addActionListener(wel.new LogInListener());
+         signUpButton.addActionListener(wel.new SignUpListener());
          signUpButton.setPreferredSize(button_size);
          
          JButton logInButton = new JButton("Log In");
@@ -57,6 +57,7 @@ public class WelcomePage{
 			frame.setVisible(false);
 			frame.dispose();
 			//open new frame
+			SignUpPage.createSignUpPage();
 		}
     		
     }
@@ -69,6 +70,7 @@ public class WelcomePage{
 			frame.setVisible(false);
 			frame.dispose();
 			//open new frame
+			LogInPage.createLogInPage();
 			
 		}
     		
