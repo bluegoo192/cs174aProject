@@ -38,6 +38,10 @@ public class WelcomePage{
          logInButton.addActionListener(wel.new LogInListener());
          logInButton.setPreferredSize(button_size);
          
+         JButton managerButton = new JButton("Manager Log In");
+         managerButton.addActionListener(wel.new ManagerListener());
+         managerButton.setPreferredSize(button_size);
+         
          panel.add( signUpButton);
          panel.add( logInButton);
          //4. Size the frame.
@@ -70,10 +74,23 @@ public class WelcomePage{
 			frame.setVisible(false);
 			frame.dispose();
 			//open new frame
-			LogInPage.createLogInPage();
+			LogInPage.createLogInPage(false);
 			
 		}
     		
+    }
+    
+    class ManagerListener implements ActionListener{
+
+		@Override
+		public void actionPerformed(ActionEvent arg0) {
+			
+			frame.setVisible(false);
+			frame.dispose();
+			
+			LogInPage.createLogInPage(true);
+		}
+    	
     }
     
     }

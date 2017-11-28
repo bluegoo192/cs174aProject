@@ -1,6 +1,7 @@
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.ResultSet;
 
 import javax.swing.*;
 
@@ -21,6 +22,7 @@ public class SignUpPage {
     static JComboBox state_list;
     static JTextField phone_number;
     static JTextField email_address;
+    static JTextField taxID;
 	
 	public static void createSignUpPage() {
 		frame = new JFrame("SignUp");
@@ -28,7 +30,7 @@ public class SignUpPage {
         Dimension d = new Dimension(800, 800);
       
         frame.getContentPane().setPreferredSize(d);
-        JPanel panel = new JPanel(new GridLayout(4,4,4,4));
+        JPanel panel = new JPanel(new GridLayout(5,5,5,5));
         
         JLabel username_label = new JLabel("Username:");
         JLabel password_label = new JLabel("Password:");
@@ -37,6 +39,7 @@ public class SignUpPage {
         JLabel state_label = new JLabel("State:");
         JLabel phone_number_label = new JLabel("Phone Number:");
         JLabel email_address_label = new JLabel("Email:");
+        JLabel taxID_label = new JLabel("Tax ID:");
 
         
         username = new JTextField(20);
@@ -46,7 +49,7 @@ public class SignUpPage {
         state_list = new JComboBox(states);
         phone_number = new JTextField(10);
         email_address = new JTextField(254);
-        
+        taxID = new JTextField(6);
         
         panel.add(username_label);
         panel.add(username);
@@ -62,7 +65,8 @@ public class SignUpPage {
         panel.add(phone_number);
         panel.add(email_address_label);
         panel.add(email_address);
-       
+        panel.add(taxID_label);
+        panel.add(taxID);       
         SignUpPage signUp = new SignUpPage();
         
         JButton enterButton = new JButton("Enter");
@@ -94,7 +98,24 @@ public class SignUpPage {
 			//check that username is unique (SQL query here)
 			
 			
+			//generate taxID
+			
 			//after confirming validity of the entered information, create new account in sql
+			
+			StringBuilder addEntry = new StringBuilder("INSERT INTO CUSTOMERS VALUES (")
+					.append(username.getText()).append(",")
+					.append(state_list.getSelectedItem()).append(",")
+					.append(email_address.getText()).append(",")
+					.append(taxID.getText()).append(",")
+					.append(phone_number.getText()).append(",")
+					.append(password.getText()).append(",");
+
+			DbClient.getInstance().runQuery(new DbQuery(addEntry.toString()) {
+				@Override
+				public void onComplete(ResultSet result) {
+					System.out.println("Added "+username+" successfully.");
+				}
+			});
 			
 			//go to new page
 			frame.setVisible(false);
