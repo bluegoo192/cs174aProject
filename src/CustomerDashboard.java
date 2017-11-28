@@ -4,6 +4,7 @@ import Database.RetrievalQuery;
 
 import java.awt.Dimension;
 import java.awt.GridLayout;
+import java.awt.HeadlessException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.ResultSet;
@@ -24,8 +25,12 @@ public class CustomerDashboard{
 	static JTextField movie_info;
 	
 	static String user;
+	
+	//used for deposit/withdraw listener
+	static String accountID ;
 
 	public static JFrame createDashboard(String username) {
+		
 		//username is the distinct name of the user logged in at the moment.
 		user = username;
 		
@@ -77,10 +82,54 @@ public class CustomerDashboard{
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
 			//go to deposit/withdraw page
+			
+			/*StringBuilder findAccountID = new StringBuilder("SELECT M.AccountID ")
+					.append("FROM Market_Account M ").append("WHERE ")
+					.append("M.username = ").append("'").append(user)
+					.append("'");
+
+			DbClient.getInstance().runQuery(new RetrievalQuery(findAccountID.toString()) {
+				@Override
+				public void onComplete(ResultSet result) {
+					
+					try {
+						if(!result.next()) {
+							
+							accountID = "";
+							
+							return;
+						}
+					} catch (HeadlessException | SQLException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+					try {
+						accountID = result.getString(1);
+					} catch (SQLException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+			});
+			
+			try {
+				Thread.sleep(500);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			System.out.println("account id IS " + accountID);
+			
+			if(accountID == "") {
+				JOptionPane.showMessageDialog(null, "no accounts shown for given username", "Error with Deposit/Withdraw", 0);
+				return;
+			}
+			*/
 			frame.setVisible(false);
 			frame.dispose();
+			accountID = "12356";
 			
-			DepositPage.createDepositPage(user);
+			DepositPage.createDepositPage(user, accountID);
 		}
 		
 	}
@@ -91,6 +140,11 @@ public class CustomerDashboard{
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
 			//go to buy/sell page
+			
+			frame.setVisible(false);
+			frame.dispose();
+			
+			BuyStocksPage.createStocksPage(user);
 			
 		}
 		
@@ -105,11 +159,23 @@ public class CustomerDashboard{
 			//get balance using username
 			StringBuilder addEntry = new StringBuilder("SELECT M.balance ")
 					.append("FROM Market_Account M ")
-					.append("WHERE M.username = ").append(user);
+					.append("WHERE M.username = ").append("'").append(user)
+					.append("'");
 			DbClient.getInstance().runQuery(new RetrievalQuery(addEntry.toString()) {
 				@Override
 				public void onComplete(ResultSet result) {
 					String balance = "";
+					
+					try {
+						if(!result.next()) {
+							JOptionPane.showMessageDialog(null, "no accounts shown for given username", "Show Balance", 1);
+							return;
+						}
+					} catch (HeadlessException | SQLException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+					
 					try {
 						balance = result.getString(1);
 					} catch (SQLException e) {

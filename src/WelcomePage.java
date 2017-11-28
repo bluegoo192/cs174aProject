@@ -42,14 +42,20 @@ public class WelcomePage{
          managerButton.addActionListener(wel.new ManagerListener());
          managerButton.setPreferredSize(button_size);
          
+         //next two buttons will be deleted when the databases are set up and populated. 
          JButton seeDash = new JButton("Test Dashboard");
          seeDash.addActionListener(wel.new DashListener());
          seeDash.setPreferredSize(button_size);
+         
+         JButton seeManager = new JButton("Test Manager");
+         seeManager.addActionListener(wel.new ManListener());
+         seeManager.setPreferredSize(button_size);
          
          panel.add( signUpButton);
          panel.add( logInButton);
          panel.add(managerButton);
          panel.add(seeDash);
+         panel.add(seeManager);
          //4. Size the frame.
          frame.pack();
          frame.setContentPane(panel);
@@ -108,6 +114,19 @@ public class WelcomePage{
 			frame.dispose();
 			
 			CustomerDashboard.createDashboard("maggie");
+		}
+    	
+    }
+    
+    class ManListener implements ActionListener{
+
+		@Override
+		public void actionPerformed(ActionEvent arg0) {
+			
+			frame.setVisible(false);
+			frame.dispose();
+			
+			ManagerDashboard.createDashboard("maggie");
 		}
     	
     }

@@ -18,38 +18,35 @@ public class DepositPage {
 	static JFrame frame;
 	
 	static String user;
-	static String accountID;
+	static String account;
 	static int beginning_balance;
 	
 	static JTextField amount;
 	
 	
-	public static void createDepositPage(String username) {
+	public static void createDepositPage(String username, String accountID) {
 		user = username;
 		//find account ID
-		StringBuilder findAccountID = new StringBuilder("SELECT M.AccountID ")
-				.append("FROM Market_Account M ").append("WHERE ")
-				.append("M.username = ").append(user);
-
-		DbClient.getInstance().runQuery(new RetrievalQuery(findAccountID.toString()) {
-			@Override
-			public void onComplete(ResultSet result) {
-				try {
-					accountID = result.getString(1);
-				} catch (SQLException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-		});
+		account = accountID;
 		
-		StringBuilder findBalance = new StringBuilder("SELECT M.Balance")
+		
+		StringBuilder findBalance = new StringBuilder("SELECT M.Balance ")
 				.append("FROM Market_Account M ").append("WHERE ")
-				.append("M.username = ").append(user);
+				.append("M.username = ").append("'").append(user)
+				.append("'");
 
 		DbClient.getInstance().runQuery(new RetrievalQuery(findBalance.toString()) {
 			@Override
 			public void onComplete(ResultSet result) {
+				try {
+					if(!result.next()) {
+						return;
+					}
+				} catch (SQLException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				
 				try {
 					beginning_balance = result.getInt(1);
 				} catch (SQLException e) {
@@ -84,6 +81,9 @@ public class DepositPage {
 		
 		frame.setContentPane(panel);
 		frame.pack();
+		
+		
+		
 		frame.setVisible(true);
 	}
 	
@@ -98,20 +98,21 @@ public class DepositPage {
 
 			StringBuilder depositString = new StringBuilder("UPDATE Market_Account ")
 					.append("SET balance = ").append(set_amount)
-					.append("WHERE username =  ").append(user);
+					.append(" WHERE username =  ").append("'").append(user)
+					.append("'");
 
 			DbClient.getInstance().runQuery(new UpdateQuery(depositString.toString()));
 			
 			//automatically generate deposit id
-			int deposit_id = (int) (Math.random()* (3000));
-			Date date = new Date(2017, 06, 07);
+			int deposit_id = (int) (Math.random()* (30000));
+			Date date = new Date(1950, 06, 07);
 			
 			//add to deposit table
 			StringBuilder createDepositRow = new StringBuilder("INSERT INTO Deposit ")
 					.append("(DepositID, AccountID, Username, Value, Date) ")
-					.append("VALUES ( ").append(deposit_id).append(", ")
-					.append(accountID).append(", ").append(user).append(", ")
-					.append(amount).append(", ").append(date).append(")");
+					.append("VALUES ( ").append("'").append(deposit_id).append("'").append(", ")
+					.append("'").append(account).append("'").append(", ").append("'").append(user).append("'").append(", ")
+					.append(deposit_amount).append(", ").append(date).append(")");
 			DbClient.getInstance().runQuery(new UpdateQuery(createDepositRow.toString()));
 			
 			
@@ -148,7 +149,7 @@ public class DepositPage {
 			StringBuilder createDepositRow = new StringBuilder("INSERT INTO Withdraw ")
 					.append("(DepositID, AccountID, Username, Value, Date) ")
 					.append("VALUES ( ").append(withdraw_id).append(", ")
-					.append(accountID).append(", ").append(user).append(", ")
+					.append(account).append(", ").append(user).append(", ")
 					.append(amount).append(", ").append(date).append(")");
 			DbClient.getInstance().runQuery(new UpdateQuery(createDepositRow.toString()));
 			

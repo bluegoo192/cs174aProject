@@ -8,6 +8,8 @@ import java.sql.Statement;
  */
 public abstract class RetrievalQuery extends DbQuery {
 
+	protected String display_string;
+	
     public RetrievalQuery(String query) {
         super(query);
     }
