@@ -104,7 +104,11 @@ public class LogInPage {
 			frame.setVisible(false);
 			frame.dispose();
 			
-			
+			if(isManager) {
+				//open manager dashboard
+			}else {
+				//open user dashboard
+			}
 			
 			
 		}

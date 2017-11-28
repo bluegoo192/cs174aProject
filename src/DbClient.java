@@ -21,7 +21,7 @@ public class DbClient {
 	private boolean isRunning = false;
 
 	// Connection setup
-	static final String JDBC_DRIVER = "com.mysql.cj.jdbc.Driver";
+	static final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
 	static final String DB_URL_ARTHUR = "jdbc:mysql://cs174a.engr.ucsb.edu:3306/silversteinDB?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC";
 	static final String USER_ARTHUR = "silverstein";
 	static final String PASS_ARTHUR = "954";

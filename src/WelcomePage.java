@@ -42,8 +42,14 @@ public class WelcomePage{
          managerButton.addActionListener(wel.new ManagerListener());
          managerButton.setPreferredSize(button_size);
          
+         JButton seeDash = new JButton("Test Dashboard");
+         seeDash.addActionListener(wel.new DashListener());
+         seeDash.setPreferredSize(button_size);
+         
          panel.add( signUpButton);
          panel.add( logInButton);
+         panel.add(managerButton);
+         panel.add(seeDash);
          //4. Size the frame.
          frame.pack();
          frame.setContentPane(panel);
@@ -89,6 +95,19 @@ public class WelcomePage{
 			frame.dispose();
 			
 			LogInPage.createLogInPage(true);
+		}
+    	
+    }
+    
+    class DashListener implements ActionListener{
+
+		@Override
+		public void actionPerformed(ActionEvent arg0) {
+			
+			frame.setVisible(false);
+			frame.dispose();
+			
+			CustomerDashboard.createDashboard("maggie");
 		}
     	
     }
