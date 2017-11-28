@@ -105,14 +105,14 @@ public class DepositPage {
 			
 			//automatically generate deposit id
 			int deposit_id = (int) (Math.random()* (30000));
-			Date date = new Date(1950, 06, 07);
+			String date = "2017-06-06";
 			
 			//add to deposit table
 			StringBuilder createDepositRow = new StringBuilder("INSERT INTO Deposit ")
 					.append("(DepositID, AccountID, Username, Value, Date) ")
 					.append("VALUES ( ").append("'").append(deposit_id).append("'").append(", ")
 					.append("'").append(account).append("'").append(", ").append("'").append(user).append("'").append(", ")
-					.append(deposit_amount).append(", ").append(date).append(")");
+					.append(deposit_amount).append(", ").append("'").append("2017-06-06").append("'").append(")");
 			DbClient.getInstance().runQuery(new UpdateQuery(createDepositRow.toString()));
 			
 			
@@ -144,14 +144,14 @@ public class DepositPage {
 			
 			//automatically generate deposit id
 			int withdraw_id = (int) (Math.random()* (3000));
-			Date date = new Date(2017, 06, 07);
+			String date = "2017-06-06";
 			
 			//add to deposit table
 			StringBuilder createWithdrawRow = new StringBuilder("INSERT INTO Withdraw ")
 					.append("(WithdrawID, AccountID, Username, Value, Date) ")
 					.append("VALUES ( ").append("'").append(withdraw_id).append("'").append(", ")
 					.append("'").append(account).append("'").append(", ").append("'").append(user).append("'").append(", ")
-					.append(withdraw_amount).append(", ").append(date).append(")");
+					.append(withdraw_amount).append(", ").append("'").append(date).append("'").append(")");
 			DbClient.getInstance().runQuery(new UpdateQuery(createWithdrawRow.toString()));
 			
 			
