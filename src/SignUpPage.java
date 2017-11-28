@@ -1,3 +1,6 @@
+import Database.DbClient;
+import Database.DbQuery;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
