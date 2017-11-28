@@ -137,7 +137,8 @@ public class DepositPage {
 
 			StringBuilder depositString = new StringBuilder("UPDATE Market_Account ")
 					.append("SET balance = ").append(set_amount)
-					.append("WHERE username =  ").append(user);
+					.append(" WHERE username =  ").append("'").append(user)
+					.append("'");
 
 			DbClient.getInstance().runQuery(new UpdateQuery(depositString.toString()));
 			
@@ -146,12 +147,12 @@ public class DepositPage {
 			Date date = new Date(2017, 06, 07);
 			
 			//add to deposit table
-			StringBuilder createDepositRow = new StringBuilder("INSERT INTO Withdraw ")
-					.append("(DepositID, AccountID, Username, Value, Date) ")
-					.append("VALUES ( ").append(withdraw_id).append(", ")
-					.append(account).append(", ").append(user).append(", ")
-					.append(amount).append(", ").append(date).append(")");
-			DbClient.getInstance().runQuery(new UpdateQuery(createDepositRow.toString()));
+			StringBuilder createWithdrawRow = new StringBuilder("INSERT INTO Withdraw ")
+					.append("(WithdrawID, AccountID, Username, Value, Date) ")
+					.append("VALUES ( ").append("'").append(withdraw_id).append("'").append(", ")
+					.append("'").append(account).append("'").append(", ").append("'").append(user).append("'").append(", ")
+					.append(withdraw_amount).append(", ").append(date).append(")");
+			DbClient.getInstance().runQuery(new UpdateQuery(createWithdrawRow.toString()));
 			
 			
 			
