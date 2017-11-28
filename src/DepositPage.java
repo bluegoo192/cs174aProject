@@ -1,5 +1,7 @@
 import Database.DbClient;
 import Database.DbQuery;
+import Database.RetrievalQuery;
+import Database.UpdateQuery;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -29,7 +31,7 @@ public class DepositPage {
 				.append("FROM Market_Account M ").append("WHERE ")
 				.append("M.username = ").append(user);
 
-		DbClient.getInstance().runQuery(new DbQuery(findAccountID.toString()) {
+		DbClient.getInstance().runQuery(new RetrievalQuery(findAccountID.toString()) {
 			@Override
 			public void onComplete(ResultSet result) {
 				try {
@@ -45,7 +47,7 @@ public class DepositPage {
 				.append("FROM Market_Account M ").append("WHERE ")
 				.append("M.username = ").append(user);
 
-		DbClient.getInstance().runQuery(new DbQuery(findBalance.toString()) {
+		DbClient.getInstance().runQuery(new RetrievalQuery(findBalance.toString()) {
 			@Override
 			public void onComplete(ResultSet result) {
 				try {
@@ -98,12 +100,7 @@ public class DepositPage {
 					.append("SET balance = ").append(set_amount)
 					.append("WHERE username =  ").append(user);
 
-			DbClient.getInstance().runQuery(new DbQuery(depositString.toString()) {
-				@Override
-				public void onComplete(ResultSet result) {
-					
-				}
-			});
+			DbClient.getInstance().runQuery(new UpdateQuery(depositString.toString()));
 			
 			//automatically generate deposit id
 			int deposit_id = (int) (Math.random()* (3000));
@@ -115,12 +112,7 @@ public class DepositPage {
 					.append("VALUES ( ").append(deposit_id).append(", ")
 					.append(accountID).append(", ").append(user).append(", ")
 					.append(amount).append(", ").append(date).append(")");
-			DbClient.getInstance().runQuery(new DbQuery(createDepositRow.toString()) {
-				@Override
-				public void onComplete(ResultSet result) {
-					
-				}
-			});
+			DbClient.getInstance().runQuery(new UpdateQuery(createDepositRow.toString()));
 			
 			
 			
@@ -146,12 +138,7 @@ public class DepositPage {
 					.append("SET balance = ").append(set_amount)
 					.append("WHERE username =  ").append(user);
 
-			DbClient.getInstance().runQuery(new DbQuery(depositString.toString()) {
-				@Override
-				public void onComplete(ResultSet result) {
-					
-				}
-			});
+			DbClient.getInstance().runQuery(new UpdateQuery(depositString.toString()));
 			
 			//automatically generate deposit id
 			int withdraw_id = (int) (Math.random()* (3000));
@@ -163,12 +150,7 @@ public class DepositPage {
 					.append("VALUES ( ").append(withdraw_id).append(", ")
 					.append(accountID).append(", ").append(user).append(", ")
 					.append(amount).append(", ").append(date).append(")");
-			DbClient.getInstance().runQuery(new DbQuery(createDepositRow.toString()) {
-				@Override
-				public void onComplete(ResultSet result) {
-					
-				}
-			});
+			DbClient.getInstance().runQuery(new UpdateQuery(createDepositRow.toString()));
 			
 			
 			

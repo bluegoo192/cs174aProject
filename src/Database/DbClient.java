@@ -61,30 +61,13 @@ public class DbClient {
 		}
 		while (!queryQueue.isEmpty()) {
 			currentQuery = queryQueue.poll();
-			try {
-				if (currentQuery.getQuery().startsWith("SELECT")) { // TODO: make this less smelly
-					ResultSet result = statement.executeQuery(currentQuery.getQuery());
-					currentQuery.onComplete(result);
-				} else {
-					int result = statement.executeUpdate(currentQuery.getQuery());
-				}
-			} catch (Exception e) {
-				System.out.println("Failed to execute query: "+currentQuery.getQuery());
-				if (currentQuery.onError(e)) return;
-			}
-
-
+			currentQuery.execute(statement);
 		}
 	}
 
 	private void onConnected() {
 		for (String query : DATABASE_INIT_QUERIES) {
-			runQuery(new DbQuery(query) {
-				@Override
-				public void onComplete(ResultSet result) {
-
-				}
-			});
+			runQuery(new UpdateQuery(query));
 		}
 		run();
 	}
@@ -142,12 +125,7 @@ public class DbClient {
 				.append(email).append(",")
 				.append(taxId).append(",")
 				.append(phone).append(",");
-		runQuery(new DbQuery(addEntry.toString()) {
-			@Override
-			public void onComplete(ResultSet result) {
-				System.out.println("Added "+username+" successfully.");
-			}
-		});
+		runQuery(new UpdateQuery(addEntry.toString()));
 	}
 
 	// Keep this section at the end of the file so this class is easier to read

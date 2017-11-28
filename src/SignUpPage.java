@@ -1,5 +1,6 @@
 import Database.DbClient;
 import Database.DbQuery;
+import Database.UpdateQuery;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -113,9 +114,9 @@ public class SignUpPage {
 					.append(phone_number.getText()).append(",")
 					.append(password.getText()).append(",");
 
-			DbClient.getInstance().runQuery(new DbQuery(addEntry.toString()) {
+			DbClient.getInstance().runQuery(new UpdateQuery(addEntry.toString()) {
 				@Override
-				public void onComplete(ResultSet result) {
+				public void onComplete(int result) {
 					System.out.println("Added "+username+" successfully.");
 				}
 			});

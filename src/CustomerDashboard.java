@@ -1,5 +1,6 @@
 import Database.DbClient;
 import Database.DbQuery;
+import Database.RetrievalQuery;
 
 import java.awt.Dimension;
 import java.awt.GridLayout;
@@ -105,7 +106,7 @@ public class CustomerDashboard{
 			StringBuilder addEntry = new StringBuilder("SELECT M.balance ")
 					.append("FROM Market_Account M ")
 					.append("WHERE M.username = ").append(user);
-			DbClient.getInstance().runQuery(new DbQuery(addEntry.toString()) {
+			DbClient.getInstance().runQuery(new RetrievalQuery(addEntry.toString()) {
 				@Override
 				public void onComplete(ResultSet result) {
 					String balance = "";

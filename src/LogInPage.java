@@ -1,5 +1,6 @@
 import Database.DbClient;
 import Database.DbQuery;
+import Database.RetrievalQuery;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -64,7 +65,7 @@ public class LogInPage {
 						.append("FROM Manager ")
 						.append("WHERE M.username = ").append(username.getText())
 						.append(" AND M.password = ").append(password.getText());
-				DbClient.getInstance().runQuery(new DbQuery(checkManagerList.toString()) {
+				DbClient.getInstance().runQuery(new RetrievalQuery(checkManagerList.toString()) {
 					@Override
 					public void onComplete(ResultSet result) {
 						try {
@@ -85,7 +86,7 @@ public class LogInPage {
 						.append("FROM CUSTOMERS C ")
 						.append("WHERE C.username = ").append(username.getText())
 						.append(" AND C.password = ").append(password.getText());
-				DbClient.getInstance().runQuery(new DbQuery(checkManagerList.toString()) {
+				DbClient.getInstance().runQuery(new RetrievalQuery(checkManagerList.toString()) {
 					@Override
 					public void onComplete(ResultSet result){
 						try {
