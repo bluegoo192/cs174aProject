@@ -234,7 +234,7 @@ public class DbClient {
 					"	Commission REAL," +
 					"	FOREIGN KEY (stock_symbol) REFERENCES Actor_Stock(stock_symbol) ON UPDATE CASCADE," +
 					"	FOREIGN KEY (MarketID) REFERENCES Market_Account(AccountID), " +
-					"	FOREIGN KEY (StockID) REFERENCES Stock_Account(AccountID)," +
+					"	FOREIGN KEY (StockID) REFERENCES stock_account(AccountID)," +
 					"	PRIMARY KEY(BuyID)" +
 					")",
 			"CREATE TABLE IF NOT EXISTS Sell_Stock(" +
@@ -247,7 +247,7 @@ public class DbClient {
 					"	OriginalBuyingPrice REAL," +
 					"	FOREIGN KEY (stock_symbol) REFERENCES Actor_Stock(stock_symbol) ON DELETE CASCADE ON UPDATE CASCADE," +
 					"	FOREIGN KEY (MarketID) REFERENCES Market_Account(AccountID)," +
-					"	FOREIGN KEY (StockID) REFERENCES Stock_Account(AccountID)," +
+					"	FOREIGN KEY (StockID) REFERENCES stock_account(AccountID)," +
 					"	PRIMARY KEY(SellID)" +
 					")"
 	};
