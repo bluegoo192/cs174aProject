@@ -58,6 +58,7 @@ public class DbClient {
 	}
 
 	private void onConnected() {
+		createTables(connection);
 		run();
 	}
 
