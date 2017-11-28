@@ -38,7 +38,7 @@ public class DbClient {
 	}
 
 	public void run() {
-		if (isRunning) return; // We can call run() whenever we want with minimal overhead
+		if (isRunning || !connected) return; // We can call run() whenever we want with minimal overhead
 		isRunning = true;
 		new Thread(new QueryRunner()).start(); // Run all queued queries in a background thread
 	}
