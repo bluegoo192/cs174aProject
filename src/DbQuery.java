@@ -15,4 +15,14 @@ public abstract class DbQuery {
     }
 
     public abstract void onComplete(ResultSet result);
+
+    /**
+     *
+     * @param e Error object
+     * @return Whether or not to retry
+     */
+    public boolean onError(Exception e) {
+        e.printStackTrace();
+        return true;
+    }
 }

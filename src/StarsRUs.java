@@ -12,7 +12,7 @@ public class StarsRUs {
 
     public static void main(String[] args) {
        
-    		WelcomePage.createFrame();
+    		//WelcomePage.createFrame();
         DbClient.getInstance();
         //5. Show it.
         
