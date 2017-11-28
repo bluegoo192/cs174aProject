@@ -21,7 +21,7 @@ public class DbClient {
 	private boolean isRunning = false;
 
 	// Connection setup
-	static final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
+	static final String JDBC_DRIVER = "com.mysql.cj.jdbc.Driver";
 	static final String DB_URL_ARTHUR = "jdbc:mysql://cs174a.engr.ucsb.edu:3306/silversteinDB?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC";
 	static final String USER_ARTHUR = "silverstein";
 	static final String PASS_ARTHUR = "954";
@@ -220,34 +220,34 @@ public class DbClient {
 					"	MovieID CHAR(20) NOT NULL," +
 					"	Role CHAR(20)," +
 					"	Total_Value REAL," +
-					"	FOREIGN KEY(stock_symbol) REFERENCES Actor_Stock(stock_symbol) ON DELETE SET NULL ON UPDATE CASCADE," +
+					"	FOREIGN KEY(stock_symbol) REFERENCES Actor_Stock(stock_symbol) ON UPDATE CASCADE," +
 					"	FOREIGN KEY(MovieID) REFERENCES Movie(MovieID) ON DELETE CASCADE ON UPDATE CASCADE," +
 					"	PRIMARY KEY(stock_symbol, MovieID)" +
 					")",
 			"CREATE TABLE IF NOT EXISTS Buy_Stock(" +
 					"	BuyID CHAR(20)," +
 					"	NumShares INT," +
-					"	StockSymbol CHAR(3) NOT NULL," +
+					"	stock_symbol CHAR(3) NOT NULL," +
 					"	MarketID CHAR(20) NOT NULL," +
 					"	StockID CHAR(20) NOT NULL," +
 					"	Date DATE," +
 					"	Commission REAL," +
-					"	FOREIGN KEY StockSymbol REFERENCES Actor_Stock(StockSymbol)  ON DELETE CASCADE ON UPDATE CASCADE," +
-					"	FOREIGN KEY MarketID REFERENCES Market_Account(AccountID) ON DELETE SET NULL, " +
-					"	FOREIGN KEY StockID REFERENCES Stock_Account(AccountID) ON DELETE SET NULL," +
+					"	FOREIGN KEY (stock_symbol) REFERENCES Actor_Stock(stock_symbol) ON UPDATE CASCADE," +
+					"	FOREIGN KEY (MarketID) REFERENCES Market_Account(AccountID), " +
+					"	FOREIGN KEY (StockID) REFERENCES Stock_Account(AccountID)," +
 					"	PRIMARY KEY(BuyID)" +
 					")",
 			"CREATE TABLE IF NOT EXISTS Sell_Stock(" +
 					"	SellID CHAR(20)," +
 					"	NumShares INT," +
-					"	StockSymbol CHAR(3) NOT NULL," +
+					"	stock_symbol CHAR(3) NOT NULL," +
 					"	MarketID CHAR(20) NOT NULL," +
 					"	StockID CHAR(20) NOT NULL," +
 					"	Date DATE," +
 					"	OriginalBuyingPrice REAL," +
-					"	FOREIGN KEY StockSymbol REFERENCES Actor_Stock(StockSymbol) ON DELETE CASCADE ON UPDATE CASCADE," +
-					"	FOREIGN KEY MarketID REFERENCES Market_Account(AccountID) ON DELETE SET NULL," +
-					"	FOREIGN KEY StockID REFERENCES Stock_Account(AccountID) ON DELETE SET NULL," +
+					"	FOREIGN KEY (stock_symbol) REFERENCES Actor_Stock(stock_symbol) ON DELETE CASCADE ON UPDATE CASCADE," +
+					"	FOREIGN KEY (MarketID) REFERENCES Market_Account(AccountID)," +
+					"	FOREIGN KEY (StockID) REFERENCES Stock_Account(AccountID)," +
 					"	PRIMARY KEY(SellID)" +
 					")"
 	};
