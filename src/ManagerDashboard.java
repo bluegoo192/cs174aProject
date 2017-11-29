@@ -1,6 +1,7 @@
 import Database.DbClient;
 import Database.DbQuery;
 import Database.RetrievalQuery;
+import Database.UpdateQuery;
 
 import java.awt.Dimension;
 import java.awt.GridLayout;
@@ -217,6 +218,47 @@ public class ManagerDashboard{
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
 			// TODO Auto-generated method stub
+			
+			int reply = JOptionPane.showConfirmDialog(null, "Are you sure? (Clicking yes will irretrivalbly delete all of the recorded transactions)", "Confirm Deletion", JOptionPane.YES_NO_OPTION);
+		    if (reply == JOptionPane.NO_OPTION)
+		    {
+		      return;
+		    }
+			
+			//delete everything in buy stock
+			StringBuilder delete_stock_buys = new StringBuilder("TRUNCATE TABLE Buy_Stock");
+			DbClient.getInstance().runQuery(new UpdateQuery(delete_stock_buys.toString()) {
+				@Override
+				public void onComplete(int numRowsAffected) {
+					System.out.println("Buy Table deleted");
+				}
+			});
+			
+			StringBuilder delete_stock_sells = new StringBuilder("TRUNCATE TABLE Sell_Stock");
+			DbClient.getInstance().runQuery(new UpdateQuery(delete_stock_sells.toString()) {
+				@Override
+				public void onComplete(int numRowsAffected) {
+					System.out.println("Sell Table deleted");
+				}
+			});
+			
+			StringBuilder delete_deposit = new StringBuilder("TRUNCATE TABLE Deposit");
+			DbClient.getInstance().runQuery(new UpdateQuery(delete_deposit.toString()) {
+				@Override
+				public void onComplete(int numRowsAffected) {
+					System.out.println("Deposit Table deleted");
+				}
+			});
+			
+			StringBuilder delete_withdraw = new StringBuilder("TRUNCATE TABLE Withdraw");
+			DbClient.getInstance().runQuery(new UpdateQuery(delete_withdraw.toString()) {
+				@Override
+				public void onComplete(int numRowsAffected) {
+					System.out.println("Withdraw Table deleted");
+				}
+			});
+			
+			
 			
 		}
 		
