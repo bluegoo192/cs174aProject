@@ -142,6 +142,8 @@ public class DbClient {
 					"	AccountID CHAR(20)," +
 					"	Balance REAL CHECK (Balance >= 0)," +
 					"	Username CHAR(20) NOT NULL,\n" +
+					"	avg_daily_balance REAL," +
+					"	last_changed DATE," +
 					"	FOREIGN KEY(username) REFERENCES Customers(username)" +
 					"ON DELETE CASCADE ON UPDATE CASCADE," +
 					"	PRIMARY KEY (AccountID) )",
