@@ -87,7 +87,7 @@ public class DepositPage {
 		frame.setVisible(true);
 	}
 	
-	class DepositListener implements ActionListener{
+	private class DepositListener implements ActionListener{
 
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
@@ -126,7 +126,7 @@ public class DepositPage {
 		
 	}
 	
-	class WithdrawListener implements ActionListener{
+	private class WithdrawListener implements ActionListener{
 
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
@@ -134,6 +134,14 @@ public class DepositPage {
 			//update user market account
 			int withdraw_amount = Integer.parseInt(amount.getText());
 			int set_amount = beginning_balance-withdraw_amount;
+			
+			if(set_amount <0) {
+				JOptionPane.showMessageDialog(null, "Cannot have balance below $0", "Error with Deposit/Withdraw", 0);
+				frame.setVisible(false);
+				frame.dispose();
+				CustomerDashboard.createDashboard(user);
+				return;
+			}
 
 			StringBuilder depositString = new StringBuilder("UPDATE Market_Account ")
 					.append("SET balance = ").append(set_amount)

@@ -77,7 +77,7 @@ public class CustomerDashboard{
          return frame;
     }
 	
-	class DepositListener implements ActionListener{
+	private class DepositListener implements ActionListener{
 
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
@@ -118,7 +118,6 @@ public class CustomerDashboard{
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			System.out.println("account id IS " + accountID);
 			
 			if(accountID == "") {
 				JOptionPane.showMessageDialog(null, "no accounts shown for given username", "Error with Deposit/Withdraw", 0);
@@ -127,7 +126,6 @@ public class CustomerDashboard{
 			
 			frame.setVisible(false);
 			frame.dispose();
-			accountID = "12356";
 			
 			DepositPage.createDepositPage(user, accountID);
 		}
@@ -135,7 +133,7 @@ public class CustomerDashboard{
 	}
 
 	
-	class BuyListener implements ActionListener{
+	private class BuyListener implements ActionListener{
 
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
@@ -151,7 +149,7 @@ public class CustomerDashboard{
 	}
 
 	
-	class BalanceListener implements ActionListener{
+	private class BalanceListener implements ActionListener{
 
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
@@ -193,7 +191,7 @@ public class CustomerDashboard{
 		
 	}
 	
-	class TransactionListener implements ActionListener{
+	private class TransactionListener implements ActionListener{
 
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
@@ -203,7 +201,7 @@ public class CustomerDashboard{
 		
 	}
 	
-	class Go1Listener implements ActionListener{
+	private class Go1Listener implements ActionListener{
 
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
@@ -254,7 +252,7 @@ public class CustomerDashboard{
 		
 	}
 	
-	class Go2Listener implements ActionListener{
+	private class Go2Listener implements ActionListener{
 
 		@Override
 		public void actionPerformed(ActionEvent arg0) {

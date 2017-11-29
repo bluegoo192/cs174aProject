@@ -72,7 +72,7 @@ public class ManagerDashboard{
          return frame;
     }
 	
-	class InterestListener implements ActionListener{
+	private class InterestListener implements ActionListener{
 
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
@@ -83,7 +83,7 @@ public class ManagerDashboard{
 		}
 		
 	}
-	class StatementListener implements ActionListener{
+	private class StatementListener implements ActionListener{
 
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
@@ -92,7 +92,7 @@ public class ManagerDashboard{
 		}
 		
 	}
-	class ActivesListener implements ActionListener{
+	private class ActivesListener implements ActionListener{
 
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
@@ -102,7 +102,7 @@ public class ManagerDashboard{
 		
 	}
 	
-	class DTERListener implements ActionListener{
+	private class DTERListener implements ActionListener{
 
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
@@ -111,7 +111,7 @@ public class ManagerDashboard{
 		}
 		
 	}
-	class Go1Listener implements ActionListener{
+	private class Go1Listener implements ActionListener{
 
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
@@ -213,7 +213,7 @@ public class ManagerDashboard{
 		}
 		
 	}
-	class DeleteListener implements ActionListener{
+	private class DeleteListener implements ActionListener{
 
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
