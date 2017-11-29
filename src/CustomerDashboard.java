@@ -83,7 +83,7 @@ public class CustomerDashboard{
 		public void actionPerformed(ActionEvent arg0) {
 			//go to deposit/withdraw page
 			
-			/*StringBuilder findAccountID = new StringBuilder("SELECT M.AccountID ")
+			StringBuilder findAccountID = new StringBuilder("SELECT M.AccountID ")
 					.append("FROM Market_Account M ").append("WHERE ")
 					.append("M.username = ").append("'").append(user)
 					.append("'");
@@ -124,7 +124,7 @@ public class CustomerDashboard{
 				JOptionPane.showMessageDialog(null, "no accounts shown for given username", "Error with Deposit/Withdraw", 0);
 				return;
 			}
-			*/
+			
 			frame.setVisible(false);
 			frame.dispose();
 			accountID = "12356";
@@ -207,8 +207,49 @@ public class CustomerDashboard{
 
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
-			//deposit page
+			//gets information about the entered stock
 			
+			//get stock
+			String stock = actor_stock.getText();
+			
+			
+			if(stock.length() != 3 || !stock.matches("[a-zA-Z]+")) {
+				JOptionPane.showMessageDialog(null, "Stock Symbol must be of size 3 and can only contain letters", "Stock Error", 0);
+				return;
+			}
+			
+			//stock is a 3 letter string
+			//query to find stock
+			
+			StringBuilder addEntry = new StringBuilder("SELECT A.current_stock_price ")
+					.append("FROM Actor_Stock A ")
+					.append("WHERE A.stock_symbol = ").append("'").append(CustomerDashboard.actor_stock.getText())
+					.append("'");
+			DbClient.getInstance().runQuery(new RetrievalQuery(addEntry.toString()) {
+				@Override
+				public void onComplete(ResultSet result) {
+					String price = "";
+					
+					try {
+						if(!result.next()) {
+							JOptionPane.showMessageDialog(null, "no stocks under this symbol", "Error in Stocks", 0);
+							return;
+						}
+					} catch (HeadlessException | SQLException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+					
+					try {
+						price = result.getString(1);
+					} catch (SQLException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					String display_string = "Current Stock Price is " + price + " dollars";
+					JOptionPane.showMessageDialog(null, display_string, "Show Current Price", 1);
+				}
+			});
 		}
 		
 	}
