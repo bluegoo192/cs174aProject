@@ -53,9 +53,10 @@ public class TransactionHistoryPage {
 		stock_account = CustomerDashboard.get_stock_account();
 		market_account = CustomerDashboard.get_market_account();
 		
-		
-		initialize_lists();
-		
+		initialize_all_lists();
+	}
+	
+	private static void build_frame() {
 		frame = new JFrame("Transaction History");
 		frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         Dimension d = new Dimension(800, 800);
@@ -129,9 +130,9 @@ public class TransactionHistoryPage {
 		
 		frame.setVisible(true);
 	}
+
 	
-	
-	private static void initialize_lists() {
+	private static void initialize_all_lists() {
 		//get deposit list
 		StringBuilder get_deposit_list = new StringBuilder("SELECT D.Value, D.Date")
 				.append(" FROM Deposit D ").append("WHERE D.AccountID = '")
@@ -145,6 +146,7 @@ public class TransactionHistoryPage {
 					if(!result.next()) {
 						deposit_list.add("NO DEPOSITS");
 						TransactionHistoryPage.set_deposits(deposit_list);
+						initialize_withdraw();
 						return;
 					}
 				}catch(SQLException e1) {
@@ -160,6 +162,7 @@ public class TransactionHistoryPage {
 						deposit_list.add(curr_result);
 					}while(result.next()) ;
 					TransactionHistoryPage.set_deposits(deposit_list);
+					initialize_withdraw();
 				} catch (SQLException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -167,40 +170,50 @@ public class TransactionHistoryPage {
 			}
 		});
 
+		
+	}
+	
+	
+	private static void initialize_withdraw() {
 		//get withdraw list
-		StringBuilder get_withdraw_list = new StringBuilder("SELECT W.Value, W.Date")
-				.append(" FROM Withdraw W ").append("WHERE W.AccountID = '")
-				.append(market_account).append("'").append(" AND W.Username = '" )
-				.append(user).append("'");
-		DbClient.getInstance().runQuery(new RetrievalQuery(get_withdraw_list.toString()) {
-			@Override
-			public void onComplete(ResultSet result) {
-				Vector<String> withdraw_list = new Vector<String>();
-				try {
-					if(!result.next()) {
-						withdraw_list.add("NO WITHDRAWS");
-						TransactionHistoryPage.set_withdraws(withdraw_list);
-						return;
-					}
-				}catch(SQLException e1) {
-					e1.printStackTrace();
-				}
+				StringBuilder get_withdraw_list = new StringBuilder("SELECT W.Value, W.Date")
+						.append(" FROM Withdraw W ").append("WHERE W.AccountID = '")
+						.append(market_account).append("'").append(" AND W.Username = '" )
+						.append(user).append("'");
+				DbClient.getInstance().runQuery(new RetrievalQuery(get_withdraw_list.toString()) {
+					@Override
+					public void onComplete(ResultSet result) {
+						Vector<String> withdraw_list = new Vector<String>();
+						try {
+							if(!result.next()) {
+								withdraw_list.add("NO WITHDRAWS");
+								TransactionHistoryPage.set_withdraws(withdraw_list);
+								initialize_buy();
+								return;
+							}
+						}catch(SQLException e1) {
+							e1.printStackTrace();
+						}
 
-				try {
-					 do{
-						String curr_result;
-						curr_result = result.getString(1);
-						curr_result += ", ";
-						curr_result += result.getString(2);
-						withdraw_list.add(curr_result);
-					}while(result.next());
-					TransactionHistoryPage.set_withdraws(withdraw_list);
-				} catch (SQLException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-		});
+						try {
+							 do{
+								String curr_result;
+								curr_result = result.getString(1);
+								curr_result += ", ";
+								curr_result += result.getString(2);
+								withdraw_list.add(curr_result);
+							}while(result.next());
+							TransactionHistoryPage.set_withdraws(withdraw_list);
+							initialize_buy();
+						} catch (SQLException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					}
+				});
+	}
+	
+	private static void initialize_buy() {
 		
 		//get buy list
 		StringBuilder get_buy_list = new StringBuilder("SELECT  B.stock_symbol, B.NumShares, B.Date")
@@ -214,6 +227,7 @@ public class TransactionHistoryPage {
 					if(!result.next()) {
 						buy_list.add("YOU HAVE NOT BOUGHT ANY STOCKS THIS MONTH");
 						TransactionHistoryPage.set_buy(buy_list);
+						initialize_sell();
 						return;
 					}
 				}catch(SQLException e1) {
@@ -229,6 +243,7 @@ public class TransactionHistoryPage {
 						buy_list.add(curr_result);
 					}while(result.next()) ;
 					TransactionHistoryPage.set_buy(buy_list);
+					initialize_sell();
 				} catch (SQLException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -236,46 +251,44 @@ public class TransactionHistoryPage {
 			}
 		});
 		
+	}
+	
+	private static void initialize_sell() {
 		//get sell list
-		StringBuilder get_sell_list = new StringBuilder("SELECT  S.stock_symbol, S.NumShares, S.Date")
-				.append(" FROM Sell_Stock S ").append("WHERE S.MarketID = '")
-				.append(market_account).append("'").append(" AND S.StockID = '").append(stock_account).append("'");
-		DbClient.getInstance().runQuery(new RetrievalQuery(get_buy_list.toString()) {
-			@Override
-			public void onComplete(ResultSet result) {
-				Vector<String> sell_list = new Vector<String>();
-				try {
-					if(!result.next()) {
-						sell_list.add("YOU HAVE NOT SOLD ANY STOCKS THIS MONTH");
-						TransactionHistoryPage.set_sell(sell_list);
-						return;
-					}
-				}catch(SQLException e1) {
-					e1.printStackTrace();
-				}
+				StringBuilder get_sell_list = new StringBuilder("SELECT  S.stock_symbol, S.NumShares, S.Date")
+						.append(" FROM Sell_Stock S ").append("WHERE S.MarketID = '")
+						.append(market_account).append("'").append(" AND S.StockID = '").append(stock_account).append("'");
+				DbClient.getInstance().runQuery(new RetrievalQuery(get_sell_list.toString()) {
+					@Override
+					public void onComplete(ResultSet result) {
+						Vector<String> sell_list = new Vector<String>();
+						try {
+							if(!result.next()) {
+								sell_list.add("YOU HAVE NOT SOLD ANY STOCKS THIS MONTH");
+								TransactionHistoryPage.set_sell(sell_list);
+								build_frame();
+								return;
+							}
+						}catch(SQLException e1) {
+							e1.printStackTrace();
+						}
 
-				try {
-					do {
-						String curr_result;
-						curr_result = result.getString(1);
-						curr_result += ", ";
-						curr_result += result.getString(2);
-						sell_list.add(curr_result);
-					}while(result.next());
-					TransactionHistoryPage.set_sell(sell_list);
-				} catch (SQLException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-		});
-		
-		try {
-			Thread.sleep(500);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+						try {
+							do {
+								String curr_result;
+								curr_result = result.getString(1);
+								curr_result += ", ";
+								curr_result += result.getString(2);
+								sell_list.add(curr_result);
+							}while(result.next());
+							TransactionHistoryPage.set_sell(sell_list);
+							build_frame();
+						} catch (SQLException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					}
+				});
 	}
 	
 	
