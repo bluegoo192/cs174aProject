@@ -10,6 +10,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -112,7 +114,27 @@ public class DemoActionsPage{
 
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
-			// TODO Auto-generated method stub
+			SimpleDateFormat dateformat= new SimpleDateFormat("yyyy-MM-dd");
+			//check date is legit
+			String new_date_string = new_date.getText();
+			System.out.println(new_date_string);
+			
+			try {
+				dateformat.parse(new_date_string);
+				//it will go to catch new_date_string is not a valid date; thus, anything after this can assume that it is a valid date
+				
+				StarsRUs.global_date = new_date_string;
+				
+				StringBuilder update_settings = new StringBuilder("UPDATE Settings SET Date = ")
+				.append(StarsRUs.global_date).append(" WHERE setting_id = 1");
+				DbClient.getInstance().runQuery(new UpdateQuery(update_settings.toString()) {});
+			}catch(Exception e){
+				JOptionPane.showMessageDialog(null, "INVALID DATE", "Error Message", 0);
+				return;
+			}
+		
+			
+			
 			
 		}
 		
