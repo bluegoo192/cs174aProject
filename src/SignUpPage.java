@@ -1,11 +1,13 @@
 import Database.DbClient;
 import Database.DbQuery;
+import Database.RetrievalQuery;
 import Database.UpdateQuery;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 
 import javax.swing.*;
 
@@ -27,6 +29,11 @@ public class SignUpPage {
     static JTextField phone_number;
     static JTextField email_address;
     static JTextField taxID;
+    
+   
+    public void update_settings(boolean market_account, boolean stock_account, boolean deposit, boolean withdraw) {
+    	
+    }
 	
 	public static void createSignUpPage() {
 		frame = new JFrame("SignUp");
@@ -89,43 +96,7 @@ public class SignUpPage {
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
 			
-			StringBuilder foreign_key_checks0 = new StringBuilder("SET FOREIGN_KEY_CHECKS=0");
-			DbClient.getInstance().runQuery(new UpdateQuery(foreign_key_checks0.toString()) {
-				@Override
-				public void onComplete(int result) {
-					System.out.println("changed foreign key constraints");
-				}
-			});
-			
-			StringBuilder truncate_customers = new StringBuilder("TRUNCATE TABLE Customers");
-			DbClient.getInstance().runQuery(new UpdateQuery(truncate_customers.toString()) {
-				@Override
-				public void onComplete(int result) {
-					System.out.println("Customers truncated");
-				}
-			});
-			StringBuilder truncate_market = new StringBuilder("TRUNCATE TABLE Market_Account");
-			DbClient.getInstance().runQuery(new UpdateQuery(truncate_market.toString()) {
-				@Override
-				public void onComplete(int result) {
-					System.out.println("Market truncated");
-				}
-			});
-			StringBuilder truncate_stock = new StringBuilder("TRUNCATE TABLE stock_account");
-			DbClient.getInstance().runQuery(new UpdateQuery(truncate_stock.toString()) {
-				@Override
-				public void onComplete(int result) {
-					System.out.println("stock truncated");
-				}
-			});
-			
-			StringBuilder foreign_key_checks1 = new StringBuilder("SET FOREIGN_KEY_CHECKS=1");
-			DbClient.getInstance().runQuery(new UpdateQuery(foreign_key_checks1.toString()) {
-				@Override
-				public void onComplete(int result) {
-					System.out.println("changed foreign key constraints");
-				}
-			});
+		
 			
 			// check that password and password confirm are the same
 			if(! password.getText().equals(password_confirm.getText())){
@@ -162,25 +133,42 @@ public class SignUpPage {
 				@Override
 				public void onComplete(int result) {
 					System.out.println("Added "+username+" successfully.");
+					addAccount();
 				}
 			});
-			String date = "2017-04-04";
-			int accountid = (int) (Math.random()*(30000));
-			String aID = Integer.toString(accountid);
+		
+		}
+		
+		
+		private void addAccount() {
 			
 			
+			String account_id = Integer.toString(StarsRUs.global_mark);
+			StarsRUs.global_mark += 1;
 			StringBuilder addMarketAccount = new StringBuilder("INSERT INTO Market_Account VALUES( ")
-					.append("'").append(aID).append("'").append(",").append("1000").append(",").append("'").append(username.getText()).append("'")
-					.append(",").append("1000").append(",").append("'").append(date).append("'")
+					.append("'").append(account_id).append("'").append(",").append("1000").append(",").append("'").append(username.getText()).append("'")
+					.append(",").append("1000").append(",").append("'").append(StarsRUs.global_date).append("'")
 					.append(")");
 			DbClient.getInstance().runQuery(new UpdateQuery(addMarketAccount.toString()) {
 				@Override
 				public void onComplete(int result) {
+					
 					System.out.println("Account created successfully");
 				}
 			});
 			
-
+			String deposit_id = Integer.toString(StarsRUs.global_deposit);
+			StarsRUs.global_deposit += 1;
+			//add to deposit table
+			StringBuilder add_initial_deposit = new StringBuilder("INSERT INTO Deposit VALUES (")
+					.append("'").append(account_id).append("','").append(deposit_id).append("','").append(username.getText()).append("',")
+					.append("1000").append(",'").append(StarsRUs.global_date).append("')");
+			DbClient.getInstance().runQuery(new UpdateQuery(add_initial_deposit.toString()) {
+				@Override
+				public void onComplete(int result) {
+					System.out.println("Initial Deposit created successfully");
+				}
+			});
 			
 			//go to new page
 			frame.setVisible(false);

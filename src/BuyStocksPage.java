@@ -28,8 +28,8 @@ public class BuyStocksPage {
 		if(stock_id.equals("")) {
 			//create stock account
 			//create new stock account
-			int stock_id = (int)(Math.random()* 30000);
-			String stock_id_string = Integer.toString(stock_id);
+			String stock_id_string = Integer.toString(StarsRUs.global_stock);
+			StarsRUs.global_stock += 1;
 			BuyStocksPage.set_stock_id(stock_id_string);
 			StringBuilder create_stock_account = new StringBuilder("INSERT INTO stock_account VALUES(")
 					.append("'").append(stock_id_string).append("'").append(",").append("0")

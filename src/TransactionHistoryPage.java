@@ -285,7 +285,6 @@ public class TransactionHistoryPage {
 		public void actionPerformed(ActionEvent arg0) {
 			frame.setVisible(false);
 			frame.dispose();
-			CustomerDashboard.createDashboard(user);
 		}
 		
 		

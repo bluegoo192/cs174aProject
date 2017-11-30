@@ -24,9 +24,9 @@ public class DbClient {
 
 	// Connection setup
 	static final String JDBC_DRIVER = "com.mysql.cj.jdbc.Driver";
-	static final String DB_URL_ARTHUR = "jdbc:mysql://cs174a.engr.ucsb.edu:3306/silversteinDB?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC";
-	static final String USER_ARTHUR = "silverstein";
-	static final String PASS_ARTHUR = "954";
+	public static final String DB_URL_ARTHUR = "jdbc:mysql://cs174a.engr.ucsb.edu:3306/silversteinDB?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC";
+	public static final String USER_ARTHUR = "silverstein";
+	public static final String PASS_ARTHUR = "954";
 	static final String DB_URL_MAGGIE = "jdbc:mysql://cs174a.engr.ucsb.edu:3066/mschmitDB";
 	static final String USER_MAGGIE = "mschmit";
 	static final String PASS_MAGGIE = "798";
@@ -263,6 +263,19 @@ public class DbClient {
 					"	FOREIGN KEY (MarketID) REFERENCES Market_Account(AccountID)," +
 					"	FOREIGN KEY (StockID) REFERENCES stock_account(AccountID)," +
 					"	PRIMARY KEY(SellID)" +
+					")",
+			"CREATE TABLE IF NOT EXISTS Settings("+
+					"	setting_id INTEGER," +
+					"	Date DATE," +
+					"	market_open BIT," +
+					"	curr_mark_account_id INTEGER," +
+					"	curr_stock_account_id INTEGER,"+
+					"	curr_deposit_id INTEGER,"+
+					"	curr_withdraw_id INTEGER, "+
+					"	PRIMARY KEY(setting_id)"+
 					")"
 	};
+	
+	//there is only one row in the settings table and it is identified by setting_id = 1
+	//market open is 1 if open and 0 if closed
 }

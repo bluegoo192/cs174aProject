@@ -254,9 +254,6 @@ public class CustomerDashboard{
 		public void actionPerformed(ActionEvent arg0) {
 			//deposit page
 			
-			frame.setVisible(false);
-			frame.dispose();
-			
 			TransactionHistoryPage.createHistoryPage();
 			
 		}
@@ -323,6 +320,8 @@ public class CustomerDashboard{
 		}
 		
 	}
+	
+	//get next accountID
     
    
     

@@ -104,15 +104,15 @@ public class DepositPage {
 			DbClient.getInstance().runQuery(new UpdateQuery(depositString.toString()));
 			
 			//automatically generate deposit id
-			int deposit_id = (int) (Math.random()* (30000));
-			String date = "2017-06-06";
+			String depID = Integer.toString(StarsRUs.global_deposit);
+			StarsRUs.global_deposit += 1;
 			
 			//add to deposit table
 			StringBuilder createDepositRow = new StringBuilder("INSERT INTO Deposit ")
 					.append("(DepositID, AccountID, Username, Value, Date) ")
-					.append("VALUES ( ").append("'").append(deposit_id).append("'").append(", ")
+					.append("VALUES ( ").append("'").append(depID).append("'").append(", ")
 					.append("'").append(account).append("'").append(", ").append("'").append(user).append("'").append(", ")
-					.append(deposit_amount).append(", ").append("'").append("2017-06-06").append("'").append(")");
+					.append(deposit_amount).append(", ").append("'").append(StarsRUs.global_date).append("'").append(")");
 			DbClient.getInstance().runQuery(new UpdateQuery(createDepositRow.toString()));
 			
 			
@@ -151,15 +151,15 @@ public class DepositPage {
 			DbClient.getInstance().runQuery(new UpdateQuery(depositString.toString()));
 			
 			//automatically generate deposit id
-			int withdraw_id = (int) (Math.random()* (3000));
-			String date = "2017-06-06";
+			String withdraw_id = Integer.toString(StarsRUs.global_withdraw);
+			StarsRUs.global_withdraw += 1;
 			
 			//add to deposit table
 			StringBuilder createWithdrawRow = new StringBuilder("INSERT INTO Withdraw ")
 					.append("(WithdrawID, AccountID, Username, Value, Date) ")
 					.append("VALUES ( ").append("'").append(withdraw_id).append("'").append(", ")
 					.append("'").append(account).append("'").append(", ").append("'").append(user).append("'").append(", ")
-					.append(withdraw_amount).append(", ").append("'").append(date).append("'").append(")");
+					.append(withdraw_amount).append(", ").append("'").append(StarsRUs.global_date).append("'").append(")");
 			DbClient.getInstance().runQuery(new UpdateQuery(createWithdrawRow.toString()));
 			
 			

@@ -14,6 +14,7 @@ import javax.swing.WindowConstants;
 public class WelcomePage{
 	
 	static JFrame frame;
+	
 
 	public static JFrame createFrame() {
     	 	 frame = new JFrame("Welcome to Stars R Us Stock Exchange System");
@@ -44,25 +45,21 @@ public class WelcomePage{
          managerButton.addActionListener(wel.new ManagerListener());
          managerButton.setPreferredSize(button_size);
          
-         //next two buttons will be deleted when the databases are set up and populated. 
-         JButton seeDash = new JButton("Test Dashboard");
-         seeDash.addActionListener(wel.new DashListener());
-         seeDash.setPreferredSize(button_size);
-         
-         JButton seeManager = new JButton("Test Manager");
-         seeManager.addActionListener(wel.new ManListener());
-         seeManager.setPreferredSize(button_size);
+         JButton demoActionsButton = new JButton("Demo Actions");
+         demoActionsButton.addActionListener(wel.new DemoListener());
+         demoActionsButton.setPreferredSize(button_size);
+
          
          panel.add( signUpButton);
          panel.add( logInButton);
          panel.add(managerButton);
-         panel.add(seeDash);
-         panel.add(seeManager);
+         panel.add(demoActionsButton);
          //4. Size the frame.
          frame.pack();
          frame.setContentPane(panel);
          
          frame.setVisible(true);
+         
          
          return frame;
     }
@@ -107,29 +104,18 @@ public class WelcomePage{
     	
     }
     
-    class DashListener implements ActionListener{
+    class DemoListener implements ActionListener{
 
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
-			
+			//Go to demo page
 			frame.setVisible(false);
 			frame.dispose();
 			
-			CustomerDashboard.createDashboard("maggie");
+			DemoActionsPage.createDemoPage();
+			
 		}
     	
-    }
-    
-    class ManListener implements ActionListener{
-
-		@Override
-		public void actionPerformed(ActionEvent arg0) {
-			
-			frame.setVisible(false);
-			frame.dispose();
-			
-			ManagerDashboard.createDashboard("maggie");
-		}
     	
     }
     

@@ -1,6 +1,7 @@
 import Database.DbClient;
 import Database.DbQuery;
 import Database.RetrievalQuery;
+import Database.UpdateQuery;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -21,6 +22,19 @@ public class LogInPage {
 	static String user = "";
 	
 	public static void createLogInPage(boolean manage) {
+		
+		//create stock to test stock stuff with
+		/*StringBuilder create_settings = new StringBuilder("INSERT INTO Settings VALUES(1, '2017-11-29', 1, 1, 1, 1)");
+		DbClient.getInstance().runQuery(new UpdateQuery(create_settings.toString()) {
+			@Override
+			public void onComplete(int result) {
+				System.out.println("Settings created successfully");
+			}
+		});
+		*/
+		
+
+		
 		isManager = manage;
 		
 		frame = new JFrame("Log In");
@@ -63,10 +77,10 @@ public class LogInPage {
 			//check if username and password are good
 			if(isManager) {
 				//check manager list
-				StringBuilder checkManagerList = new StringBuilder("SELECT C.username ")
-						.append("FROM Manager ")
-						.append("WHERE M.username = ").append(username.getText())
-						.append(" AND M.password = ").append(password.getText());
+				StringBuilder checkManagerList = new StringBuilder("SELECT M.ManagerID ")
+						.append("FROM Manager M ")
+						.append("WHERE M.ManagerID = ").append("'").append(username.getText()).append("'")
+						.append(" AND M.Password = ").append("'").append(password.getText()).append("'");
 				DbClient.getInstance().runQuery(new RetrievalQuery(checkManagerList.toString()) {
 					@Override
 					public void onComplete(ResultSet result) {
@@ -76,6 +90,7 @@ public class LogInPage {
 								JOptionPane.showMessageDialog(null, "No users match username/password set", "Error Message", 0);
 								return;
 							}
+							LogInPage.user = LogInPage.username.getText();
 						} catch (SQLException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
@@ -126,6 +141,7 @@ public class LogInPage {
 			
 			if(isManager) {
 				//open manager dashboard
+				ManagerDashboard.createDashboard(username.getText());
 			}else {
 				//open user dashboard
 				CustomerDashboard.createDashboard(username.getText());
