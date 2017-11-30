@@ -88,6 +88,31 @@ public class SignUpPage {
 
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
+			
+			StringBuilder foreign_key_checks0 = new StringBuilder("SET FOREIGN_KEY_CHECKS=0");
+			DbClient.getInstance().runQuery(new UpdateQuery(foreign_key_checks0.toString()) {
+				@Override
+				public void onComplete(int result) {
+					System.out.println("changed foreign key constraints");
+				}
+			});
+			
+			StringBuilder truncate_customers = new StringBuilder("TRUNCATE TABLE Customers");
+			DbClient.getInstance().runQuery(new UpdateQuery(truncate_customers.toString()) {
+				@Override
+				public void onComplete(int result) {
+					System.out.println("Customers truncated");
+				}
+			});
+			
+			StringBuilder foreign_key_checks1 = new StringBuilder("SET FOREIGN_KEY_CHECKS=1");
+			DbClient.getInstance().runQuery(new UpdateQuery(foreign_key_checks1.toString()) {
+				@Override
+				public void onComplete(int result) {
+					System.out.println("changed foreign key constraints");
+				}
+			});
+			
 			// check that password and password confirm are the same
 			if(! password.getText().equals(password_confirm.getText())){
 				JOptionPane.showMessageDialog(null, "PASSWORD AND PASSWORD CONFIRM DO NOT MATCH", "Error Message", 0);
@@ -99,20 +124,25 @@ public class SignUpPage {
 				return;
 			}
 			
-			//check that username is unique (SQL query here)
+			int reply = JOptionPane.showConfirmDialog(null, "Automatically create market account and deposit $1000? (must click yes to continue)", "Confirm Deletion", JOptionPane.YES_NO_OPTION);
+		    if (reply == JOptionPane.NO_OPTION)
+		    {
+		      return;
+		    }
 			
+			//check that username is unique (SQL query here)
 			
 			//generate taxID
 			
 			//after confirming validity of the entered information, create new account in sql
 			
-			StringBuilder addEntry = new StringBuilder("INSERT INTO CUSTOMERS VALUES (")
-					.append(username.getText()).append(",")
-					.append(state_list.getSelectedItem()).append(",")
-					.append(email_address.getText()).append(",")
-					.append(taxID.getText()).append(",")
-					.append(phone_number.getText()).append(",")
-					.append(password.getText()).append(",");
+			StringBuilder addEntry = new StringBuilder("INSERT INTO Customers VALUES (")
+					.append("'").append(username.getText()).append("'").append(",")
+					.append("'").append(state_list.getSelectedItem()).append("'").append(",")
+					.append("'").append(email_address.getText()).append("'").append(",")
+					.append("'").append(taxID.getText()).append("'").append(",")
+					.append("'").append(phone_number.getText()).append("'").append(",")
+					.append("'").append(password.getText()).append("'").append(")");
 
 			DbClient.getInstance().runQuery(new UpdateQuery(addEntry.toString()) {
 				@Override
@@ -120,12 +150,29 @@ public class SignUpPage {
 					System.out.println("Added "+username+" successfully.");
 				}
 			});
+			String date = "2017-04-04";
+			int accountid = (int) (Math.random()*(30000));
+			String aID = Integer.toString(accountid);
+			
+			
+			StringBuilder addMarketAccount = new StringBuilder("INSERT INTO Market_Account VALUES( ")
+					.append("'").append(aID).append("'").append(",").append("1000").append(",").append("'").append(username.getText()).append("'")
+					.append(",").append("1000").append(",").append("'").append(date).append("'")
+					.append(")");
+			DbClient.getInstance().runQuery(new UpdateQuery(addMarketAccount.toString()) {
+				@Override
+				public void onComplete(int result) {
+					System.out.println("Account created successfully");
+				}
+			});
+			
+
 			
 			//go to new page
 			frame.setVisible(false);
 			frame.dispose();
 			
-			
+			CustomerDashboard.createDashboard(username.getText());
 		}
 		
 	}

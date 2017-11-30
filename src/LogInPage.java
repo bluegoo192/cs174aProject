@@ -18,6 +18,8 @@ public class LogInPage {
 	static JTextField username;
 	static JPasswordField password;
 	
+	static String user = "";
+	
 	public static void createLogInPage(boolean manage) {
 		isManager = manage;
 		
@@ -83,9 +85,9 @@ public class LogInPage {
 			}else {
 				//check customers list
 				StringBuilder checkManagerList = new StringBuilder("SELECT C.username ")
-						.append("FROM CUSTOMERS C ")
-						.append("WHERE C.username = ").append(username.getText())
-						.append(" AND C.password = ").append(password.getText());
+						.append("FROM Customers C ")
+						.append("WHERE C.username = ").append("'").append(username.getText()).append("'")
+						.append(" AND C.password = ").append("'").append(password.getText()).append("'");
 				DbClient.getInstance().runQuery(new RetrievalQuery(checkManagerList.toString()) {
 					@Override
 					public void onComplete(ResultSet result){
@@ -95,14 +97,28 @@ public class LogInPage {
 								JOptionPane.showMessageDialog(null, "No managers match username/password set", "Error Message", 0);
 								return;
 							}
+							
+							//set user thing in LogInPage to username
+							LogInPage.user = LogInPage.username.getText();
 						} catch (SQLException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
+						
+						
 					}
 				});
 			}
+			try {
+				Thread.sleep(500);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			
+			if(user.equals("")) {
+				return;
+			}
 			
 			//go to new page
 			frame.setVisible(false);
@@ -112,6 +128,8 @@ public class LogInPage {
 				//open manager dashboard
 			}else {
 				//open user dashboard
+				CustomerDashboard.createDashboard(username.getText());
+				
 			}
 			
 			
