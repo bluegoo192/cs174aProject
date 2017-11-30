@@ -38,33 +38,28 @@ public class BuyStocksPage {
 				@Override
 				public void onComplete(int result) {
 					System.out.println("created stock account");
+					build_frame();
 				}
 			});
+		}else {
+			build_frame();
 		}
-		
-		
-		
-		frame = new JFrame("Buy/Sell Stocks");
-		frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+
+		//now that stock_id has the stock id, do something
+	}
+	
+	private static void build_frame() {
+		BuyStocksPage.frame = new JFrame("Buy/Sell Stocks");
+		BuyStocksPage.frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         Dimension d = new Dimension(800, 800);
       
-        frame.getContentPane().setPreferredSize(d);
+        BuyStocksPage.frame.getContentPane().setPreferredSize(d);
         JPanel panel = new JPanel(new GridLayout(4,4,4,4));
        
 		
-		frame.setContentPane(panel);
-		frame.pack();
-		frame.setVisible(true);
-		
-		
-		try {
-			Thread.sleep(500);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		//now that stock_id has the stock id, do something
+        BuyStocksPage.frame.setContentPane(panel);
+        BuyStocksPage.frame.pack();
+        BuyStocksPage.frame.setVisible(true);
 	}
 	
 	static void set_stock_id(String input) {
