@@ -1,8 +1,8 @@
 package Database;
 
 import java.sql.*;
-import java.util.LinkedList;
-import java.util.Queue;
+import java.sql.Date;
+import java.util.*;
 
 
 //import java.sql.CommunicationsException;
@@ -21,6 +21,8 @@ public class DbClient {
 	boolean connected = false;
 	private Queue<DbQuery> queryQueue = new LinkedList<>();
 	private boolean isRunning = false;
+
+	public java.sql.Date TODAY = new Date(System.currentTimeMillis());
 
 	// Connection setup
 	static final String JDBC_DRIVER = "com.mysql.cj.jdbc.Driver";
@@ -122,17 +124,34 @@ public class DbClient {
 		}
 	}
 
-//	/**
-//	 * Directly adjust a market_account's balance.  Use for deposits and withdrawals
-//	 * @param accountID: id of the market account
-//	 * @param change: quantity to adjust by.  Negative for withdrawal, positive for deposit
-//	 */
+	/**
+	 * Directly adjust a market_account's balance.  Use for deposits and withdrawals
+	 //* @param accountID: id of the market account
+	 //* @param change: quantity to adjust by.  Negative for withdrawal, positive for deposit
+	 */
 //	public void adjustBalance(String accountID, long change) {
 //		StringBuilder adjustQuery = new StringBuilder("UPDATE Market_Account SET ")
 //				.append("Balance = Balance + ").append(change).append(", ")
 //				.append("last_changed = ").append()
 //				.append("WHERE AccountID = ").append(accountID).append(" ");
 //		UpdateQuery adjust = new UpdateQuery(adjustQuery.toString());
+//		try {
+//			Connection connection = DbClient.getInstance().getConnection();
+//
+//			PreparedStatement statement = connection.prepareStatement(
+//					"UPDATE Market_Account " +
+//							"SET Balance = Balance + ?, " +
+//							"last_changed = ?, " +
+//							"avg_daily_balance = avg_daily_balance + (Balance *)? " +
+//							"WHERE AccountID = ?");
+//
+//			statement.setLong(1, change);
+//			statement.setDate(2, TODAY);
+//			//statement.setLong(3, );
+//			//pstmt.executeUpdate();
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
 //	}
 
 	public void createEntryCustomers(String username, String password, String taxId, String state, String phone, String email) {

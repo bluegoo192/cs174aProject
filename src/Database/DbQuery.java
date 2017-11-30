@@ -37,10 +37,20 @@ public abstract class DbQuery {
         } else {
             executePreparedStatement();
         }
+        try {
+            if (queryStatement != null) queryStatement.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public final void execute() {
         executePreparedStatement();
+        try {
+            if (queryStatement != null) queryStatement.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     protected abstract void executeStringQuery(Statement statement);
