@@ -17,17 +17,17 @@ public class DepositPage {
 
 	static JFrame frame;
 	
-	static String user;
-	static String account;
+	private static String user;
+	private static String account;
 	static int beginning_balance;
 	
 	static JTextField amount;
 	
 	
-	public static void createDepositPage(String username, String accountID) {
-		user = username;
+	public static void createDepositPage() {
+		user = CustomerDashboard.getUser();
 		//find account ID
-		account = accountID;
+		account = CustomerDashboard.get_market_account();
 		
 		
 		StringBuilder findBalance = new StringBuilder("SELECT M.Balance ")
