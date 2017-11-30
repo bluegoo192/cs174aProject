@@ -104,6 +104,20 @@ public class SignUpPage {
 					System.out.println("Customers truncated");
 				}
 			});
+			StringBuilder truncate_market = new StringBuilder("TRUNCATE TABLE Market_Account");
+			DbClient.getInstance().runQuery(new UpdateQuery(truncate_market.toString()) {
+				@Override
+				public void onComplete(int result) {
+					System.out.println("Market truncated");
+				}
+			});
+			StringBuilder truncate_stock = new StringBuilder("TRUNCATE TABLE stock_account");
+			DbClient.getInstance().runQuery(new UpdateQuery(truncate_stock.toString()) {
+				@Override
+				public void onComplete(int result) {
+					System.out.println("stock truncated");
+				}
+			});
 			
 			StringBuilder foreign_key_checks1 = new StringBuilder("SET FOREIGN_KEY_CHECKS=1");
 			DbClient.getInstance().runQuery(new UpdateQuery(foreign_key_checks1.toString()) {

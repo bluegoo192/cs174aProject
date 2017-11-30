@@ -27,8 +27,8 @@ public class WelcomePage{
          JLabel label1 = new JLabel("Welcome to Stars R Us Stock Exchange System");
          label1.setVerticalAlignment(JLabel.CENTER);
          label1.setHorizontalAlignment(JLabel.CENTER);
-         //frame.getContentPane().add(label1);
          panel.add(label1);
+         
          //create buttons
          Dimension button_size = new Dimension(20, 20);
          WelcomePage wel= new WelcomePage();

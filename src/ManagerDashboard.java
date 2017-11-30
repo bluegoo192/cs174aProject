@@ -9,13 +9,18 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Vector;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextField;
+import javax.swing.ListSelectionModel;
 import javax.swing.WindowConstants;
 
 
@@ -28,6 +33,16 @@ public class ManagerDashboard{
 	static String manager;
 	
 	static String print_string;
+	
+	private static JList market_list = new JList();
+	private static JList stock_list = new JList();
+	
+	public static void set_market(Vector<String> input) {
+		market_list = new JList(input);
+	}
+	public static void set_stock(Vector<String> input) {
+		stock_list = new JList(input);
+	}
 
 	public static JFrame createDashboard(String managerID) {
 		//username is the distinct name of the user logged in at the moment.
@@ -115,104 +130,160 @@ public class ManagerDashboard{
 	}
 	private class Go1Listener implements ActionListener{
 
+		JFrame frame1;
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
 			// List all accounts associated with a certain customer and their balances
 			String user = customer_report.getText();
+			System.out.println(user);
 			
-			print_string = "This customer's balances are: ";
-			
-			StringBuilder get_balances = new StringBuilder("SELECT M.balance ")
-					.append("FROM Market_Account M ")
-					.append("WHERE M.username = ").append("'").append(user)
-					.append("'");
-			DbClient.getInstance().runQuery(new RetrievalQuery(get_balances.toString()) {
+			//get market balance
+			StringBuilder market_balance = new StringBuilder("SELECT M.AccountID, M.Balance ")
+					.append("FROM Market_Account M ").append("WHERE M.Username = '")
+					.append(user).append("'");
+			//query and create JList
+			DbClient.getInstance().runQuery(new RetrievalQuery(market_balance.toString()) {
 				@Override
 				public void onComplete(ResultSet result) {
-					String balance = "";
-					String get_balances = "";
+					Vector<String> market_list = new Vector<String>();
 					try {
-						while(result.next()) {
-							String print_string = "";
-							balance = result.getString(1);
-							get_balances += balance;
-							get_balances += ", ";
-						}
-						if(get_balances.equals("")) {
-							System.out.println("no balances");
-							ManagerDashboard.print_string = "THERE ARE NO ACCOUNTS ASSOCIATED WITH THIS USERNAME";
+						if(!result.next()) {
+							market_list.add("NO MARKET ACCOUNTS");
+							ManagerDashboard.set_market(market_list);
 							return;
 						}
+					}catch(SQLException e1) {
+						e1.printStackTrace();
+					}
+
+					try {
+						do {
 						
-						display_string = print_string;
-						
-						ManagerDashboard.print_string += display_string;
+							String curr_result;
+							curr_result = "Market Account: ";
+							curr_result += result.getString(1);
+							curr_result += ", ";
+							curr_result += result.getString(2);
+							System.out.println(curr_result);
+							market_list.add(curr_result);
+						}while(result.next());
+						ManagerDashboard.set_market(market_list);
 					} catch (SQLException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
-					
+				}
+			});
+			
+			//get stock balance
+			StringBuilder stock_balance = new StringBuilder("SELECT S.AccountID, S.StockBalance ")
+					.append("FROM stock_account S ").append("WHERE S.Username = '")
+					.append(user).append("'");
+			//query and create JList
+			DbClient.getInstance().runQuery(new RetrievalQuery(stock_balance.toString()) {
+				@Override
+				public void onComplete(ResultSet result) {
+					Vector<String> stock_list = new Vector<String>();
+					try {
+						if(!result.next()) {
+							stock_list.add("NO STOCK ACCOUNTS");
+							ManagerDashboard.set_stock(stock_list);
+							return;
+						}
+					}catch(SQLException e1) {
+						e1.printStackTrace();
+					}
+
+					try {
+						do {
+							String curr_result;
+							curr_result = "Stock Account: ";
+							curr_result += result.getString(1);
+							curr_result += ", ";
+							curr_result += result.getString(2);
+							System.out.println(curr_result);
+							stock_list.add(curr_result);
+						}while(result.next());
+						ManagerDashboard.set_stock(stock_list);
+					} catch (SQLException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 				}
 			});
 			
 			try {
 				Thread.sleep(500);
-			} catch (InterruptedException e1) {
+			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
-				e1.printStackTrace();
+				e.printStackTrace();
 			}
 			
-			if(print_string.equals("THERE ARE NO ACCOUNTS ASSOCIATED WITH THIS USERNAME")){
-				JOptionPane.showMessageDialog(null, print_string, "Show Balances", 0);
-				return;
-			}
-			
-			StringBuilder get_stock_balances = new StringBuilder("SELECT S.StockBalance ")
-					.append("FROM stock_account S ")
-					.append("WHERE S.username = ").append("'").append(user)
-					.append("'");
-			DbClient.getInstance().runQuery(new RetrievalQuery(get_stock_balances.toString()) {
-				@Override
-				public void onComplete(ResultSet result) {
-					String balance = "";
-					String get_balances = "";
-					try {
-						while(result.next()) {
-							String print_string = "";
-							balance = result.getString(1);
-							get_balances += balance;
-							get_balances += ", ";
-						}
-						
-						if(get_balances.equals("")) {
-							ManagerDashboard.print_string = "THERE ARE NO ACCOUNTS ASSOCIATED WITH THIS USERNAME";
-							return;
-						}
-						display_string = print_string;
-						ManagerDashboard.print_string += display_string;
-					} catch (SQLException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-					
-				}
-			});
-			
-			try {
-				Thread.sleep(500);
-			} catch (InterruptedException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-			
-			if(print_string.equals("THERE ARE NO ACCOUNTS ASSOCIATED WITH THIS USERNAME")){
-				JOptionPane.showMessageDialog(null, print_string, "Show Balances", 0);
-				return;
-			}
-			
-			
-			JOptionPane.showMessageDialog(null, print_string, "Show Balances", 1);
+			create_frame(user);
 		}
+		
+		private void create_frame(String user) {
+			//create the frame and add the lists
+			frame1 = new JFrame("Customer Report");
+			frame1.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+			
+	        JPanel panel = new JPanel(new GridLayout(4,4,4,4));
+	        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+	        
+	        JLabel title = new JLabel("Customer Report for " + user);
+	        
+	      //create market list and label
+	        JLabel market_label = new JLabel("Market Accounts:");
+	        market_label.setVerticalAlignment(JLabel.CENTER);
+	        
+	        market_list.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
+	        market_list.setLayoutOrientation(JList.HORIZONTAL_WRAP);
+	        market_list.setVisibleRowCount(-1);
+
+	        JScrollPane marketScroller = new JScrollPane(market_list);
+	        marketScroller.setPreferredSize(new Dimension(250, 80));
+	        
+	        //create stock list and label
+	      //create deposit list and label
+	        JLabel stock_label = new JLabel("Stock Accounts:");
+	        stock_label.setVerticalAlignment(JLabel.CENTER);
+	        
+	        stock_list.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
+	        stock_list.setLayoutOrientation(JList.HORIZONTAL_WRAP);
+	        stock_list.setVisibleRowCount(-1);
+
+	        JScrollPane stockScroller = new JScrollPane(stock_list);
+	        stockScroller.setPreferredSize(new Dimension(250, 80));
+	        
+	        JButton backButton = new JButton("Back to Manager Dash");
+	        backButton.addActionListener(new ActionListener() {
+
+				@Override
+				public void actionPerformed(ActionEvent arg0) {
+					// TODO Auto-generated method stub
+					frame1.setVisible(false);
+					frame1.dispose();
+					
+				}
+	        	
+	        	
+	        });
+
+	        panel.add(title);
+	        panel.add(market_label);
+	        panel.add(marketScroller);
+	        panel.add(stock_label);
+	        panel.add(stockScroller);
+	        panel.add(backButton);
+
+	        frame1.setContentPane(panel);
+	        frame1.pack();
+	        frame1.setVisible(true);
+	        
+			//display
+		}
+		
+		
 		
 	}
 	private class DeleteListener implements ActionListener{
