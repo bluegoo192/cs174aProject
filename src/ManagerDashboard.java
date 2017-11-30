@@ -150,6 +150,7 @@ public class ManagerDashboard{
 						if(!result.next()) {
 							market_list.add("NO MARKET ACCOUNTS");
 							ManagerDashboard.set_market(market_list);
+							get_stock_list(user);
 							return;
 						}
 					}catch(SQLException e1) {
@@ -168,12 +169,16 @@ public class ManagerDashboard{
 							market_list.add(curr_result);
 						}while(result.next());
 						ManagerDashboard.set_market(market_list);
+						get_stock_list(user);
 					} catch (SQLException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 				}
 			});
+		}
+		
+		private void get_stock_list(String user) {
 			
 			//get stock balance
 			StringBuilder stock_balance = new StringBuilder("SELECT S.AccountID, S.StockBalance ")
@@ -188,6 +193,7 @@ public class ManagerDashboard{
 						if(!result.next()) {
 							stock_list.add("NO STOCK ACCOUNTS");
 							ManagerDashboard.set_stock(stock_list);
+							create_frame(user);
 							return;
 						}
 					}catch(SQLException e1) {
@@ -205,6 +211,7 @@ public class ManagerDashboard{
 							stock_list.add(curr_result);
 						}while(result.next());
 						ManagerDashboard.set_stock(stock_list);
+						create_frame(user);
 					} catch (SQLException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -219,7 +226,6 @@ public class ManagerDashboard{
 				e.printStackTrace();
 			}
 			
-			create_frame(user);
 		}
 		
 		private void create_frame(String user) {

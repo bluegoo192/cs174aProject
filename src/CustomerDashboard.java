@@ -53,6 +53,17 @@ public class CustomerDashboard{
 		return user;
 	}
 	
+	
+
+	public static void createDashboard(String username) {
+		
+		//initialize the global variables
+		user = username;
+		initialize_accounts();
+		
+    	 	
+    }
+	
 	private static void initialize_accounts() {
 		//get stock ID
 		StringBuilder find_stock_account = new StringBuilder("SELECT S.AccountID ")
@@ -66,6 +77,7 @@ public class CustomerDashboard{
 						//no stock account
 						//create new stock account
 						CustomerDashboard.set_stock_account("");
+						initialize_market_account();
 						return;
 					}
 				} catch (SQLException e1) {
@@ -76,13 +88,18 @@ public class CustomerDashboard{
 				try {
 					String stock_id = result.getString(1);
 					CustomerDashboard.set_stock_account(stock_id);
+					initialize_market_account();
 				} catch (SQLException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
 		});
+
 		
+	}
+	
+	private static void initialize_market_account() {
 		StringBuilder findAccountID = new StringBuilder("SELECT M.AccountID ")
 				.append("FROM Market_Account M ").append("WHERE ")
 				.append("M.username = ").append("'").append(user)
@@ -95,6 +112,7 @@ public class CustomerDashboard{
 				try {
 					if(!result.next()) {
 						set_market_account("");
+						build_frame();
 						return;
 					}
 				} catch (HeadlessException | SQLException e1) {
@@ -103,29 +121,17 @@ public class CustomerDashboard{
 				}
 				try {
 					set_market_account(result.getString(1));
+					build_frame();
 				} catch (SQLException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
 		});
-		
-		try {
-			Thread.sleep(500);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
 	}
-
-	public static JFrame createDashboard(String username) {
-		
-		//initialize the global variables
-		user = username;
-		initialize_accounts();
-		
-    	 	 frame = new JFrame(username + "'s Dashboard");
+	
+	private static void build_frame() {
+		 frame = new JFrame(user + "'s Dashboard");
          frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
          Dimension dim = new Dimension(800, 800);
        
@@ -166,8 +172,7 @@ public class CustomerDashboard{
          
          frame.setVisible(true);
          
-         return frame;
-    }
+	}
 	
 	private class DepositListener implements ActionListener{
 
