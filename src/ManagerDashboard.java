@@ -10,6 +10,7 @@ import java.awt.event.ActionListener;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -38,6 +39,7 @@ public class ManagerDashboard{
        
          frame.getContentPane().setPreferredSize(dim);
          JPanel panel = new JPanel(new GridLayout(5,5,5,5));
+         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
          
          ManagerDashboard d = new ManagerDashboard();
          

@@ -14,15 +14,33 @@ public class BuyStocksPage {
 
 	static JFrame frame;
 	
-	static String user;
+	private static String user;
 	private static String stock_id;
 	
 	
 	static JTextField amount;
 	
 	
-	public static void createStocksPage(String username) {
-		user = username;
+	public static void createStocksPage() {
+		user = CustomerDashboard.getUser();
+		stock_id = CustomerDashboard.get_stock_account();
+		
+		if(stock_id.equals("")) {
+			//create stock account
+			//create new stock account
+			int stock_id = (int)(Math.random()* 30000);
+			String stock_id_string = Integer.toString(stock_id);
+			BuyStocksPage.set_stock_id(stock_id_string);
+			StringBuilder create_stock_account = new StringBuilder("INSERT INTO stock_account VALUES(")
+					.append("'").append(stock_id_string).append("'").append(",").append("100")
+					.append(",").append("'").append(user).append("'").append(")");
+			DbClient.getInstance().runQuery(new UpdateQuery(create_stock_account.toString()) {
+				@Override
+				public void onComplete(int result) {
+					System.out.println("created stock account");
+				}
+			});
+		}
 		
 		frame = new JFrame("Buy/Sell Stocks");
 		frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);

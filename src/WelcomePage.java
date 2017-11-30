@@ -3,6 +3,7 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -21,6 +22,7 @@ public class WelcomePage{
        
          frame.getContentPane().setPreferredSize(d);
          JPanel panel = new JPanel(new GridLayout(4,4,4,4));
+         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
          
          JLabel label1 = new JLabel("Welcome to Stars R Us Stock Exchange System");
          label1.setVerticalAlignment(JLabel.CENTER);
