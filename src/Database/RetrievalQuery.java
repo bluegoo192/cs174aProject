@@ -1,5 +1,7 @@
 package Database;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.Statement;
 
@@ -23,13 +25,21 @@ public abstract class RetrievalQuery extends DbQuery {
     }
 
     @Override
-    public void execute(Statement statement) {
+    protected void executeStringQuery(Statement statement) {
         try {
             ResultSet result = statement.executeQuery(this.getQuery());
             this.onComplete(result);
         } catch (Exception e) {
             this.onError(e);
         }
+    }
 
+    @Override
+    protected void executePreparedStatement() {
+        try {
+            onComplete(getQueryStatement().executeQuery());
+        } catch (Exception e) {
+            this.onError(e);
+        }
     }
 }

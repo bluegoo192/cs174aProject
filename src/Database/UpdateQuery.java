@@ -23,13 +23,21 @@ public class UpdateQuery extends DbQuery {
     }
 
     @Override
-    public void execute(Statement statement) {
+    protected void executeStringQuery(Statement statement) {
         try {
             int result = statement.executeUpdate(this.getQuery());
             onComplete(result);
         } catch (Exception e) {
             this.onError(e);
         }
+    }
 
+    @Override
+    protected void executePreparedStatement() {
+        try {
+            onComplete(getQueryStatement().executeUpdate());
+        } catch (Exception e) {
+            this.onError(e);
+        }
     }
 }
