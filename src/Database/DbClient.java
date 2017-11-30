@@ -37,6 +37,10 @@ public class DbClient {
 		return ourInstance;
 	}
 
+	public Connection getConnection() {
+		return connection;
+	}
+
 	public void run() {
 		if (isRunning || !connected) return; // We can call run() whenever we want with minimal overhead
 		isRunning = true;
@@ -117,6 +121,19 @@ public class DbClient {
 			isRunning = false;
 		}
 	}
+
+//	/**
+//	 * Directly adjust a market_account's balance.  Use for deposits and withdrawals
+//	 * @param accountID: id of the market account
+//	 * @param change: quantity to adjust by.  Negative for withdrawal, positive for deposit
+//	 */
+//	public void adjustBalance(String accountID, long change) {
+//		StringBuilder adjustQuery = new StringBuilder("UPDATE Market_Account SET ")
+//				.append("Balance = Balance + ").append(change).append(", ")
+//				.append("last_changed = ").append()
+//				.append("WHERE AccountID = ").append(accountID).append(" ");
+//		UpdateQuery adjust = new UpdateQuery(adjustQuery.toString());
+//	}
 
 	public void createEntryCustomers(String username, String password, String taxId, String state, String phone, String email) {
 		StringBuilder addEntry = new StringBuilder("INSERT INTO CUSTOMERS VALUES (")
