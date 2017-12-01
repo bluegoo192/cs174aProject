@@ -291,6 +291,8 @@ public class DbClient {
 					"	curr_stock_account_id INTEGER,"+
 					"	curr_deposit_id INTEGER,"+
 					"	curr_withdraw_id INTEGER, "+
+					"	curr_buy_id INTEGER,"+
+					"	curr_sell_id INTEGER,"+
 					"	PRIMARY KEY(setting_id)"+
 					")"
 	};

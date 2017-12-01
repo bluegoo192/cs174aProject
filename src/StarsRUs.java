@@ -17,43 +17,79 @@ public class StarsRUs {
 	public static int global_mark;
 	public static int global_stock;
 	public static int global_deposit;
+	public static int global_buy;
+	public static int global_sell;
 	public static int global_withdraw;
 
 
 	public static void main(String[] args) {
 		
 /*
-		StringBuilder foreign_key_checks0 = new StringBuilder("SET FOREIGN_KEY_CHECKS=0");
-		DbClient.getInstance().runQuery(new UpdateQuery(foreign_key_checks0.toString()) {
+		StringBuilder foreign_key0 = new StringBuilder("SET FOREIGN_KEY_CHECKS=0;");
+		DbClient.getInstance().runQuery(new UpdateQuery(foreign_key0.toString()) {
 			@Override
 			public void onComplete(int result) {
-				System.out.println("changed foreign key constraints");
+				System.out.println("foreign key 0");
+			}
+		});
+		StringBuilder delete_buy = new StringBuilder("TRUNCATE TABLE Buy_Stock");
+		DbClient.getInstance().runQuery(new UpdateQuery(delete_buy.toString()) {
+			@Override
+			public void onComplete(int result) {
+				System.out.println("Buy Deleted");
 			}
 		});
 		
-		StringBuilder truncate_customers = new StringBuilder("TRUNCATE TABLE Customers");
-		DbClient.getInstance().runQuery(new UpdateQuery(truncate_customers.toString()) {
+		StringBuilder delete_sell = new StringBuilder("TRUNCATE TABLE Sell_Stock");
+		DbClient.getInstance().runQuery(new UpdateQuery(delete_sell.toString()) {
 			@Override
 			public void onComplete(int result) {
-				System.out.println("Customers truncated");
-			}
-		});
-		StringBuilder truncate_market = new StringBuilder("TRUNCATE TABLE Market_Account");
-		DbClient.getInstance().runQuery(new UpdateQuery(truncate_market.toString()) {
-			@Override
-			public void onComplete(int result) {
-				System.out.println("Market truncated");
-			}
-		});
-		StringBuilder truncate_stock = new StringBuilder("TRUNCATE TABLE stock_account");
-		DbClient.getInstance().runQuery(new UpdateQuery(truncate_stock.toString()) {
-			@Override
-			public void onComplete(int result) {
-				System.out.println("stock truncated");
+				System.out.println("Sell Deleted");
 			}
 		});
 		
-		*/
+		StringBuilder delete_mark = new StringBuilder("TRUNCATE TABLE Market_Account");
+		DbClient.getInstance().runQuery(new UpdateQuery(delete_mark.toString()) {
+			@Override
+			public void onComplete(int result) {
+				System.out.println("Market Accounts Deleted");
+			}
+		});
+		
+		StringBuilder delete_stock = new StringBuilder("TRUNCATE TABLE stock_account");
+		DbClient.getInstance().runQuery(new UpdateQuery(delete_stock.toString()) {
+			@Override
+			public void onComplete(int result) {
+				System.out.println("Stock Accounts Deleted");
+			}
+		});
+		
+		StringBuilder delete_cust = new StringBuilder("TRUNCATE TABLE Customers");
+		DbClient.getInstance().runQuery(new UpdateQuery(delete_cust.toString()) {
+			@Override
+			public void onComplete(int result) {
+				System.out.println("Customers Deleted");
+			}
+		});
+		
+		StringBuilder update_set = new StringBuilder("UPDATE Settings SET curr_mark_account_id = 1, curr_stock_account_id = 1, curr_deposit_id = 1");
+		DbClient.getInstance().runQuery(new UpdateQuery(update_set.toString()) {
+			@Override
+			public void onComplete(int result) {
+				System.out.println("update settings");
+			}
+		});
+		
+		StringBuilder foreign_key1 = new StringBuilder("SET FOREIGN_KEY_CHECKS=1;");
+		DbClient.getInstance().runQuery(new UpdateQuery(foreign_key1.toString()) {
+			@Override
+			public void onComplete(int result) {
+				System.out.println("foreign key 1");
+			}
+		});
+
+*/
+	
 	
 
 		Runtime.getRuntime().addShutdownHook(new Thread()
@@ -64,7 +100,7 @@ public class StarsRUs {
 				//update settings
 				StringBuilder update_settings = new StringBuilder("UPDATE Settings SET curr_mark_account_id = ")
 						.append(global_mark).append(", curr_stock_account_id = ").append(global_stock).append(", curr_deposit_id = ")
-						.append(global_deposit).append(" WHERE setting_id = 1");
+						.append(global_deposit).append(", curr_buy_id = ").append(global_buy).append(", curr_sell_id = ").append(global_sell).append(" WHERE setting_id = 1");
 				try {
 					Class.forName("com.mysql.cj.jdbc.Driver");
 					Connection connection = DriverManager.getConnection(DbClient.DB_URL_ARTHUR, DbClient.USER_ARTHUR, DbClient.PASS_ARTHUR);
@@ -87,7 +123,7 @@ public class StarsRUs {
 
 		//initialize global variables
 		StringBuilder initialize_var = new StringBuilder("SELECT S.Date, S.curr_mark_account_id, S.curr_stock_account_id, S.curr_deposit_id, ")
-				.append("S.curr_withdraw_id FROM Settings S WHERE setting_id = 1");
+				.append("S.curr_withdraw_id, S.curr_buy_id, S.curr_sell_id FROM Settings S WHERE setting_id = 1");
 
 		DbClient.getInstance().runQuery(new RetrievalQuery(initialize_var.toString()) {
 
@@ -102,14 +138,21 @@ public class StarsRUs {
 					global_stock = result.getInt(3);
 					global_deposit = result.getInt(4);
 					global_withdraw = result.getInt(5);
+					global_buy = result.getInt(6);
+					global_sell = result.getInt(7);
 				} catch (SQLException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 
 
+
 				WelcomePage.createFrame();
+				
+				
 				DbClient.getInstance();
+				
+				
 				//5. Show it.
 
 			}
