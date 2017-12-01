@@ -109,10 +109,10 @@ public class DepositPage {
 			
 			//add to deposit table
 			StringBuilder createDepositRow = new StringBuilder("INSERT INTO Deposit ")
-					.append("(DepositID, AccountID, Username, Value, Date) ")
+					.append("(DepositID, AccountID, Username, Value, Date, OriginalBalance) ")
 					.append("VALUES ( ").append("'").append(depID).append("'").append(", ")
 					.append("'").append(account).append("'").append(", ").append("'").append(user).append("'").append(", ")
-					.append(deposit_amount).append(", ").append("'").append(StarsRUs.global_date).append("'").append(")");
+					.append(deposit_amount).append(", ").append("'").append(StarsRUs.global_date).append("'").append(",").append(beginning_balance).append(")");
 			DbClient.getInstance().runQuery(new UpdateQuery(createDepositRow.toString()));
 			
 			
@@ -156,10 +156,10 @@ public class DepositPage {
 			
 			//add to deposit table
 			StringBuilder createWithdrawRow = new StringBuilder("INSERT INTO Withdraw ")
-					.append("(WithdrawID, AccountID, Username, Value, Date) ")
+					.append("(WithdrawID, AccountID, Username, Value, Date, OriginalBalance) ")
 					.append("VALUES ( ").append("'").append(withdraw_id).append("'").append(", ")
 					.append("'").append(account).append("'").append(", ").append("'").append(user).append("'").append(", ")
-					.append(withdraw_amount).append(", ").append("'").append(StarsRUs.global_date).append("'").append(")");
+					.append(withdraw_amount).append(", ").append("'").append(StarsRUs.global_date).append("'").append(",").append(beginning_balance).append(")");
 			DbClient.getInstance().runQuery(new UpdateQuery(createWithdrawRow.toString()));
 			
 			

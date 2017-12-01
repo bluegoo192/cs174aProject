@@ -177,7 +177,7 @@ public class SignUpPage {
 			//add to deposit table
 			StringBuilder add_initial_deposit = new StringBuilder("INSERT INTO Deposit VALUES (")
 					.append("'").append(account_id).append("','").append(deposit_id).append("','").append(username.getText()).append("',")
-					.append("1000").append(",'").append(StarsRUs.global_date).append("')");
+					.append("1000").append(",'").append(StarsRUs.global_date).append(",").append("0").append("')");
 			DbClient.getInstance().runQuery(new UpdateQuery(add_initial_deposit.toString()) {
 				@Override
 				public void onComplete(int result) {

@@ -197,6 +197,7 @@ public class DbClient {
 					"	Username CHAR(20) NOT NULL," +
 					"	Value REAL," +
 					"	Date DATE," +
+					"	OriginalBalance REAL,"+
 					"	FOREIGN KEY (username) REFERENCES Customers(username) ON DELETE CASCADE ON UPDATE CASCADE," +
 					"	FOREIGN KEY (accountID) REFERENCES Market_Account(AccountID) ON DELETE CASCADE ON UPDATE CASCADE," +
 					"	PRIMARY KEY(DepositID)" +
@@ -207,6 +208,7 @@ public class DbClient {
 					"	Username CHAR(20) NOT NULL," +
 					"	Value REAL," +
 					"	Date DATE," +
+					"	OriginalBalance REAL,"+
 					"FOREIGN KEY (username) REFERENCES Customers(username) ON DELETE CASCADE ON UPDATE CASCADE," +
 					"	FOREIGN KEY (accountID) REFERENCES Market_Account(AccountID) ON DELETE CASCADE ON UPDATE CASCADE," +
 					"	PRIMARY KEY(WithdrawID)" +
