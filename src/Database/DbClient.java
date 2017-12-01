@@ -181,6 +181,7 @@ public class DbClient {
 					"	Username CHAR(20) NOT NULL,\n" +
 					"	avg_daily_balance REAL," +
 					"	last_changed DATE," +
+					"	days_since_interest INT," +
 					"	FOREIGN KEY(username) REFERENCES Customers(username)" +
 					"ON DELETE CASCADE ON UPDATE CASCADE," +
 					"	PRIMARY KEY (AccountID) )",
