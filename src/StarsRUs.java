@@ -87,8 +87,32 @@ public class StarsRUs {
 				System.out.println("foreign key 1");
 			}
 		});
+		
+		"CREATE TABLE IF NOT EXISTS Sell_Stock(" +
+					"	SellID CHAR(20)," +
+					"	NumShares INT," +
+					"	stock_symbol CHAR(3) NOT NULL," +
+					"	MarketID CHAR(20) NOT NULL," +
+					"	StockID CHAR(20) NOT NULL," +
+					"	Date DATE," +
+					"	OriginalBuyingPrice REAL," +
+					"	Selling_Price REAL,"+
+					"	Profit REAL,"+
+					"	Commission REAL,"+
+					"	FOREIGN KEY (stock_symbol) REFERENCES Actor_Stock(stock_symbol) ON DELETE CASCADE ON UPDATE CASCADE," +
+					"	FOREIGN KEY (MarketID) REFERENCES Market_Account(AccountID)," +
+					"	FOREIGN KEY (StockID) REFERENCES stock_account(AccountID)," +
+					"	PRIMARY KEY(SellID)" +
+					")",
 */
 
+		StringBuilder add_stock = new StringBuilder("INSERT INTO Sell_Stock VALUES('1', 1000, 'sch', '1', '1', '2017-11-29', '20', '1000000', '10001', '20')");
+		DbClient.getInstance().runQuery(new UpdateQuery(add_stock.toString()) {
+			@Override
+			public void onComplete(int result) {
+				System.out.println("stock successfully added");
+			}
+		});
 	
 	
 

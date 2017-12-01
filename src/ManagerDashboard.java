@@ -75,6 +75,8 @@ public class ManagerDashboard{
 
 		panel.add(add_interest);
 		panel.add(actives);
+		panel.add(dter);
+		
 		panel.add(customer_report);
 		panel.add(go_1);
 		panel.add(monthly_statement);
@@ -115,106 +117,38 @@ public class ManagerDashboard{
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
 
-			/*StringBuilder get_actives = new StringBuilder("SELECT M.username FROM ")
-					.append("(SELECT COALESCE(B.NumShares) as num_b, B.MarketID FROM Buy_Stock B GROUP BY B.MarketID) as B1, ")
-					.append("(SELECT COALESCE(S.NumShares) as num_s, S.MarketID FROM Sell_Stock S GROUP BY S.MarketID) as S1,")
-					.append("Market_Account M ").append("WHERE M.AccountID = B1.MarketID ");*/
-
-			StringBuilder get_actives = new StringBuilder("SELECT M.Username, SUM(B.NumShares+S.NumShares) FROM ")
-					.append("Buy_Stock B, Sell_Stock S, Market_Account M ")
-					.append("WHERE B.MarketID = M.AccountID and B.MarketID = S.MarketID GROUP BY M.username HAVING SUM(B.NumShares+S.NumShares) >= 1000");
-			DbClient.getInstance().runQuery(new RetrievalQuery(get_actives.toString()) {
+			StringBuilder combine = new StringBuilder("SELECT M.Username, nested_shares.sum_shares FROM  (SELECT marketIDs.MarketID, SUM(COALESCE(Buy_Stock.NumShares, 0) + COALESCE(Sell_Stock.NumShares, 0)) as sum_shares, Buy_Stock.MarketID as ID ")
+					.append("FROM( SELECT DISTINCT(MarketID) FROM (SELECT MarketID FROM Buy_Stock UNION SELECT MarketID FROM Sell_Stock) tmp ")
+					.append(") marketIDs")
+					.append(" LEFT JOIN Sell_Stock ON Sell_Stock.MarketID = marketIDs.MarketID ")
+					.append("LEFT JOIN Buy_Stock ON Buy_Stock.MarketID = marketIDs.MarketID")
+					.append(" GROUP BY Buy_Stock.MarketID HAVING sum_shares >= 1000) as nested_shares, Market_Account M")
+					.append(" WHERE nested_shares.ID = M.AccountID");		
+			DbClient.getInstance().runQuery(new RetrievalQuery(combine.toString()) {
 				@Override
 				public void onComplete(ResultSet result) {
-
 					try {
 						if(!result.next()) {
-							//check just sell_stock
-							StringBuilder check_sell = new StringBuilder("SELECT M.Username, SUM(S.NumShares) FROM ")
-									.append("Sell_Stock S, Market_Account M ")
-									.append("WHERE S.MarketID = M.AccountID GROUP BY M.username HAVING SUM(S.NumShares) >= 1000");
-							DbClient.getInstance().runQuery(new RetrievalQuery(check_sell.toString()) {
-
-								@Override
-								public void onComplete(ResultSet result) {
-									// TODO Auto-generated method stub
-									try {
-										if(!result.next()) {
-											//check just buy_stock
-											StringBuilder check_buy = new StringBuilder("SELECT M.Username, SUM(B.NumShares) FROM ")
-													.append("Buy_Stock B, Market_Account M ")
-													.append("WHERE B.MarketID = M.AccountID GROUP BY M.username HAVING SUM(B.NumShares) >= 1000");
-											DbClient.getInstance().runQuery(new RetrievalQuery(check_buy.toString()) {
-
-												@Override
-												public void onComplete(ResultSet result) {
-													// TODO Auto-generated method stub
-													try {
-														if(!result.next()) {
-															JOptionPane.showMessageDialog(null, "NO ACTIVE USERS", "Error Message", 0);
-															return;
-														}else {
-															Vector<String> output_users = new Vector<String>();
-															do {
-																String curr_result;
-																curr_result = result.getString(1);
-																curr_result += ", ";
-																curr_result += result.getString(2);
-																output_users.add(curr_result);
-															}while(result.next());
-															//print as JList
-															build_actives_frame(output_users);
-															return;
-														}
-													} catch (SQLException e) {
-														// TODO Auto-generated catch block
-														e.printStackTrace();
-													}
-												}
-
-											});
-										}else {
-											Vector<String> output_users = new Vector<String>();
-											do {
-												String curr_result;
-												curr_result = result.getString(1);
-												curr_result += ", ";
-												curr_result += result.getString(2);
-												output_users.add(curr_result);
-											}while(result.next());
-
-											//print as JList
-											build_actives_frame(output_users);
-										}
-								} catch (SQLException e) {
-									// TODO Auto-generated catch block
-									e.printStackTrace();
-								}
-							}
-
-						});
-
-											return;
-					}else {
-						//print out
-						Vector<String> output_users = new Vector<String>();
-						do {
-							String curr_result;
-							curr_result = result.getString(1);
-							curr_result += ", ";
-							curr_result += result.getString(2);
-							output_users.add(curr_result);
-						}while(result.next());
-
-						//print as JList
-						build_actives_frame(output_users);
+							JOptionPane.showMessageDialog(null, "NO ACTIVE CUSTOMERS", "Customer Message", 1);
+							return;
+						}else {
+							Vector<String> output_string = new Vector<String>();
+							do {
+								String curr_result;
+								curr_result = result.getString(1);
+								curr_result += ", ";
+								curr_result += result.getString(2);
+								output_string.add(curr_result);
+							}while(result.next());
+							build_actives_frame(output_string);
+						}
+					} catch (SQLException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
 					}
-				} catch (SQLException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
 				}
-			}
-		});
+			});
+
 
 	}
 
@@ -230,7 +164,7 @@ public class ManagerDashboard{
 		actives_label.setVerticalAlignment(JLabel.CENTER);
 
 		user_list.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
-		user_list.setLayoutOrientation(JList.HORIZONTAL_WRAP);
+		user_list.setLayoutOrientation(JList.VERTICAL_WRAP);
 		user_list.setVisibleRowCount(-1);
 
 		JScrollPane activeScroller = new JScrollPane(user_list);
@@ -271,7 +205,93 @@ private class DTERListener implements ActionListener{
 	@Override
 	public void actionPerformed(ActionEvent arg0) {
 		// TODO Auto-generated method stub
+		
+		//join buy_stock and sell_stock
+		StringBuilder combine = new StringBuilder("SELECT M.Username, nested_query.total_earnings FROM (SELECT marketIDs.MarketID, SUM(COALESCE(Sell_Stock.Profit, 0)")
+				.append("+ COALESCE(Accrue_Interest.MoneyAdded, 0)) as total_earnings ")
+				.append("FROM( SELECT DISTINCT(MarketID) FROM (SELECT MarketID FROM Sell_Stock UNION SELECT AccountID FROM Accrue_Interest) tmp ")
+				.append(") marketIDs ")
+				.append("LEFT JOIN Sell_Stock ON Sell_Stock.MarketID = marketIDs.MarketID ")
+				.append("LEFT JOIN Accrue_Interest ON Accrue_Interest.AccountID = marketIDs.MarketID")
+				.append(" GROUP BY Sell_Stock.MarketID HAVING total_earnings >= 10000) as nested_query, Market_Account M");
+		DbClient.getInstance().runQuery(new RetrievalQuery(combine.toString()) {
+			@Override
+			public void onComplete(ResultSet result) {
+				Vector<String> dter_list = new Vector<String>();
+				try {
+					if(!result.next()) {
+						dter_list.add("NO CUSTOMERS MUST BE REPORTED THIS MONTH");
+						build_dter_frame(dter_list);
+						return;
+					}
+					
+				}catch(SQLException e1) {
+					e1.printStackTrace();
+				}
 
+				try {
+					do {
+						String curr_result;
+						curr_result = result.getString(1);
+						curr_result += ", ";
+						curr_result += result.getString(2);
+						dter_list.add(curr_result);
+					}while(result.next());
+					build_dter_frame(dter_list);
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		});
+		
+		
+	}
+	
+	private void build_dter_frame(Vector<String> users) {
+		JList user_list = new JList(users);
+
+		JFrame frame1 = new JFrame("Government Drug & Tax Evasion Report");
+		frame1.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+		Dimension d = new Dimension(800, 800);
+
+		//create deposit list and label
+		JLabel actives_label = new JLabel("Customers to be reported this month: ");
+		actives_label.setVerticalAlignment(JLabel.CENTER);
+
+		user_list.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
+		user_list.setLayoutOrientation(JList.VERTICAL_WRAP);
+		user_list.setVisibleRowCount(-1);
+
+		JScrollPane activeScroller = new JScrollPane(user_list);
+		activeScroller.setPreferredSize(new Dimension(250, 80));
+
+		TransactionHistoryPage t = new TransactionHistoryPage();
+		JButton backButton = new JButton("Back to Dash");
+		backButton.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				// TODO Auto-generated method stub
+				frame1.setVisible(false);
+				frame1.dispose();
+			}
+
+		});
+
+		JPanel panel = new JPanel(new GridLayout(4,4,4,4));
+		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+
+		panel.add(actives_label);
+		panel.add(activeScroller);
+		panel.add(backButton);
+
+		frame1.setContentPane(panel);
+		frame1.pack();
+
+
+
+		frame1.setVisible(true);
 	}
 
 }
