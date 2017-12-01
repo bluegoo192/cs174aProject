@@ -67,17 +67,17 @@ public class ManagerDashboard{
 		actives.addActionListener(d.new ActivesListener());
 		JButton dter = new JButton("Generate DTER");
 		dter.addActionListener(d.new DTERListener());
-		customer_report = new JTextField("Type username of customer here");
-		JButton go_1 = new JButton("Go");
+		customer_report = new JTextField("Type username of customer here. This field can be used to generate either the Monthly Statment or the Customer Report");
+		JButton go_1 = new JButton("Customer Report");
 		go_1.addActionListener(d.new Go1Listener());
 		JButton delete_trans = new JButton("Delete Transactions");
 		delete_trans.addActionListener(d.new DeleteListener());
 
 		panel.add(add_interest);
-		panel.add(monthly_statement);
 		panel.add(actives);
 		panel.add(customer_report);
 		panel.add(go_1);
+		panel.add(monthly_statement);
 		panel.add(delete_trans);
 
 

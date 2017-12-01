@@ -87,8 +87,8 @@ public class StarsRUs {
 				System.out.println("foreign key 1");
 			}
 		});
-
 */
+
 	
 	
 

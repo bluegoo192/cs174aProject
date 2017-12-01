@@ -173,6 +173,7 @@ public class DbClient {
 					"	TaxID CHAR(9) UNIQUE," +
 					"	Phone CHAR(10)," +
 					"	Password CHAR(20)," +
+					"	Name CHAR(30),"+
 					"	PRIMARY KEY (Username))",
 			"CREATE TABLE IF NOT EXISTS Market_Account (" +
 					"	AccountID CHAR(20)," +
@@ -278,6 +279,9 @@ public class DbClient {
 					"	StockID CHAR(20) NOT NULL," +
 					"	Date DATE," +
 					"	OriginalBuyingPrice REAL," +
+					"	Selling_Price REAL,"+
+					"	Profit REAL,"+
+					"	Commission REAL,"+
 					"	FOREIGN KEY (stock_symbol) REFERENCES Actor_Stock(stock_symbol) ON DELETE CASCADE ON UPDATE CASCADE," +
 					"	FOREIGN KEY (MarketID) REFERENCES Market_Account(AccountID)," +
 					"	FOREIGN KEY (StockID) REFERENCES stock_account(AccountID)," +

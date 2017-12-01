@@ -121,13 +121,26 @@ public class SignUpPage {
 			
 			//after confirming validity of the entered information, create new account in sql
 			
+		    /*
+			 * CREATE TABLE IF NOT EXISTS Customers (" +
+					"	Username CHAR(20)," +
+					"	Name CHAR(40),"+
+					"	State CHAR(2)," +
+					"	Email CHAR(254) UNIQUE," +
+					"	TaxID CHAR(9) UNIQUE," +
+					"	Phone CHAR(10)," +
+					"	Password CHAR(20)," +
+					"	PRIMARY KEY (Username))
+			 */
+		    
 			StringBuilder addEntry = new StringBuilder("INSERT INTO Customers VALUES (")
 					.append("'").append(username.getText()).append("'").append(",")
 					.append("'").append(state_list.getSelectedItem()).append("'").append(",")
 					.append("'").append(email_address.getText()).append("'").append(",")
 					.append("'").append(taxID.getText()).append("'").append(",")
 					.append("'").append(phone_number.getText()).append("'").append(",")
-					.append("'").append(password.getText()).append("'").append(")");
+					.append("'").append(password.getText()).append("'").append(",")
+					.append("'").append(name.getText()).append("'").append(")");
 
 			DbClient.getInstance().runQuery(new UpdateQuery(addEntry.toString()) {
 				@Override
@@ -156,6 +169,8 @@ public class SignUpPage {
 					System.out.println("Account created successfully");
 				}
 			});
+			
+			
 			
 			String deposit_id = Integer.toString(StarsRUs.global_deposit);
 			StarsRUs.global_deposit += 1;
