@@ -10,13 +10,18 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Vector;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextField;
+import javax.swing.ListSelectionModel;
 import javax.swing.WindowConstants;
 
 
@@ -31,6 +36,7 @@ public class CustomerDashboard{
 	//used for deposit/withdraw listener
 	private static String market_accountID;
 	private static String stock_accountID = "";
+	
 	
 	//setter functions
 	public static void set_stock_account(String input) {
@@ -266,6 +272,7 @@ public class CustomerDashboard{
 	}
 	
 	private class Go1Listener implements ActionListener{
+		private Vector<String> actor_info;
 
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
@@ -283,7 +290,33 @@ public class CustomerDashboard{
 			//stock is a 3 letter string
 			//query to find stock
 			
-			StringBuilder addEntry = new StringBuilder("SELECT A.current_stock_price ")
+			/*
+			 * "CREATE TABLE IF NOT EXISTS Actor_Stock (" +
+					"	Name CHAR(20)," +
+					"	Birth DATE," +
+					"	stock_symbol CHAR(3)," +
+					"	current_stock_price REAL," +
+					"	closing_prices_log MEDIUMTEXT," +
+					"	PRIMARY KEY (stock_symbol))",
+					
+				"CREATE TABLE IF NOT EXISTS Movie (" +
+					"	MovieID CHAR(20)," +
+					"	Title CHAR(20)," +
+					"	Year CHAR(4)," +
+					"	PRIMARY KEY (MovieID)" +
+					")",
+			"CREATE TABLE IF NOT EXISTS MovieContract(" +
+					"	stock_symbol CHAR(3) NOT NULL," +
+					"	MovieID CHAR(20) NOT NULL," +
+					"	Role CHAR(20)," +
+					"	Total_Value REAL," +
+					"	FOREIGN KEY(stock_symbol) REFERENCES Actor_Stock(stock_symbol) ON UPDATE CASCADE," +
+					"	FOREIGN KEY(MovieID) REFERENCES Movie(MovieID) ON DELETE CASCADE ON UPDATE CASCADE," +
+					"	PRIMARY KEY(stock_symbol, MovieID)" +
+					")",
+			 */
+			
+			StringBuilder addEntry = new StringBuilder("SELECT A.current_stock_price, A.Name, A.Birth ")
 					.append("FROM Actor_Stock A ")
 					.append("WHERE A.stock_symbol = ").append("'").append(CustomerDashboard.actor_stock.getText())
 					.append("'");
@@ -296,22 +329,126 @@ public class CustomerDashboard{
 						if(!result.next()) {
 							JOptionPane.showMessageDialog(null, "no stocks under this symbol", "Error in Stocks", 0);
 							return;
+						}else {
+							
+							Vector<String> output_string = new Vector<String>();
+							do {
+								String curr_result;
+								curr_result = result.getString(1);
+								curr_result += ", ";
+								curr_result += result.getString(2);
+								curr_result += ", ";
+								curr_result += result.getString(3);
+								output_string.add(curr_result);
+							}while(result.next());
+							
+							actor_info = output_string;
+							
+							StringBuilder movie_info = new StringBuilder("SELECT M.Title, M.Year, C.Role, C.Total_Value  ")
+									.append("FROM Movie M, MovieContract C ")
+									.append("WHERE C.stock_symbol = '").append(CustomerDashboard.actor_stock.getText())
+									.append("' AND M.MovieID = C.MovieID");
+							DbClient.getInstance().runQuery(new RetrievalQuery(movie_info.toString() ) {
+
+								@Override
+								public void onComplete(ResultSet result) {
+									// TODO Auto-generated method stub
+									Vector<String> output_string = new Vector<String>();
+									try {
+										if(!result.next()) {
+											output_string.add("THIS ACTOR CURRENTLY HAS NO MOVIE CONTRACTS");
+											build_actor_frame(output_string);
+											return;
+										}else {
+											
+											do {
+												String curr_result;
+												curr_result = result.getString(1);
+												curr_result += ", ";
+												curr_result += result.getString(2);
+												curr_result += ", ";
+												curr_result += result.getString(3);
+												output_string.add(curr_result);
+											}while(result.next());
+											build_actor_frame(output_string);
+											return;
+										}
+									} catch (SQLException e) {
+										// TODO Auto-generated catch block
+										e.printStackTrace();
+									}
+								}
+								
+							});
 						}
 					} catch (HeadlessException | SQLException e1) {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
 					}
-					
-					try {
-						price = result.getString(1);
-					} catch (SQLException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-					String display_string = "Current Stock Price is " + price + " dollars";
-					JOptionPane.showMessageDialog(null, display_string, "Show Current Price", 1);
 				}
 			});
+		}
+		
+		private void build_actor_frame(Vector<String> actor_movie_info) {
+			
+			JList movie_list = new JList(actor_movie_info);
+			JList actor_list = new JList(actor_info);
+
+			JFrame frame1 = new JFrame("Active Users");
+			frame1.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+			Dimension d = new Dimension(800, 800);
+
+			//create actor list
+			//create movie list and label
+			JLabel actor_label = new JLabel("Current Actor Info");
+			actor_label.setVerticalAlignment(JLabel.CENTER);
+
+			actor_list.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
+			actor_list.setLayoutOrientation(JList.VERTICAL_WRAP);
+			actor_list.setVisibleRowCount(-1);
+
+			JScrollPane actorScroller = new JScrollPane(actor_list);
+			actorScroller.setPreferredSize(new Dimension(250, 80));
+			
+			//create movie list and label
+			JLabel movie_label = new JLabel("Movie Contract Info");
+			movie_label.setVerticalAlignment(JLabel.CENTER);
+
+			movie_list.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
+			movie_list.setLayoutOrientation(JList.VERTICAL_WRAP);
+			movie_list.setVisibleRowCount(-1);
+
+			JScrollPane movieScroller = new JScrollPane(movie_list);
+			movieScroller.setPreferredSize(new Dimension(250, 80));
+
+			TransactionHistoryPage t = new TransactionHistoryPage();
+			JButton backButton = new JButton("Back to Dash");
+			backButton.addActionListener(new ActionListener() {
+
+				@Override
+				public void actionPerformed(ActionEvent arg0) {
+					// TODO Auto-generated method stub
+					frame1.setVisible(false);
+					frame1.dispose();
+				}
+
+			});
+
+			JPanel panel = new JPanel(new GridLayout(4,4,4,4));
+			panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+
+			panel.add(actor_label);
+			panel.add(actorScroller);
+			panel.add(movie_label);
+			panel.add(movieScroller);
+			panel.add(backButton);
+
+			frame1.setContentPane(panel);
+			frame1.pack();
+
+			frame1.setVisible(true);
+
+			
 		}
 		
 	}

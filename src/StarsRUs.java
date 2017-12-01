@@ -106,13 +106,6 @@ public class StarsRUs {
 					")",
 */
 
-		StringBuilder add_stock = new StringBuilder("INSERT INTO Sell_Stock VALUES('1', 1000, 'sch', '1', '1', '2017-11-29', '20', '1000000', '10001', '20')");
-		DbClient.getInstance().runQuery(new UpdateQuery(add_stock.toString()) {
-			@Override
-			public void onComplete(int result) {
-				System.out.println("stock successfully added");
-			}
-		});
 	
 	
 
