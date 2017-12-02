@@ -20,7 +20,7 @@ public class MovieApi {
      */
     public CompletableFuture<ResultSet> getMovieInfo(String name) {
         CompletableFuture<ResultSet> promise = new CompletableFuture<>();
-        String query = "SELECT * FROM Movies WHERE title = " + name;
+        String query = "SELECT * FROM Movies WHERE title = '" + name + "'";
         DbClient.getInstance().runQuery(new RetrievalQuery(query) {
             @Override
             public void onComplete(ResultSet result) {

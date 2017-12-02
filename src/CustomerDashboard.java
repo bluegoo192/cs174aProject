@@ -1,7 +1,5 @@
 import Database.DbClient;
-import Database.DbQuery;
 import Database.RetrievalQuery;
-import Database.UpdateQuery;
 
 import java.awt.Dimension;
 import java.awt.GridLayout;
@@ -11,6 +9,9 @@ import java.awt.event.ActionListener;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Vector;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Exchanger;
+import java.util.concurrent.Future;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -160,8 +161,8 @@ public class CustomerDashboard{
          JButton go_1 = new JButton("Go");
          go_1.addActionListener(d.new Go1Listener());
          movie_info = new JTextField("Type name of movie to see information");
-         JButton go_2 = new JButton("Go");
-         go_2.addActionListener(d.new Go2Listener());
+         JButton lookupMovieButton = new JButton("Look up movie");
+         lookupMovieButton.addActionListener(d.new LookupMovieListener());
          
          panel.add(deposit);
          panel.add(buy);
@@ -170,7 +171,7 @@ public class CustomerDashboard{
          panel.add(actor_stock);
          panel.add(go_1);
          panel.add(movie_info);
-         panel.add(go_2);
+         panel.add(lookupMovieButton);
          
          
          //4. Size the frame.
@@ -428,11 +429,34 @@ public class CustomerDashboard{
 		
 	}
 	
-	private class Go2Listener implements ActionListener{
+	private class LookupMovieListener implements ActionListener{
 
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
-			//deposit page
+			CompletableFuture<ResultSet> info;
+			try {
+				Integer id = Integer.parseInt(movie_info.getText());
+				info = DbClient.getMovieApi().getMovieInfo(id);
+			} catch (NumberFormatException e) {
+				info = DbClient.getMovieApi().getMovieInfo(movie_info.getText());
+			}
+			movie_info.setText("Loading...");
+			info.thenAccept(result -> {
+				try {
+					if (result.next()) {
+						StringBuilder infoString = new StringBuilder("");
+						infoString.append(result.getString("title")).append("\nRating: ")
+								.append(result.getFloat("rating")).append("\nProduction year: ")
+								.append(result.getInt("production_year"));
+						movie_info.setText(infoString.toString());
+					} else {
+						movie_info.setText("Invalid movie name or id");
+					}
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+
+			});
 			
 		}
 		
