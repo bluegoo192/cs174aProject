@@ -94,24 +94,42 @@ public class DepositPage {
 			
 			//update user market account
 			int deposit_amount = Integer.parseInt(amount.getText());
-			try {
+			/*try {
 				DbClient.getInstance().adjustMarketAccountBalance(user, deposit_amount);
 			} catch (SQLException e) {
 				e.printStackTrace();
 				System.out.print("Deposit failed, please try again");
-			}
+			}*/
 			
 			//automatically generate deposit id
 			String depID = Integer.toString(StarsRUs.global_deposit);
 			StarsRUs.global_deposit += 1;
 			
+			//DbClient.adjustMarketAccountBalance(String accountID, long amount)
+			
+			/*
+			 * 
+			 * "CREATE TABLE IF NOT EXISTS Market_Account (" +
+					"	AccountID CHAR(20)," +
+					"	Balance REAL CHECK (Balance >= 0)," +
+					"	Username CHAR(20) NOT NULL,\n" +
+					"	old_ADB REAL," +  // old average daily balance (until the most recent balance change)
+					"	last_changed DATE," +
+					"	last_interest_accrual DATE," +
+					"	Original_Monthly_Balance REAL,"+
+					"	FOREIGN KEY(username) REFERENCES Customers(username)" +
+					"ON DELETE CASCADE ON UPDATE CASCADE," +
+					"	PRIMARY KEY (AccountID) )",
+			 */
+			
 			//add to deposit table
-			StringBuilder createDepositRow = new StringBuilder("INSERT INTO Deposit ")
-					.append("(DepositID, AccountID, Username, Value, Date, OriginalBalance) ")
-					.append("VALUES ( ").append("'").append(depID).append("'").append(", ")
-					.append("'").append(account).append("'").append(", ").append("'").append(user).append("'").append(", ")
-					.append(deposit_amount).append(", ").append("'").append(StarsRUs.global_date).append("'").append(",").append(beginning_balance).append(")");
-			DbClient.getInstance().runQuery(new UpdateQuery(createDepositRow.toString()));
+			try {
+				DbClient.getInstance().adjustMarketAccountBalance(account,  deposit_amount);
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				System.out.println("DEPOIST NOT MADE");
+				e.printStackTrace();
+			}
 			
 			
 			
@@ -130,7 +148,7 @@ public class DepositPage {
 		public void actionPerformed(ActionEvent arg0) {
 			// update user market account
 			//update user market account
-			int withdraw_amount = Integer.parseInt(amount.getText());
+			int withdraw_amount = -1*Integer.parseInt(amount.getText());
 			int set_amount = beginning_balance-withdraw_amount;
 			
 			if(set_amount <0) {
@@ -153,13 +171,19 @@ public class DepositPage {
 			StarsRUs.global_withdraw += 1;
 			
 			//add to withdraw table
-			StringBuilder createWithdrawRow = new StringBuilder("INSERT INTO Withdraw ")
+		/*	StringBuilder createWithdrawRow = new StringBuilder("INSERT INTO Withdraw ")
 					.append("(WithdrawID, AccountID, Username, Value, Date, OriginalBalance) ")
 					.append("VALUES ( ").append("'").append(withdraw_id).append("'").append(", ")
 					.append("'").append(account).append("'").append(", ").append("'").append(user).append("'").append(", ")
 					.append(withdraw_amount).append(", ").append("'").append(StarsRUs.global_date).append("'").append(",").append(beginning_balance).append(")");
 			DbClient.getInstance().runQuery(new UpdateQuery(createWithdrawRow.toString()));
-			
+			*/
+			try {
+				DbClient.getInstance().adjustMarketAccountBalance(account,  withdraw_amount);
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			
 			
 			frame.setVisible(false);

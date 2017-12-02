@@ -87,6 +87,12 @@ public class DemoActionsPage{
 		public void actionPerformed(ActionEvent arg0) {
 			// TODO Auto-generated method stub
 
+			//change settings to 1
+			StarsRUs.open_or_closed = true;
+			
+			StringBuilder update_settings = new StringBuilder("UPDATE Settings SET market_open = 1").append(" WHERE setting_id = 1");
+			DbClient.getInstance().runQuery(new UpdateQuery(update_settings.toString()));
+			
 		}
 	}
 	
@@ -95,7 +101,10 @@ public class DemoActionsPage{
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
 			// TODO Auto-generated method stub
+			StarsRUs.open_or_closed = false;
 			
+			StringBuilder update_settings = new StringBuilder("UPDATE Settings SET market_open = 0").append(" WHERE setting_id = 1");
+			DbClient.getInstance().runQuery(new UpdateQuery(update_settings.toString()));
 		}
 		
 	}
@@ -125,9 +134,10 @@ public class DemoActionsPage{
 				
 				StarsRUs.global_date = new_date_string;
 				
-				StringBuilder update_settings = new StringBuilder("UPDATE Settings SET Date = ")
-				.append(StarsRUs.global_date).append(" WHERE setting_id = 1");
-				DbClient.getInstance().runQuery(new UpdateQuery(update_settings.toString()) {});
+				StringBuilder update_settings = new StringBuilder("UPDATE Settings SET Date = '")
+				.append(StarsRUs.global_date).append("' WHERE setting_id = 1");
+				DbClient.getInstance().runQuery(new UpdateQuery(update_settings.toString()));
+				
 			}catch(Exception e){
 				JOptionPane.showMessageDialog(null, "INVALID DATE", "Error Message", 0);
 				return;

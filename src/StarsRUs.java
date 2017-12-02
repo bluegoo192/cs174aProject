@@ -20,6 +20,11 @@ public class StarsRUs {
 	public static int global_buy;
 	public static int global_sell;
 	public static int global_withdraw;
+	public static boolean open_or_closed;
+	
+	public StarsRUs() {
+		
+	}
 
 
 	public static void main(String[] args) {
@@ -137,7 +142,7 @@ public class StarsRUs {
 
 		//initialize global variables
 		StringBuilder initialize_var = new StringBuilder("SELECT S.Date, S.curr_mark_account_id, S.curr_stock_account_id, S.curr_deposit_id, ")
-				.append("S.curr_withdraw_id, S.curr_buy_id, S.curr_sell_id FROM Settings S WHERE setting_id = 1");
+				.append("S.curr_withdraw_id, S.curr_buy_id, S.curr_sell_id, S.market_open FROM Settings S WHERE setting_id = 1");
 
 		DbClient.getInstance().runQuery(new RetrievalQuery(initialize_var.toString()) {
 
@@ -154,6 +159,7 @@ public class StarsRUs {
 					global_withdraw = result.getInt(5);
 					global_buy = result.getInt(6);
 					global_sell = result.getInt(7);
+					open_or_closed = result.getBoolean(7);
 				} catch (SQLException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -165,6 +171,7 @@ public class StarsRUs {
 				
 				
 				DbClient.getInstance();
+				System.out.println(global_date);
 				
 				
 				//5. Show it.
