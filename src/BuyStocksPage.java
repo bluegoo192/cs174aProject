@@ -16,12 +16,13 @@ public class BuyStocksPage {
 	
 	private static String user;
 	private static String stock_id;
+	private String[] stocks = {"Loading stocks..."};
 	
 	
 	static JTextField amount;
 	
 	
-	public static void createStocksPage() {
+	public void createStocksPage() {
 		user = CustomerDashboard.getUser();
 		stock_id = CustomerDashboard.get_stock_account();
 		
@@ -48,16 +49,21 @@ public class BuyStocksPage {
 		//now that stock_id has the stock id, do something
 	}
 	
-	private static void build_frame() {
+	private void build_frame() {
 		BuyStocksPage.frame = new JFrame("Buy/Sell Stocks");
 		BuyStocksPage.frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         Dimension d = new Dimension(800, 800);
       
         BuyStocksPage.frame.getContentPane().setPreferredSize(d);
         JPanel panel = new JPanel(new GridLayout(4,4,4,4));
-       
-		
-        BuyStocksPage.frame.setContentPane(panel);
+		panel.add(new TextField("Enter a stock symbol"));
+		panel.add(new Button("Buy"));
+		panel.add(new JComboBox<String>(stocks));
+		panel.add(new Button("Sell"));
+		panel.add(new Button("Back"));
+
+
+		BuyStocksPage.frame.setContentPane(panel);
         BuyStocksPage.frame.pack();
         BuyStocksPage.frame.setVisible(true);
 	}
