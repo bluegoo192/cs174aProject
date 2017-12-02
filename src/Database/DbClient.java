@@ -130,8 +130,12 @@ public class DbClient {
 	 //* @param change: quantity to adjust by.  Negative for withdrawal, positive for deposit
 	 */
 	public void adjustBalance(String accountID, long change) throws SQLException {
-		Connection connection = DbClient.getInstance().getConnection();
+		PreparedStatement statement = getAdjustBalanceStatement(accountID, change);
+		UpdateQuery adjustQuery = new UpdateQuery(statement);
+		this.runQuery(adjustQuery);
+	}
 
+	private PreparedStatement getAdjustBalanceStatement(String accountID, long change) throws SQLException {
 		// new avg_daily_balance =
 		// (   (old_avg_daily_balance / <num days it was an average over>)
 		//   + (old_balance * <days balance was at old_balance>)  )
@@ -140,7 +144,7 @@ public class DbClient {
 				"UPDATE Market_Account " +
 						"SET " +
 						"old_ADB = ( (old_ADB / (last_changed - last_interest_accrual)) + (Balance * (? - last_changed)) ) " +
-							"/ (? - last_interest_accrual)" +
+						"/ (? - last_interest_accrual)" +
 						"Balance = Balance + ?" +
 						"last_changed = ?, " +
 						"WHERE AccountID = ?");
@@ -149,15 +153,22 @@ public class DbClient {
 		statement.setLong(3, change);
 		statement.setDate(4, TODAY);
 		statement.setString(5, accountID);
-		UpdateQuery adjustQuery = new UpdateQuery(statement);
-		this.runQuery(adjustQuery);
+		return statement;
 	}
 
 //	public void accrueInterest(String accountID) throws SQLException {
 //		// Update the average daily balance
 //		adjustBalance(accountID, 0);
 //		double interestRate = 0.01;
-//		String getDataQuery = "Select () FROM Market_Account A, "
+//		String getDataQuery = "Select (A.old_ADB, S.interest_rate) " +
+//				"FROM Market_Account A, Settings S WHERE A.AccountID = " + accountID + " AND " +
+//				"S.setting_id = 1";
+//		runQuery(new RetrievalQuery(getDataQuery) {
+//			@Override
+//			public void onComplete(ResultSet result) {
+//
+//			}
+//		});
 //
 //	}
 

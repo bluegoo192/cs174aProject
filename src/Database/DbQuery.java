@@ -29,6 +29,10 @@ public abstract class DbQuery {
     }
     public abstract void onComplete(ResultSet result);
 
+    public void setQueryStatement(PreparedStatement statement) {
+        queryStatement = statement;
+    }
+
     public abstract void onComplete(int numRowsAffected);
 
     public final void execute(Statement statement) {
