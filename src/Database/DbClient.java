@@ -364,6 +364,8 @@ public class DbClient {
 					"	StockID CHAR(20) NOT NULL," +
 					"	Date DATE," +
 					"	Commission REAL," +
+					"	numStillOwned INT," +
+					"	price REAL," +
 					"	FOREIGN KEY (stock_symbol) REFERENCES Actor_Stock(stock_symbol) ON UPDATE CASCADE," +
 					"	FOREIGN KEY (MarketID) REFERENCES Market_Account(AccountID), " +
 					"	FOREIGN KEY (StockID) REFERENCES stock_account(AccountID)," +

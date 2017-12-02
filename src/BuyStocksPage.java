@@ -80,41 +80,6 @@ public class BuyStocksPage {
 			}
 		};
 		DbClient.getInstance().runQuery(getStocks);
-//		stock_id = CustomerDashboard.get_stock_account();
-//
-//		if(stock_id.equals("")) {
-//			//create stock account
-//			//create new stock account
-//			String stock_id_string = Integer.toString(StarsRUs.global_stock);
-//			StarsRUs.global_stock += 1;
-//			BuyStocksPage.set_stock_id(stock_id_string);
-////			try {
-////				PreparedStatement statement = DbClient.getInstance().getMainConnection().prepareStatement("" +
-////						"INSERT INTO stock_account VALUES (?, ?, ?, ?)");
-////				statement.setString(1, stock_id_string);
-////				statement.setDouble(2, 3);
-////				statement.setString(3, user);
-////				statement.setString(4, )
-////			} catch (SQLException e) {
-////				System.out.println("Failed to create statement");
-////				e.printStackTrace();
-////			}
-//
-//			StringBuilder create_stock_account = new StringBuilder("INSERT INTO stock_account VALUES(")
-//					.append("'").append(stock_id_string).append("'").append(",").append("0")
-//					.append(",").append("'").append(user).append("'").append(")");
-//			build_frame();
-//			DbClient.getInstance().runQuery(new UpdateQuery(create_stock_account.toString()) {
-//				@Override
-//				public void onComplete(int result) {
-//					System.out.println("created stock account");
-//				}
-//			});
-//		}else {
-//			build_frame();
-//		}
-
-		//now that stock_id has the stock id, do something
 	}
 	
 	private void build_frame() {
@@ -179,13 +144,15 @@ public class BuyStocksPage {
 						try {
 							// Update Buy_Stock and stock_account
 							PreparedStatement statement = DbClient.getInstance().getMainConnection().prepareStatement(
-									"INSERT INTO Buy_Stock VALUES (?, ?, ?, ?, ?, ?, ?)");
+									"INSERT INTO Buy_Stock VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
 							statement.setString(1, Integer.toString(currentBuyId+1));
 							statement.setInt(2, quantity);
 							statement.setString(3, symbol);
 							statement.setString(4, Integer.toString(marketId));
 							statement.setDate(6, DbClient.getInstance().TODAY);
 							statement.setDouble(7, DbClient.getInstance().commission);
+							statement.setInt(8, quantity);
+							statement.setDouble(9, price);
 							if (result2.next()) { // if they already have a stock account
 								statement.setString(5, result2.getString("AccountID"));
 								DbClient.getInstance().runQuery(new UpdateQuery(statement));
@@ -227,7 +194,12 @@ public class BuyStocksPage {
 	}
 
 	private void sellStock(String symbol, double quantity) {
-
+//		DbQuery getStockOwnership = new RetrievalQuery("SELECT * FROM Buy_Stock B, Customers C WHERE numStillOwned > 0 AND Market") {
+//			@Override
+//			public void onComplete(ResultSet result) {
+//
+//			}
+//		}
 	}
 	
 	static void set_stock_id(String input) {
