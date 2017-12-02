@@ -174,8 +174,8 @@ public class DbClient {
 		PreparedStatement statement = mainConnection.prepareStatement(
 				"UPDATE Market_Account " +
 						"SET" +
-						" old_ADB = ( (old_ADB / (last_changed - last_interest_accrual)) + (Balance * (? - last_changed)) )" +
-							"/ (? - last_interest_accrual)," +
+						" old_ADB = ( (old_ADB / DATEDIFF(last_changed, last_interest_accrual)) + (Balance * DATEDIFF(?, last_changed)) )" +
+							"/ DATEDIFF(?, last_interest_accrual)," +
 						" Balance = Balance + ?," +
 						" last_changed = ? " +
 						" WHERE AccountID = ? ");
