@@ -45,6 +45,10 @@ public class DbClient {
 		return mainConnection;
 	}
 
+	public Connection getMoviesConnection() {
+		return moviesConnection;
+	}
+
 	public void run() {
 		if (isRunning || !connected) return; // We can call run() whenever we want with minimal overhead
 		isRunning = true;
@@ -59,9 +63,10 @@ public class DbClient {
 	// Slower than running multiple at once, but safer and easier to reason about
 	private void runQueryQueue() {
 		DbQuery currentQuery;
-		Statement statement;
+		Statement[] statements = new Statement[2];
 		try {
-			statement = mainConnection.createStatement();
+			statements[0] = mainConnection.createStatement();
+			statements[1] = moviesConnection.createStatement();
 		} catch (Exception e) {
 			System.out.println("Failed to create Statement object.  Retry later.");
 			e.printStackTrace();
@@ -69,7 +74,7 @@ public class DbClient {
 		}
 		while (!queryQueue.isEmpty()) {
 			currentQuery = queryQueue.poll();
-			currentQuery.execute(statement);
+			currentQuery.execute(statements);
 		}
 	}
 

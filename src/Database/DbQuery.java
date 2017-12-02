@@ -10,6 +10,7 @@ import java.sql.Statement;
 public abstract class DbQuery {
     private String query;
     private PreparedStatement queryStatement = null;
+    int type = 0; // 0 = main database, 1 = movie database
 
     public DbQuery(String query) {
         this.query = query;
@@ -24,6 +25,11 @@ public abstract class DbQuery {
         return this.query;
     }
 
+    public DbQuery setType(int type) {  // returns this for convenience
+        this.type = type;
+        return this;
+    }
+
     public PreparedStatement getQueryStatement() {
         return this.queryStatement;
     }
@@ -35,9 +41,9 @@ public abstract class DbQuery {
 
     public abstract void onComplete(int numRowsAffected);
 
-    public final void execute(Statement statement) {
+    public final void execute(Statement[] statements) {
         if (queryStatement == null) {
-            executeStringQuery(statement);
+            executeStringQuery(statements[type]);
         } else {
             executePreparedStatement();
         }
