@@ -61,27 +61,7 @@ public class TransactionHistoryPage {
 		frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         Dimension d = new Dimension(800, 800);
         
-        //create deposit list and label
-        JLabel deposit_label = new JLabel("Deposits:");
-        deposit_label.setVerticalAlignment(JLabel.CENTER);
-        
-        deposit_list.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
-        deposit_list.setLayoutOrientation(JList.HORIZONTAL_WRAP);
-        deposit_list.setVisibleRowCount(-1);
-
-        JScrollPane depositScroller = new JScrollPane(deposit_list);
-        depositScroller.setPreferredSize(new Dimension(250, 80));
-        
-        //create withdraw list and label
-        JLabel withdraw_label = new JLabel("Withdraws:");
-        withdraw_label.setVerticalAlignment(JLabel.CENTER);
-        
-        withdraw_list.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
-        withdraw_list.setLayoutOrientation(JList.HORIZONTAL_WRAP);
-        withdraw_list.setVisibleRowCount(-1);
-
-        JScrollPane withdrawScroller = new JScrollPane(withdraw_list);
-        withdrawScroller.setPreferredSize(new Dimension(250, 80));
+      
         
         //create buy list and label
         JLabel buy_label = new JLabel("Buy:");
@@ -113,10 +93,6 @@ public class TransactionHistoryPage {
         JButton backButton = new JButton("Back to Dash");
         backButton.addActionListener(t.new BackListener());
 
-        panel.add(deposit_label);
-		panel.add(depositScroller);
-		panel.add(withdraw_label);
-		panel.add(withdrawScroller);
 		panel.add(buy_label);
 		panel.add(buyScroller);
 		panel.add(sell_label);
@@ -134,86 +110,6 @@ public class TransactionHistoryPage {
 	
 	private static void initialize_all_lists() {
 		//get deposit list
-		StringBuilder get_deposit_list = new StringBuilder("SELECT D.Value, D.Date")
-				.append(" FROM Deposit D ").append("WHERE D.AccountID = '")
-				.append(market_account).append("'").append(" AND D.Username = '" )
-				.append(user).append("'");
-		DbClient.getInstance().runQuery(new RetrievalQuery(get_deposit_list.toString()) {
-			@Override
-			public void onComplete(ResultSet result) {
-				Vector<String> deposit_list = new Vector<String>();
-				try {
-					if(!result.next()) {
-						deposit_list.add("NO DEPOSITS");
-						TransactionHistoryPage.set_deposits(deposit_list);
-						initialize_withdraw();
-						return;
-					}
-				}catch(SQLException e1) {
-					e1.printStackTrace();
-				}
-
-				try {
-					do{
-						String curr_result;
-						curr_result = result.getString(1);
-						curr_result += ", ";
-						curr_result += result.getString(2);
-						deposit_list.add(curr_result);
-					}while(result.next()) ;
-					TransactionHistoryPage.set_deposits(deposit_list);
-					initialize_withdraw();
-				} catch (SQLException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-		});
-
-		
-	}
-	
-	
-	private static void initialize_withdraw() {
-		//get withdraw list
-				StringBuilder get_withdraw_list = new StringBuilder("SELECT W.Value, W.Date")
-						.append(" FROM Withdraw W ").append("WHERE W.AccountID = '")
-						.append(market_account).append("'").append(" AND W.Username = '" )
-						.append(user).append("'");
-				DbClient.getInstance().runQuery(new RetrievalQuery(get_withdraw_list.toString()) {
-					@Override
-					public void onComplete(ResultSet result) {
-						Vector<String> withdraw_list = new Vector<String>();
-						try {
-							if(!result.next()) {
-								withdraw_list.add("NO WITHDRAWS");
-								TransactionHistoryPage.set_withdraws(withdraw_list);
-								initialize_buy();
-								return;
-							}
-						}catch(SQLException e1) {
-							e1.printStackTrace();
-						}
-
-						try {
-							 do{
-								String curr_result;
-								curr_result = result.getString(1);
-								curr_result += ", ";
-								curr_result += result.getString(2);
-								withdraw_list.add(curr_result);
-							}while(result.next());
-							TransactionHistoryPage.set_withdraws(withdraw_list);
-							initialize_buy();
-						} catch (SQLException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-					}
-				});
-	}
-	
-	private static void initialize_buy() {
 		
 		//get buy list
 		StringBuilder get_buy_list = new StringBuilder("SELECT  B.stock_symbol, B.NumShares, B.Date")

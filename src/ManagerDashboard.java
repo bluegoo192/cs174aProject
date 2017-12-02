@@ -2,6 +2,7 @@ import Database.DbClient;
 import Database.DbQuery;
 import Database.RetrievalQuery;
 import Database.UpdateQuery;
+
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
@@ -116,21 +117,23 @@ public class ManagerDashboard{
 					.append(") marketIDs ")
 					.append("LEFT JOIN Sell_Stock ON Sell_Stock.MarketID = marketIDs.ID ")
 					.append("LEFT JOIN Accrue_Interest ON Accrue_Interest.AccountID = marketIDs.ID")
-					.append(" GROUP BY Sell_Stock.MarketID HAVING total_earnings >= 10000) as nested_query, Market_Account M")
-					.append(" WHERE M.Username = '").append(customer_report.getText()).append("' AND nested_query.ID = M.AccountID");		
+					.append(" GROUP BY Sell_Stock.MarketID HAVING total_earnings >= 10000) as nested_query, Market_Account M, Customers C ")
+					.append(" WHERE M.Username = '").append(customer_report.getText()).append("' AND nested_query.ID = M.AccountID ")
+					.append("AND M.Username = C.Username");		
 			DbClient.getInstance().runQuery(new RetrievalQuery(get_profits.toString()) {
 
 				@Override
 				public void onComplete(ResultSet result) {
 					// TODO Auto-generated method stub
-					String profits = "";
+					Vector<String> first_query = new Vector<String>();
 					try {
 						if(!result.next()) {
-							profits = "NO TRANSACTIONS RECORDED FOR THIS MONTH FOR THIS CUSTOMER";
+							first_query.add("NO TRANSACTIONS RECORDED FOR THIS MONTH FOR THIS CUSTOMER");
 						}else {
-							profits = "Profits = " + result.getString(1) + " dollars";
+							first_query.add(result.getString(1).toString());
 						}
-						System.out.println(profits);
+
+						get_commision(first_query);
 					} catch (SQLException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -138,12 +141,245 @@ public class ManagerDashboard{
 				}
 
 			});
-			
+
+
+		}
+
+		private void get_commision(Vector<String> first_query) {
+			//get commision information
+			StringBuilder combine = new StringBuilder("SELECT nested_shares.sum_comm FROM  (SELECT marketIDs.MarketID, SUM(COALESCE(Buy_Stock.Commission, 0) + COALESCE(Sell_Stock.Commission, 0)) as sum_comm, Buy_Stock.MarketID as ID ")
+					.append("FROM( SELECT DISTINCT(MarketID) FROM (SELECT MarketID FROM Buy_Stock UNION SELECT MarketID FROM Sell_Stock) tmp ")
+					.append(") marketIDs")
+					.append(" LEFT JOIN Sell_Stock ON Sell_Stock.MarketID = marketIDs.MarketID ")
+					.append("LEFT JOIN Buy_Stock ON Buy_Stock.MarketID = marketIDs.MarketID")
+					.append(" GROUP BY Buy_Stock.MarketID HAVING sum_comm >= 1000) as nested_shares, Market_Account M")
+					.append(" WHERE nested_shares.ID = M.AccountID AND M.Username = '").append(customer_report.getText()).append("'");
+			DbClient.getInstance().runQuery(new RetrievalQuery(combine.toString()) {
+
+				@Override
+				public void onComplete(ResultSet result) {
+					// TODO Auto-generated method stub
+					String commission = "";
+					try {
+						if(!result.next()) {
+							commission = "NO COMMISSIONS FOR THIS CUSTOMER";
+
+						}else {
+							commission = result.getString(1).toString();
+						}
+
+						get_transactions(first_query, commission);
+					} catch (SQLException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+
+
+				}
+
+
+			});
+
+		}
+
+		private void get_transactions(Vector<String> first_query, String commission) {
+			//get deposit list
+
+			//get buy list
+			StringBuilder get_buy_list = new StringBuilder("SELECT  B.stock_symbol, B.NumShares, B.Date")
+					.append(" FROM Buy_Stock B, Market_Account M ").append("WHERE M.Username = '")
+					.append(customer_report.getText()).append("' AND B.MarketID = M.AccountID");
+			DbClient.getInstance().runQuery(new RetrievalQuery(get_buy_list.toString()) {
+				@Override
+				public void onComplete(ResultSet result) {
+					Vector<String> buy_list = new Vector<String>();
+					try {
+						if(!result.next()) {
+							buy_list.add("YOU HAVE NOT BOUGHT ANY STOCKS THIS MONTH");
+							initialize_sell(first_query, commission, buy_list);
+							return;
+						}
+					}catch(SQLException e1) {
+						e1.printStackTrace();
+					}
+
+					try {
+						do{
+							String curr_result;
+							curr_result = result.getString(1);
+							curr_result += ", ";
+							curr_result += result.getString(2);
+							buy_list.add(curr_result);
+						}while(result.next()) ;
+						TransactionHistoryPage.set_buy(buy_list);
+						initialize_sell(first_query, commission, buy_list);
+					} catch (SQLException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+			});
+
+		}
+
+		private void initialize_sell(Vector<String> first_query, String commission, Vector<String> buy_list) {
+			//get sell list
+			StringBuilder get_sell_list = new StringBuilder("SELECT  S.stock_symbol, S.NumShares, S.Date")
+					.append(" FROM Sell_Stock S, Market_Account M ").append("WHERE M.Username = '")  
+					.append(customer_report.getText()).append("' AND S.MarketID = M.AccountID");
+			DbClient.getInstance().runQuery(new RetrievalQuery(get_sell_list.toString()) {
+				@Override
+				public void onComplete(ResultSet result) {
+					Vector<String> sell_list = new Vector<String>();
+					try {
+						if(!result.next()) {
+							sell_list.add("YOU HAVE NOT SOLD ANY STOCKS THIS MONTH");
+							get_info(first_query, commission, buy_list, sell_list);
+							return;
+						}
+					}catch(SQLException e1) {
+						e1.printStackTrace();
+					}
+
+				}
+			});
+		}
+
+		private void get_info(Vector<String> first_query, String commission, Vector<String> buy_list, Vector<String> sell_list) {
+			StringBuilder get_info = new StringBuilder(" SELECT C.Name, C.Username, C.Email, M.balance, M.Original_Monthly_Balance FROM Customers C, Market_Account M ")
+					.append("WHERE M.Username = C.Username AND C.Username = '").append(customer_report.getText()).append("'");
+			DbClient.getInstance().runQuery(new RetrievalQuery(get_info.toString()) {
+				@Override
+				public void onComplete(ResultSet result) {
+					Vector<String> info = new Vector<String>();
+					try {
+						if(!result.next()) {
+							info.add("NO CUSTOMER INFO");
+							return;
+						}else {
+							info.add(result.getString(1).toString());
+							info.add(result.getString(2).toString());
+							info.add(result.getString(3).toString());
+							info.add("Current Balance: " + result.getString(4).toString());
+							info.add("Beginning of the Month Balance: " + result.getString(5).toString());
+							build_frame(first_query, commission, buy_list, sell_list, info);
+						}
+					}catch(SQLException e1) {
+						e1.printStackTrace();
+					}
+
+					
+				}
+
+			});
+
+		}
+
+		public void build_frame(Vector<String> first_query, String commission, Vector<String> buy, Vector<String> sell, Vector<String> info) {
+			System.out.println(commission);
+			System.out.println(first_query.get(0));
+			System.out.println(info.get(0));
+			System.out.println(info.get(1));
+			System.out.println(info.get(2));
+			System.out.println(info.get(3));
+			System.out.println(info.get(4));
+			System.out.println(buy.get(0));
+			System.out.println(sell.get(0));
+			 
+			JFrame frame2 = new JFrame("MONTHLY REPORT");
+			frame2.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+	        Dimension d = new Dimension(800, 800);
+	        
+	      
+	        JLabel info_label = new JLabel("CUSTOMER INFO");
+	        info_label.setVerticalAlignment(JLabel.CENTER);
+	        JList info_list = new JList(info);
+	        
+	        info_list.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
+	        info_list.setLayoutOrientation(JList.HORIZONTAL_WRAP);
+	        info_list.setVisibleRowCount(-1);
+	        
+	        JScrollPane infoScroller = new JScrollPane(info_list);
+	        infoScroller.setPreferredSize(new Dimension(250, 80));
+	        
+	        JLabel trans_label = new JLabel("TRANSACTION INFORMATION");
+	        	trans_label.setVerticalAlignment(JLabel.CENTER);
+	        JList trans_list = new JList(first_query);
+	        
+	        trans_list.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
+	        trans_list.setLayoutOrientation(JList.HORIZONTAL_WRAP);
+	      	trans_list.setVisibleRowCount(-1);
+	        
+	        JScrollPane transScroller = new JScrollPane(trans_list);
+	        transScroller.setPreferredSize(new Dimension(250, 80));
+	        
+	        JLabel comm = new JLabel(commission);
+	        comm.setVerticalAlignment(JLabel.CENTER);
+	        
+	        //create buy list and label
+	        JLabel buy_label = new JLabel("Buy:");
+	        buy_label.setVerticalAlignment(JLabel.CENTER);
+	        JList buy_list = new JList(buy);
+	        
+	        buy_list.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
+	        buy_list.setLayoutOrientation(JList.HORIZONTAL_WRAP);
+	        buy_list.setVisibleRowCount(-1);
+
+	        JScrollPane  buyScroller = new JScrollPane( buy_list);
+	        buyScroller.setPreferredSize(new Dimension(250, 80));
+	        
+	        //create sell list and label
+	        JLabel sell_label = new JLabel("Sell:");
+	        sell_label.setVerticalAlignment(JLabel.CENTER);
+	        JList sell_list = new JList(sell);
+	        
+	        sell_list.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
+	        sell_list.setLayoutOrientation(JList.HORIZONTAL_WRAP);
+	        sell_list.setVisibleRowCount(-1);
+
+	        JScrollPane sellScroller = new JScrollPane(sell_list);
+	        sellScroller.setPreferredSize(new Dimension(250, 80));
+	        
+	        JButton backButton = new JButton("Back to Dash");
+			backButton.addActionListener(new ActionListener() {
+
+				@Override
+				public void actionPerformed(ActionEvent arg0) {
+					// TODO Auto-generated method stub
+					frame2.setVisible(false);
+					frame2.dispose();
+				}
+
+			});
+	      
+	        frame2.getContentPane().setPreferredSize(d);
+	        JPanel panel = new JPanel(new GridLayout(4,4,4,4));
+	        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+	        
+	        
+	        
+	        panel.add(info_label);
+	        panel.add(infoScroller);
+	        panel.add(trans_label);
+	        panel.add(transScroller);
+	        panel.add(comm);
+	        panel.add(buy_label);
+	        panel.add(buy_list);
+	        panel.add(buyScroller);
+	        panel.add(sell_label);
+	        panel.add(sellScroller);
+	        panel.add(backButton);
+	        
+	        frame2.setContentPane(panel);
+	        
+	        frame2.pack();
+	        frame2.setVisible(true);
 			
 		}
+
 	}
 
-	
+
 	private class ActivesListener implements ActionListener{
 
 		@Override
@@ -155,7 +391,7 @@ public class ManagerDashboard{
 					.append(" LEFT JOIN Sell_Stock ON Sell_Stock.MarketID = marketIDs.MarketID ")
 					.append("LEFT JOIN Buy_Stock ON Buy_Stock.MarketID = marketIDs.MarketID")
 					.append(" GROUP BY Buy_Stock.MarketID HAVING sum_shares >= 1000) as nested_shares, Market_Account M")
-					.append(" WHERE nested_shares.ID = M.AccountID");		
+					.append(" WHERE nested_shares.ID = M.AccountID");
 			DbClient.getInstance().runQuery(new RetrievalQuery(combine.toString()) {
 				@Override
 				public void onComplete(ResultSet result) {
@@ -239,13 +475,14 @@ public class ManagerDashboard{
 			// TODO Auto-generated method stub
 
 			//join buy_stock and sell_stock
-			StringBuilder combine = new StringBuilder("SELECT M.Username, nested_query.total_earnings FROM (SELECT marketIDs.MarketID, SUM(COALESCE(Sell_Stock.Profit, 0)")
+			StringBuilder combine = new StringBuilder("SELECT M.Username, nested_query.total_earnings, C.State, C.TaxID FROM (SELECT marketIDs.MarketID, SUM(COALESCE(Sell_Stock.Profit, 0)")
 					.append("+ COALESCE(Accrue_Interest.MoneyAdded, 0)) as total_earnings ")
 					.append("FROM( SELECT DISTINCT(MarketID) FROM (SELECT MarketID FROM Sell_Stock UNION SELECT AccountID FROM Accrue_Interest) tmp ")
 					.append(") marketIDs ")
 					.append("LEFT JOIN Sell_Stock ON Sell_Stock.MarketID = marketIDs.MarketID ")
 					.append("LEFT JOIN Accrue_Interest ON Accrue_Interest.AccountID = marketIDs.MarketID")
-					.append(" GROUP BY Sell_Stock.MarketID HAVING total_earnings >= 10000) as nested_query, Market_Account M");
+					.append(" GROUP BY Sell_Stock.MarketID HAVING total_earnings >= 10000) as nested_query, Market_Account M, Customers C ")
+					.append("WHERE C.Username = M.Username");
 			DbClient.getInstance().runQuery(new RetrievalQuery(combine.toString()) {
 				@Override
 				public void onComplete(ResultSet result) {
@@ -267,6 +504,10 @@ public class ManagerDashboard{
 							curr_result = result.getString(1);
 							curr_result += ", ";
 							curr_result += result.getString(2);
+							curr_result += ", ";
+							curr_result += result.getString(3);
+							curr_result += ", ";
+							curr_result += result.getString(4);
 							dter_list.add(curr_result);
 						}while(result.next());
 						build_dter_frame(dter_list);
@@ -279,6 +520,7 @@ public class ManagerDashboard{
 
 
 		}
+		
 
 		private void build_dter_frame(Vector<String> users) {
 			JList user_list = new JList(users);
@@ -496,6 +738,13 @@ public class ManagerDashboard{
 			{
 				return;
 			}
+
+			StringBuilder update_starting_balance = new StringBuilder("UPDATE Market_Account SET Original_Monthly_Balance = Balance");
+			DbClient.getInstance().runQuery(new UpdateQuery(update_starting_balance.toString()) {
+				public void onComplete(int numRowsAffected) {
+					System.out.println("updated original monthly balance");
+				}
+			});
 
 			//delete everything in buy stock
 			StringBuilder delete_stock_buys = new StringBuilder("TRUNCATE TABLE Buy_Stock");

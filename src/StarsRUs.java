@@ -88,8 +88,10 @@ public class StarsRUs {
 			}
 		});
 		
+		*/
 		
-*/
+		//StringBuilder add_stock = new StringBuilder("INSERT INTO Buy_Stock VALUES('1', )");
+
 
 	
 	

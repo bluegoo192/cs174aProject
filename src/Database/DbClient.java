@@ -232,6 +232,7 @@ public class DbClient {
 					"	old_ADB REAL," +  // old average daily balance (until the most recent balance change)
 					"	last_changed DATE," +
 					"	last_interest_accrual DATE," +
+					"	Original_Monthly_Balance REAL,"+
 					"	FOREIGN KEY(username) REFERENCES Customers(username)" +
 					"ON DELETE CASCADE ON UPDATE CASCADE," +
 					"	PRIMARY KEY (AccountID) )",
