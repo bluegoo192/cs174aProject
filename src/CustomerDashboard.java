@@ -78,6 +78,7 @@ public class CustomerDashboard{
 		DbClient.getInstance().runQuery(new RetrievalQuery(find_stock_account.toString()) {
 			@Override
 			public void onComplete(ResultSet result) {
+				System.out.println(result.toString());
 				try {
 					if(!result.next()) {
 						//no stock account
