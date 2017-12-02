@@ -85,6 +85,18 @@ public class DbClient {
 		for (String query : DATABASE_INIT_QUERIES) {
 			runQuery(new UpdateQuery(query));
 		}
+		runQuery(new RetrievalQuery("SELECT Date FROM Settings WHERE setting_id = 1") {
+			@Override
+			public void onComplete(ResultSet result) {
+				try {
+					result.next();
+					TODAY = result.getDate("Date");
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+
+			}
+		});
 		run();
 	}
 

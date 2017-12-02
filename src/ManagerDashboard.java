@@ -98,9 +98,19 @@ public class ManagerDashboard{
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
 			// add appropriate amount of interest to all accounts
-			//average daily balance
-
-
+			// average daily balance
+			RetrievalQuery getUsers = new RetrievalQuery("SELECT Username FROM Customers") {
+				@Override
+				public void onComplete(ResultSet result) {
+					try {
+						while (result.next()) {
+							DbClient.getInstance().accrueInterest(result.getString("Username"));
+						}
+					} catch (SQLException e) {
+						e.printStackTrace();
+					}
+				}
+			};
 		}
 
 	}
