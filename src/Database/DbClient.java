@@ -237,10 +237,12 @@ public class DbClient {
 					"	PRIMARY KEY (AccountID) )",
 			"CREATE TABLE IF NOT EXISTS stock_account (" +
 					"	AccountID CHAR(20)," +
-					"	StockBalance REAL CHECK (StockBalance >= 0)," +
+					"	StockBalance REAL CHECK (StockBalance >= 0), " +
+					"	stock_symbol CHAR(3) NOT NULL, " +
 					"	Username CHAR(20) NOT NULL," +
 					"	FOREIGN KEY(username) REFERENCES Customers(username)" +
 					"		ON DELETE CASCADE ON UPDATE CASCADE," +
+					"	FOREIGN KEY (stock_symbol) REFERENCES Actor_Stock(stock_symbol)," +
 					"	PRIMARY KEY (AccountID))" ,
 			"CREATE TABLE IF NOT EXISTS Deposit(" +
 					"	DepositID CHAR(20)," +
