@@ -23,7 +23,7 @@ public class BuyStocksPage {
 	private static String user;
 	private static String stock_id;
 	private String marketID;
-	private HashMap<String, Double> stockQuantityMap = new HashMap<>();
+	private HashMap<String, Integer> stockQuantityMap = new HashMap<>();
 
 	JButton buyButton;
 	JButton sellButton;
@@ -66,7 +66,8 @@ public class BuyStocksPage {
 					stocksComboBox.removeAll();
 					while (result.next()) {
 						results++;
-						stocksComboBox.addItem(result.getString("stock_symbol"));
+						stocksComboBox.addItem(result.getString("stock_symbol")+" ("+result.getInt("StockBalance")+")");
+						stockQuantityMap.put(result.getString("stock_symbol"), result.getInt("StockBalance"));
 					}
 					if (results == 0) {
 						sellButton.setText("Sell (no stocks owned)");
