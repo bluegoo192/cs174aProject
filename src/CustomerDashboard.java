@@ -463,8 +463,28 @@ public class CustomerDashboard{
 	private class TopMoviesListener implements ActionListener {
 
 		@Override
-		public void actionPerformed(ActionEvent e) {
-			resetMovieInfo("Top Movies").validate();
+		public void actionPerformed(ActionEvent ev) {
+			CompletableFuture<ResultSet> info;
+			resetMovieInfo("Top Movies");
+			info = DbClient.getMovieApi().getTopMovies();
+			info.thenAccept(result -> {
+				resetMovieInfo("Top Movies");
+				try {
+					boolean results = false;
+					while (result.next()) {
+						movieInfo.add(new JLabel(result.getString("title")));
+						results = true;
+					}
+					if (!results) {
+						movieInfo.add(new JLabel("No movies with a 5 star rating"));
+					}
+					frame.validate();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+
+			});
+			frame.validate();
 		}
 	}
 
