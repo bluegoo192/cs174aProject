@@ -25,6 +25,8 @@ public class DbClient {
 
 	public java.sql.Date TODAY = new Date(System.currentTimeMillis());
 
+	private static MovieApi movieApi;
+
 	// Connection setup
 	static final String JDBC_DRIVER = "com.mysql.cj.jdbc.Driver";
 	public static final String MOVIESDB_URL = "jdbc:mysql://cs174a.engr.ucsb.edu:3306/moviesDB?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC";
@@ -56,6 +58,7 @@ public class DbClient {
 	}
 
 	private DbClient() {
+		movieApi = new MovieApi();
 		new Thread(new AutoConnector()).start(); // Connect asynchronously
 	}
 
@@ -88,6 +91,10 @@ public class DbClient {
 	public void runQuery(DbQuery query) {
 		queryQueue.add(query);
 		run();
+	}
+
+	public static MovieApi getMovieApi() {
+		return movieApi;
 	}
 
 	/**

@@ -10,6 +10,9 @@ import java.util.concurrent.CompletableFuture;
  */
 public class MovieApi {
 
+    // Limit instantiation to this package (Database)
+    protected MovieApi() {}
+
     /**
      * Get a movie's id, title, rating, and production_year
      * @param name Name of the movie
