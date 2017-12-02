@@ -1,5 +1,7 @@
 package Database;
 
+import com.mysql.cj.x.protobuf.MysqlxCrud;
+
 import java.sql.*;
 import java.sql.Date;
 import java.util.*;
@@ -142,12 +144,12 @@ public class DbClient {
 		//  / (total days)
 		PreparedStatement statement = connection.prepareStatement(
 				"UPDATE Market_Account " +
-						"SET " +
-						"old_ADB = ( (old_ADB / (last_changed - last_interest_accrual)) + (Balance * (? - last_changed)) ) " +
-						"/ (? - last_interest_accrual)" +
-						"Balance = Balance + ?" +
-						"last_changed = ?, " +
-						"WHERE AccountID = ?");
+						"SET" +
+						" old_ADB = ( (old_ADB / (last_changed - last_interest_accrual)) + (Balance * (? - last_changed)) )" +
+							"/ (? - last_interest_accrual)" +
+						" Balance = Balance + ?" +
+						" last_changed = ?," +
+						" WHERE AccountID = ?");
 		statement.setDate(1, TODAY);
 		statement.setDate(2, TODAY);
 		statement.setLong(3, change);
@@ -156,21 +158,51 @@ public class DbClient {
 		return statement;
 	}
 
-//	public void accrueInterest(String accountID) throws SQLException {
-//		// Update the average daily balance
-//		adjustBalance(accountID, 0);
-//		double interestRate = 0.01;
-//		String getDataQuery = "Select (A.old_ADB, S.interest_rate) " +
-//				"FROM Market_Account A, Settings S WHERE A.AccountID = " + accountID + " AND " +
-//				"S.setting_id = 1";
-//		runQuery(new RetrievalQuery(getDataQuery) {
-//			@Override
-//			public void onComplete(ResultSet result) {
-//
-//			}
-//		});
-//
-//	}
+	public void accrueInterest(String accountID) throws SQLException {
+
+		/* Step 1: Update the average daily balance */
+		runQuery(new UpdateQuery(getAdjustBalanceStatement(accountID, 0)) {
+			@Override
+			public void onComplete(int numRowsAffected) {
+
+				/* Step 2: Get the updated average daily balance and interest rate */
+				String getDataQuery = "Select (A.old_ADB, S.interest_rate) " + // old_ADB is actually current right now
+						"FROM Market_Account A, Settings S WHERE A.AccountID = " + accountID + " AND " +
+						"S.setting_id = 1";
+				runQuery(new RetrievalQuery(getDataQuery) {
+					@Override
+					public void onComplete(ResultSet result) {
+						try {
+							long interest = result.getLong("old_ADB") * result.getLong("interest_rate");
+
+							/* Step 3: update market account and record transaction in Accrue_Interest */
+							PreparedStatement marketAccountStatement = connection.prepareStatement("UPDATE Market_Account " +
+									"SET Balance = Balance + ?" +
+									" last_interest_accrual = ?" +
+									" old_ADB = Balance" +
+									" last_changed = ?" +
+									" WHERE AccountID = ?");
+							marketAccountStatement.setLong(1, interest);
+							marketAccountStatement.setDate(2, TODAY);
+							marketAccountStatement.setDate(3, TODAY);
+							marketAccountStatement.setString(4, accountID);
+							PreparedStatement accrueInterestStatement = connection.prepareStatement("INSERT INTO " +
+									"Accrue_Interest (AccountID, MONTH, MoneyAdded)" +
+									" VALUES (?, ?, ?)");
+							accrueInterestStatement.setString(1, accountID);
+							accrueInterestStatement.setDate(2, TODAY);
+							accrueInterestStatement.setLong(3, interest);
+							runQuery(new UpdateQuery(marketAccountStatement));
+							runQuery(new UpdateQuery(accrueInterestStatement));
+						} catch (SQLException e) {
+							System.out.println("FAILED TO ACCRUE INTEREST FOR "+accountID);
+							e.printStackTrace();
+						}
+					}
+				});
+			}
+		});
+	}
 
 	public void createEntryCustomers(String username, String password, String taxId, String state, String phone, String email) {
 		StringBuilder addEntry = new StringBuilder("INSERT INTO CUSTOMERS VALUES (")
