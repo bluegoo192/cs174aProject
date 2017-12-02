@@ -94,14 +94,12 @@ public class DepositPage {
 			
 			//update user market account
 			int deposit_amount = Integer.parseInt(amount.getText());
-			int set_amount = beginning_balance+deposit_amount;
-
-			StringBuilder depositString = new StringBuilder("UPDATE Market_Account ")
-					.append("SET balance = ").append(set_amount)
-					.append(" WHERE username =  ").append("'").append(user)
-					.append("'");
-
-			DbClient.getInstance().runQuery(new UpdateQuery(depositString.toString()));
+			try {
+				DbClient.getInstance().adjustMarketAccountBalance(user, deposit_amount);
+			} catch (SQLException e) {
+				e.printStackTrace();
+				System.out.print("Deposit failed, please try again");
+			}
 			
 			//automatically generate deposit id
 			String depID = Integer.toString(StarsRUs.global_deposit);
@@ -143,18 +141,18 @@ public class DepositPage {
 				return;
 			}
 
-			StringBuilder depositString = new StringBuilder("UPDATE Market_Account ")
-					.append("SET balance = ").append(set_amount)
-					.append(" WHERE username =  ").append("'").append(user)
-					.append("'");
-
-			DbClient.getInstance().runQuery(new UpdateQuery(depositString.toString()));
+			try {
+				DbClient.getInstance().adjustMarketAccountBalance(user, withdraw_amount);
+			} catch (SQLException e) {
+				e.printStackTrace();
+				System.out.print("Deposit failed, please try again");
+			}
 			
-			//automatically generate deposit id
+			//automatically generate withdraw id
 			String withdraw_id = Integer.toString(StarsRUs.global_withdraw);
 			StarsRUs.global_withdraw += 1;
 			
-			//add to deposit table
+			//add to withdraw table
 			StringBuilder createWithdrawRow = new StringBuilder("INSERT INTO Withdraw ")
 					.append("(WithdrawID, AccountID, Username, Value, Date, OriginalBalance) ")
 					.append("VALUES ( ").append("'").append(withdraw_id).append("'").append(", ")

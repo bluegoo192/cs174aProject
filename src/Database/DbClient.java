@@ -131,7 +131,7 @@ public class DbClient {
 	 //* @param accountID: id of the market account
 	 //* @param change: quantity to adjust by.  Negative for withdrawal, positive for deposit
 	 */
-	public void adjustBalance(String accountID, long change) throws SQLException {
+	public void adjustMarketAccountBalance(String accountID, long change) throws SQLException {
 		PreparedStatement statement = getAdjustBalanceStatement(accountID, change);
 		UpdateQuery adjustQuery = new UpdateQuery(statement);
 		this.runQuery(adjustQuery);
