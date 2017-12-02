@@ -290,32 +290,6 @@ public class CustomerDashboard{
 			//stock is a 3 letter string
 			//query to find stock
 			
-			/*
-			 * "CREATE TABLE IF NOT EXISTS Actor_Stock (" +
-					"	Name CHAR(20)," +
-					"	Birth DATE," +
-					"	stock_symbol CHAR(3)," +
-					"	current_stock_price REAL," +
-					"	closing_prices_log MEDIUMTEXT," +
-					"	PRIMARY KEY (stock_symbol))",
-					
-				"CREATE TABLE IF NOT EXISTS Movie (" +
-					"	MovieID CHAR(20)," +
-					"	Title CHAR(20)," +
-					"	Year CHAR(4)," +
-					"	PRIMARY KEY (MovieID)" +
-					")",
-			"CREATE TABLE IF NOT EXISTS MovieContract(" +
-					"	stock_symbol CHAR(3) NOT NULL," +
-					"	MovieID CHAR(20) NOT NULL," +
-					"	Role CHAR(20)," +
-					"	Total_Value REAL," +
-					"	FOREIGN KEY(stock_symbol) REFERENCES Actor_Stock(stock_symbol) ON UPDATE CASCADE," +
-					"	FOREIGN KEY(MovieID) REFERENCES Movie(MovieID) ON DELETE CASCADE ON UPDATE CASCADE," +
-					"	PRIMARY KEY(stock_symbol, MovieID)" +
-					")",
-			 */
-			
 			StringBuilder addEntry = new StringBuilder("SELECT A.current_stock_price, A.Name, A.Birth ")
 					.append("FROM Actor_Stock A ")
 					.append("WHERE A.stock_symbol = ").append("'").append(CustomerDashboard.actor_stock.getText())

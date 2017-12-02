@@ -88,22 +88,7 @@ public class StarsRUs {
 			}
 		});
 		
-		"CREATE TABLE IF NOT EXISTS Sell_Stock(" +
-					"	SellID CHAR(20)," +
-					"	NumShares INT," +
-					"	stock_symbol CHAR(3) NOT NULL," +
-					"	MarketID CHAR(20) NOT NULL," +
-					"	StockID CHAR(20) NOT NULL," +
-					"	Date DATE," +
-					"	OriginalBuyingPrice REAL," +
-					"	Selling_Price REAL,"+
-					"	Profit REAL,"+
-					"	Commission REAL,"+
-					"	FOREIGN KEY (stock_symbol) REFERENCES Actor_Stock(stock_symbol) ON DELETE CASCADE ON UPDATE CASCADE," +
-					"	FOREIGN KEY (MarketID) REFERENCES Market_Account(AccountID)," +
-					"	FOREIGN KEY (StockID) REFERENCES stock_account(AccountID)," +
-					"	PRIMARY KEY(SellID)" +
-					")",
+		
 */
 
 	
@@ -127,11 +112,21 @@ public class StarsRUs {
 						System.out.println("Updated globals");
 					}
 					
+					if (stat != null) {
+					    stat.close();
+					}
+
+					if (connection != null) {
+					    connection.close();
+					}
+					
 				} catch (ClassNotFoundException ce) {
 					// TODO Auto-generated catch block
 					ce.printStackTrace();
 				}catch (SQLException se) {
 					se.printStackTrace();
+				}finally {
+					
 				}
 				
 		
