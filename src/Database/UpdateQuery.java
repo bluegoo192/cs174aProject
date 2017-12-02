@@ -1,5 +1,6 @@
 package Database;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -10,6 +11,10 @@ import java.sql.Statement;
 public class UpdateQuery extends DbQuery {
     public UpdateQuery(String query) {
         super(query);
+    }
+
+    public UpdateQuery(PreparedStatement statement) {
+        super(statement);
     }
 
     @Override

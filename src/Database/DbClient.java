@@ -129,30 +129,34 @@ public class DbClient {
 	 //* @param accountID: id of the market account
 	 //* @param change: quantity to adjust by.  Negative for withdrawal, positive for deposit
 	 */
-//	public void adjustBalance(String accountID, long change) {
-//		StringBuilder adjustQuery = new StringBuilder("UPDATE Market_Account SET ")
-//				.append("Balance = Balance + ").append(change).append(", ")
-//				.append("last_changed = ").append()
-//				.append("WHERE AccountID = ").append(accountID).append(" ");
-//		UpdateQuery adjust = new UpdateQuery(adjustQuery.toString());
-//		try {
-//			Connection connection = DbClient.getInstance().getConnection();
-//
-//			PreparedStatement statement = connection.prepareStatement(
-//					"UPDATE Market_Account " +
-//							"SET Balance = Balance + ?, " +
-//							"last_changed = ?, " +
-//							"avg_daily_balance = avg_daily_balance + (Balance *)? " +
-//							"WHERE AccountID = ?");
-//
-//			statement.setLong(1, change);
-//			statement.setDate(2, TODAY);
-//			//statement.setLong(3, );
-//			//pstmt.executeUpdate();
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		}
-//	}
+	public void adjustBalance(String accountID, long change) {
+		try {
+			Connection connection = DbClient.getInstance().getConnection();
+
+			// new avg_daily_balance =
+			// (   (old_avg_daily_balance / <num days it was an average over>)
+			//   + (old_balance * <days balance was at old_balance>)  )
+			//  / (total days)
+			PreparedStatement statement = connection.prepareStatement(
+					"UPDATE Market_Account " +
+							"SET " +
+							"old_ADB = ( (old_ADB / (last_changed - last_interest_accrual)) + (Balance * (? - last_changed)) ) " +
+										"/ (? - last_interest_accrual)" +
+							"Balance = Balance + ?" +
+							"last_changed = ?, " +
+							"WHERE AccountID = ?");
+
+			statement.setDate(1, TODAY);
+			statement.setDate(2, TODAY);
+			statement.setLong(3, change);
+			statement.setDate(4, TODAY);
+			statement.setString(5, accountID);
+			UpdateQuery adjustQuery = new UpdateQuery(statement);
+			this.runQuery(adjustQuery);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 
 	public void createEntryCustomers(String username, String password, String taxId, String state, String phone, String email) {
 		StringBuilder addEntry = new StringBuilder("INSERT INTO CUSTOMERS VALUES (")
@@ -179,9 +183,9 @@ public class DbClient {
 					"	AccountID CHAR(20)," +
 					"	Balance REAL CHECK (Balance >= 0)," +
 					"	Username CHAR(20) NOT NULL,\n" +
-					"	avg_daily_balance REAL," +
+					"	old_ADB REAL," +  // old average daily balance (until the most recent balance change)
 					"	last_changed DATE," +
-					"	days_since_interest INT," +
+					"	last_interest_accrual DATE," +
 					"	FOREIGN KEY(username) REFERENCES Customers(username)" +
 					"ON DELETE CASCADE ON UPDATE CASCADE," +
 					"	PRIMARY KEY (AccountID) )",

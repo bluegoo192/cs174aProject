@@ -1,9 +1,6 @@
 package Database;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.Statement;
+import java.sql.*;
 
 /**
  * Created by Arthur on 11/28/17.
@@ -14,6 +11,10 @@ public abstract class RetrievalQuery extends DbQuery {
 	
     public RetrievalQuery(String query) {
         super(query);
+    }
+
+    public RetrievalQuery(PreparedStatement statement) {
+        super(statement);
     }
 
     @Override
