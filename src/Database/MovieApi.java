@@ -42,4 +42,21 @@ public class MovieApi {
         }.setType(1));
         return promise;
     }
+
+    /**
+     * Get reviews of a given movie
+     * @param movieId ID of the movie
+     * @return Future ResultSet
+     */
+    public CompletableFuture<ResultSet> getReviews(int movieId) {
+        CompletableFuture<ResultSet> promise = new CompletableFuture<>();
+        String query = "SELECT * FROM Reviews WHERE movie_id = "+movieId;
+        DbClient.getInstance().runQuery(new RetrievalQuery(query) {
+            @Override
+            public void onComplete(ResultSet result) {
+                promise.complete(result);
+            }
+        }.setType(1));
+        return promise;
+    }
 }
