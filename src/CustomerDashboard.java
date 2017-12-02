@@ -1,36 +1,23 @@
 import Database.DbClient;
 import Database.RetrievalQuery;
 
-import java.awt.Dimension;
-import java.awt.GridLayout;
-import java.awt.HeadlessException;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Vector;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Exchanger;
-import java.util.concurrent.Future;
 
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextField;
-import javax.swing.ListSelectionModel;
-import javax.swing.WindowConstants;
+import javax.swing.*;
 
 
 public class CustomerDashboard{
 	
 	static JFrame frame;
 	static JTextField actor_stock;
-	static JTextField movie_info;
+	static JTextField movieLookupField;
+	static JComponent movieInfo;
 	
 	private static String user;
 	
@@ -160,7 +147,10 @@ public class CustomerDashboard{
          actor_stock = new JTextField("Type stock symbol Here to see current price");
          JButton go_1 = new JButton("Go");
          go_1.addActionListener(d.new Go1Listener());
-         movie_info = new JTextField("Type name of movie to see information");
+         movieLookupField = new JTextField("Type name of movie to see information");
+		movieInfo = new JPanel();
+		movieInfo.setLayout(new BoxLayout(movieInfo, BoxLayout.PAGE_AXIS));
+		movieInfo.add(new JLabel("MOVIE INFO"));
          JButton lookupMovieButton = new JButton("Look up movie");
          lookupMovieButton.addActionListener(d.new LookupMovieListener());
          
@@ -170,7 +160,8 @@ public class CustomerDashboard{
          panel.add(transaction_history);
          panel.add(actor_stock);
          panel.add(go_1);
-         panel.add(movie_info);
+         panel.add(movieLookupField);
+		panel.add(movieInfo);
          panel.add(lookupMovieButton);
          
          
@@ -435,31 +426,39 @@ public class CustomerDashboard{
 		public void actionPerformed(ActionEvent arg0) {
 			CompletableFuture<ResultSet> info;
 			try {
-				Integer id = Integer.parseInt(movie_info.getText());
+				Integer id = Integer.parseInt(movieLookupField.getText());
 				info = DbClient.getMovieApi().getMovieInfo(id);
 			} catch (NumberFormatException e) {
-				info = DbClient.getMovieApi().getMovieInfo(movie_info.getText());
+				info = DbClient.getMovieApi().getMovieInfo(movieLookupField.getText());
 			}
-			movie_info.setText("Loading...");
+			resetMovieInfo();
 			info.thenAccept(result -> {
+				resetMovieInfo();
 				try {
 					if (result.next()) {
-						StringBuilder infoString = new StringBuilder("");
-						infoString.append(result.getString("title")).append("\nRating: ")
-								.append(result.getFloat("rating")).append("\nProduction year: ")
-								.append(result.getInt("production_year"));
-						movie_info.setText(infoString.toString());
+						movieInfo.add(new JLabel("Title: "+result.getString("title")));
+						movieInfo.add(new JLabel("Rating: "+result.getLong("rating")));
+						movieInfo.add(new JLabel("Production year: "+result.getInt("production_year")));
+						frame.validate();
 					} else {
-						movie_info.setText("Invalid movie name or id");
+						movieInfo.add(new JLabel("Invalid movie title or id"));
+						frame.validate();
 					}
 				} catch (SQLException e) {
 					e.printStackTrace();
 				}
 
 			});
-			
+			movieInfo.add(new JLabel("Loading..."));
+			frame.validate();
 		}
 		
+	}
+
+	private JFrame resetMovieInfo() {
+		movieInfo.removeAll();
+		movieInfo.add(new JLabel("Movie Info"));
+		return frame; // so we can optionally call validate() after
 	}
 	
 	//get next accountID
