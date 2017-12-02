@@ -6,12 +6,15 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.concurrent.Exchanger;
 
 import javax.swing.*;
 
 import Database.DbClient;
+import Database.DbQuery;
 import Database.RetrievalQuery;
 import Database.UpdateQuery;
+import com.mysql.cj.x.protobuf.MysqlxCrud;
 
 public class BuyStocksPage {
 
@@ -19,12 +22,15 @@ public class BuyStocksPage {
 	
 	private static String user;
 	private static String stock_id;
+	private String marketID;
 	private ArrayList<String> stocks = new ArrayList<>();
 	private HashMap<String, Double> stockQuantityMap = new HashMap<>();
 
 	JButton buyButton;
 	JButton sellButton;
 	JButton backButton;
+	TextField stockSymbolField = new TextField("Enter stock to buy");
+	TextField quantityField = new TextField("Enter quantity");
 	JComboBox<String> stocksComboBox;
 	
 	
@@ -32,6 +38,18 @@ public class BuyStocksPage {
 
 	public BuyStocksPage() {
 		buyButton = new JButton("Buy");
+		buyButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				try {
+					Integer quantity = Integer.parseInt(quantityField.getText());
+					buyStock(stockSymbolField.getText(), quantity);
+				} catch (Exception ex) {
+					quantityField.setText("Must be a number!");
+				}
+
+			}
+		});
 		sellButton = new JButton("Sell");
 		backButton = new JButton("Back");
 		stocks.add("Loading stock accounts...");
@@ -107,7 +125,8 @@ public class BuyStocksPage {
       
         BuyStocksPage.frame.getContentPane().setPreferredSize(d);
         JPanel panel = new JPanel(new GridLayout(4,4,4,4));
-		panel.add(new TextField("Enter a stock symbol"));
+		panel.add(stockSymbolField);
+		panel.add(quantityField);
 		panel.add(buyButton);
 		panel.add(stocksComboBox);
 		panel.add(sellButton);
@@ -117,6 +136,99 @@ public class BuyStocksPage {
 		BuyStocksPage.frame.setContentPane(panel);
         BuyStocksPage.frame.pack();
         BuyStocksPage.frame.setVisible(true);
+	}
+
+	private void buyStock(String symbol, int quantity) {
+//			statement.setString(3, symbol);
+//			statement.setString(4, );
+		DbQuery mainQuery = new RetrievalQuery("SELECT S.curr_buy_id AS curr_buy_id, S.curr_stock_account_id AS curr_stock_id, MA.AccountID AS marketID, MA.Balance AS balance, AS.current_stock_price AS price FROM " +
+				"Settings S, Market_Account MA, Actor_Stock AS WHERE S.setting_id = 1 AND AS.stock_symbol = '" + symbol + "' " +
+				"AND MA.Username = '"+user+"'") {
+			@Override
+			public void onComplete(ResultSet result) {
+				final Integer currentBuyId;
+				final Integer marketId;
+				final Integer currentStockId;
+				final Double balance;
+				final Double price;
+				try {
+					if (result.next()) {
+						currentBuyId = result.getInt("curr_buy_id");
+						marketId = result.getInt("marketID");
+						currentStockId = result.getInt("curr_stock_id");
+						balance = result.getDouble("balance");
+						price = result.getDouble("price");
+						if (balance < (price * quantity)) {
+							System.err.println("Can't afford purchase");
+							return;
+						}
+						System.out.println("sf" + currentBuyId+"  "+marketId);
+					} else {
+						currentBuyId = 1;
+						marketId = 1;
+						currentStockId = 1;
+						balance = 0.0;
+						price = 100.0;
+					}
+				} catch (SQLException e) {
+					e.printStackTrace();
+					return;
+				}
+				DbQuery getStockAccountQuery = new RetrievalQuery("SELECT * FROM stock_account WHERE Username = '"+user+"' AND stock_symbol = '"+symbol+"'") {
+					@Override
+					public void onComplete(ResultSet result2) {
+						try {
+							// Update Buy_Stock and stock_account
+							PreparedStatement statement = DbClient.getInstance().getMainConnection().prepareStatement(
+									"INSERT INTO Buy_Stock VALUES (?, ?, ?, ?, ?, ?, ?)");
+							statement.setString(1, Integer.toString(currentBuyId+1));
+							statement.setInt(2, quantity);
+							statement.setString(3, symbol);
+							statement.setString(4, Integer.toString(marketId));
+							statement.setDate(6, DbClient.getInstance().TODAY);
+							statement.setDouble(7, DbClient.getInstance().commission);
+							if (result2.next()) { // if they already have a stock account
+								statement.setString(5, result2.getString("AccountID"));
+								DbClient.getInstance().runQuery(new UpdateQuery(statement));
+								PreparedStatement updateAccount = DbClient.getInstance().getMainConnection().prepareStatement(
+										"UPDATE stock_account SET StockBalance = StockBalance + ? WHERE AccountID = ?"
+								);
+								updateAccount.setDouble(1, quantity);
+								updateAccount.setString(2, result2.getString("AccountID"));
+								DbClient.getInstance().runQuery(new UpdateQuery(updateAccount));
+							} else { // if they don't, make one first
+								PreparedStatement createAccount = DbClient.getInstance().getMainConnection().prepareStatement(
+										"INSERT INTO stock_account VALUES (?,?,?,?)");
+								createAccount.setString(1, Integer.toString(currentStockId+1));
+								createAccount.setDouble(2, quantity);
+								createAccount.setString(3, user);
+								createAccount.setString(4, symbol);
+
+								statement.setString(5, Integer.toString(currentStockId+1));
+								UpdateQuery createAccountQuery = new UpdateQuery(createAccount) {
+									@Override
+									public void onComplete(int numRowsAffected) {
+										DbClient.getInstance().runQuery(new UpdateQuery(statement));
+									}
+								};
+								DbClient.getInstance().runQuery(createAccountQuery);
+							}
+							// Update balance
+							DbClient.getInstance().adjustMarketAccountBalance(Integer.toString(marketId), (long) -(quantity * price));
+						} catch (SQLException e) {
+							e.printStackTrace();
+							return;
+						}
+					}
+				};
+				DbClient.getInstance().runQuery(getStockAccountQuery);
+			}
+		};
+		DbClient.getInstance().runQuery(mainQuery);
+	}
+
+	private void sellStock(String symbol, double quantity) {
+
 	}
 	
 	static void set_stock_id(String input) {

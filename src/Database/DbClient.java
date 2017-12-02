@@ -22,6 +22,7 @@ public class DbClient {
 	boolean connected = false;
 	private Queue<DbQuery> queryQueue = new LinkedList<>();
 	private boolean isRunning = false;
+	public final int commission = 20;
 
 	public java.sql.Date TODAY = new Date(System.currentTimeMillis());
 
@@ -282,7 +283,7 @@ public class DbClient {
 					"	StockBalance REAL CHECK (StockBalance >= 0), " +
 					"	stock_symbol CHAR(3) NOT NULL, " +
 					"	Username CHAR(20) NOT NULL," +
-					"	FOREIGN KEY(username) REFERENCES Customers(username)" +
+					"	FOREIGN KEY(Username) REFERENCES Customers(Username)" +
 					"		ON DELETE CASCADE ON UPDATE CASCADE," +
 					"	FOREIGN KEY (stock_symbol) REFERENCES Actor_Stock(stock_symbol)," +
 					"	PRIMARY KEY (AccountID))" ,
