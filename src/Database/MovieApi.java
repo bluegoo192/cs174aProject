@@ -27,15 +27,19 @@ public class MovieApi {
         return promise;
     }
 
-//    public CompletableFuture<ResultSet> getTopMovies() {
-//        CompletableFuture<ResultSet> promise = new CompletableFuture<>();
-//        String query = "SELECT * FROM Movies WHERE id = " + id;
-//        DbClient.getInstance().runQuery(new RetrievalQuery(query) {
-//            @Override
-//            public void onComplete(ResultSet result) {
-//                promise.complete(result);
-//            }
-//        }.setType(1));
-//        return promise;
-//    }
+    /**
+     * Get titles of movies wwith a rating of 5
+     * @return Future ResultSet
+     */
+    public CompletableFuture<ResultSet> getTopMovies() {
+        CompletableFuture<ResultSet> promise = new CompletableFuture<>();
+        String query = "SELECT title FROM Movies WHERE rating = 5";
+        DbClient.getInstance().runQuery(new RetrievalQuery(query) {
+            @Override
+            public void onComplete(ResultSet result) {
+                promise.complete(result);
+            }
+        }.setType(1));
+        return promise;
+    }
 }
