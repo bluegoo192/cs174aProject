@@ -23,7 +23,6 @@ public class BuyStocksPage {
 	private static String user;
 	private static String stock_id;
 	private String marketID;
-	private ArrayList<String> stocks = new ArrayList<>();
 	private HashMap<String, Double> stockQuantityMap = new HashMap<>();
 
 	JButton buyButton;
@@ -32,7 +31,7 @@ public class BuyStocksPage {
 	TextField stockSymbolField = new TextField("Enter stock to buy");
 	TextField quantityField = new TextField("Enter quantity");
 	JComboBox<String> stocksComboBox;
-	
+
 	
 	static JTextField amount;
 
@@ -52,9 +51,14 @@ public class BuyStocksPage {
 		});
 		sellButton = new JButton("Sell");
 		backButton = new JButton("Back");
-		stocks.add("Loading stock accounts...");
-		stocksComboBox = new JComboBox<>(stocks.toArray(new String[stocks.size()]));
-		RetrievalQuery getStocks = new RetrievalQuery("SELECT stock_symbol, StockBalance FROM stock_account WHERE AccountID = "+user+" ") {
+		stocksComboBox = new JComboBox<>();
+	}
+	
+	
+	public void createStocksPage() {
+		user = CustomerDashboard.getUser();
+		build_frame();
+		RetrievalQuery getStocks = new RetrievalQuery("SELECT stock_symbol, StockBalance FROM stock_account WHERE Username = '"+user+"' ") {
 			@Override
 			public void onComplete(ResultSet result) {
 				try {
@@ -75,12 +79,6 @@ public class BuyStocksPage {
 			}
 		};
 		DbClient.getInstance().runQuery(getStocks);
-	}
-	
-	
-	public void createStocksPage() {
-		user = CustomerDashboard.getUser();
-		build_frame();
 //		stock_id = CustomerDashboard.get_stock_account();
 //
 //		if(stock_id.equals("")) {
