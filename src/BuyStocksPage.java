@@ -141,8 +141,8 @@ public class BuyStocksPage {
 	private void buyStock(String symbol, int quantity) {
 //			statement.setString(3, symbol);
 //			statement.setString(4, );
-		DbQuery mainQuery = new RetrievalQuery("SELECT S.curr_buy_id AS curr_buy_id, S.curr_stock_account_id AS curr_stock_id, MA.AccountID AS marketID, MA.Balance AS balance, AS.current_stock_price AS price FROM " +
-				"Settings S, Market_Account MA, Actor_Stock AS WHERE S.setting_id = 1 AND AS.stock_symbol = '" + symbol + "' " +
+		DbQuery mainQuery = new RetrievalQuery("SELECT S.curr_buy_id AS curr_buy_id, S.curr_stock_account_id AS curr_stock_id, MA.AccountID AS marketID, MA.Balance AS balance, A.current_stock_price AS price FROM " +
+				"Settings S, Market_Account MA, Actor_Stock A WHERE S.setting_id = 1 AND A.stock_symbol = '" + symbol + "' " +
 				"AND MA.Username = '"+user+"'") {
 			@Override
 			public void onComplete(ResultSet result) {
@@ -158,7 +158,7 @@ public class BuyStocksPage {
 						currentStockId = result.getInt("curr_stock_id");
 						balance = result.getDouble("balance");
 						price = result.getDouble("price");
-						if (balance < (price * quantity)) {
+						if (balance < (price * quantity) + DbClient.getInstance().commission) {
 							System.err.println("Can't afford purchase");
 							return;
 						}
@@ -214,7 +214,7 @@ public class BuyStocksPage {
 								DbClient.getInstance().runQuery(createAccountQuery);
 							}
 							// Update balance
-							DbClient.getInstance().adjustMarketAccountBalance(Integer.toString(marketId), (long) -(quantity * price));
+							DbClient.getInstance().adjustMarketAccountBalance(Integer.toString(marketId), (long) -((quantity * price)+DbClient.getInstance().commission));
 						} catch (SQLException e) {
 							e.printStackTrace();
 							return;
