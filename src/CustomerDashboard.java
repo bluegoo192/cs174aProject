@@ -210,7 +210,7 @@ public class CustomerDashboard{
 			frame.setVisible(false);
 			frame.dispose();
 			
-			BuyStocksPage.createStocksPage();
+			new BuyStocksPage().createStocksPage();
 			
 		}
 		
