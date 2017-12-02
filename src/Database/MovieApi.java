@@ -12,6 +12,23 @@ public class MovieApi {
 
     /**
      * Get a movie's id, title, rating, and production_year
+     * @param name Name of the movie
+     * @return Future ResultSet
+     */
+    public CompletableFuture<ResultSet> getMovieInfo(String name) {
+        CompletableFuture<ResultSet> promise = new CompletableFuture<>();
+        String query = "SELECT * FROM Movies WHERE title = " + name;
+        DbClient.getInstance().runQuery(new RetrievalQuery(query) {
+            @Override
+            public void onComplete(ResultSet result) {
+                promise.complete(result);
+            }
+        }.setType(1));
+        return promise;
+    }
+
+    /**
+     * Get a movie's id, title, rating, and production_year
      * @param id ID of the movie
      * @return Future ResultSet
      */
