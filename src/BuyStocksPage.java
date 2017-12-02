@@ -17,9 +17,27 @@ public class BuyStocksPage {
 	private static String user;
 	private static String stock_id;
 	private String[] stocks = {"Loading stocks..."};
+
+	Button buyButton;
+	Button sellButton;
+	Button backButton;
+	JComboBox<String> stocksComboBox;
 	
 	
 	static JTextField amount;
+
+	public BuyStocksPage() {
+		buyButton = new Button();
+		sellButton = new Button();
+		backButton = new Button();
+		stocksComboBox = new JComboBox<>(stocks);
+//		RetrievalQuery getStocks = new RetrievalQuery("SELECT () FROM stock_account WHERE S.AccountID = "+user+" ") {
+//			@Override
+//			public void onComplete(ResultSet result) {
+//
+//			}
+//		}
+	}
 	
 	
 	public void createStocksPage() {
@@ -57,10 +75,10 @@ public class BuyStocksPage {
         BuyStocksPage.frame.getContentPane().setPreferredSize(d);
         JPanel panel = new JPanel(new GridLayout(4,4,4,4));
 		panel.add(new TextField("Enter a stock symbol"));
-		panel.add(new Button("Buy"));
-		panel.add(new JComboBox<String>(stocks));
-		panel.add(new Button("Sell"));
-		panel.add(new Button("Back"));
+		panel.add(buyButton);
+		panel.add(stocksComboBox);
+		panel.add(sellButton);
+		panel.add(backButton);
 
 
 		BuyStocksPage.frame.setContentPane(panel);
