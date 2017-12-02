@@ -152,6 +152,10 @@ public class CustomerDashboard{
 		movieInfo.setLayout(new BoxLayout(movieInfo, BoxLayout.PAGE_AXIS));
 		movieInfo.add(new JLabel("MOVIE INFO"));
          JButton lookupMovieButton = new JButton("Look up movie");
+		JButton topMoviesButton = new JButton("See top movies");
+		topMoviesButton.addActionListener(d.new TopMoviesListener());
+		JButton reviewsButton = new JButton("Look up reviews");
+		reviewsButton.addActionListener(d.new ReviewsListener());
          lookupMovieButton.addActionListener(d.new LookupMovieListener());
          
          panel.add(deposit);
@@ -161,8 +165,10 @@ public class CustomerDashboard{
          panel.add(actor_stock);
          panel.add(go_1);
          panel.add(movieLookupField);
-		panel.add(movieInfo);
+		panel.add(topMoviesButton);
+		panel.add(reviewsButton);
          panel.add(lookupMovieButton);
+		panel.add(movieInfo);
          
          
          //4. Size the frame.
@@ -431,14 +437,14 @@ public class CustomerDashboard{
 			} catch (NumberFormatException e) {
 				info = DbClient.getMovieApi().getMovieInfo(movieLookupField.getText());
 			}
-			resetMovieInfo();
+			resetMovieInfo("Movie Information");
 			info.thenAccept(result -> {
-				resetMovieInfo();
+				resetMovieInfo("Movie Information");
 				try {
 					if (result.next()) {
-						movieInfo.add(new JLabel("Title: "+result.getString("title")));
-						movieInfo.add(new JLabel("Rating: "+result.getLong("rating")));
-						movieInfo.add(new JLabel("Production year: "+result.getInt("production_year")));
+						movieInfo.add(new JLabel("Title: " + result.getString("title")));
+						movieInfo.add(new JLabel("Rating: " + result.getLong("rating")));
+						movieInfo.add(new JLabel("Production year: " + result.getInt("production_year")));
 						frame.validate();
 					} else {
 						movieInfo.add(new JLabel("Invalid movie title or id"));
@@ -452,12 +458,55 @@ public class CustomerDashboard{
 			movieInfo.add(new JLabel("Loading..."));
 			frame.validate();
 		}
-		
 	}
 
-	private JFrame resetMovieInfo() {
+	private class TopMoviesListener implements ActionListener {
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			resetMovieInfo("Top Movies").validate();
+		}
+	}
+
+	private class ReviewsListener implements ActionListener {
+
+		@Override
+		public void actionPerformed(ActionEvent event) {
+			CompletableFuture<ResultSet> info;
+			resetMovieInfo("Reviews");
+			try {
+				Integer id = Integer.parseInt(movieLookupField.getText());
+				info = DbClient.getMovieApi().getReviews(id);
+			} catch (NumberFormatException e) {
+				movieInfo.add(new JLabel("Sorry, reviews only support the movie id at this time"));
+				frame.validate();
+				return;
+			}
+			info.thenAccept(result -> {
+				resetMovieInfo("Reviews");
+				try {
+					boolean results = false;
+					while (result.next()) {
+						movieInfo.add(new JLabel("\"" + result.getString("review") + "\"  -"+result.getString("author")));
+						results = true;
+					}
+					if (!results) {
+						movieInfo.add(new JLabel("No reviews"));
+					}
+					frame.validate();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+
+			});
+			movieInfo.add(new JLabel("Loading..."));
+			frame.validate();
+		}
+	}
+
+	private JFrame resetMovieInfo(String title) {
 		movieInfo.removeAll();
-		movieInfo.add(new JLabel("Movie Info"));
+		movieInfo.add(new JLabel(title));
 		return frame; // so we can optionally call validate() after
 	}
 	
