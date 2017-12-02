@@ -4,6 +4,7 @@ import java.awt.event.ActionListener;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import javax.swing.*;
@@ -18,26 +19,41 @@ public class BuyStocksPage {
 	
 	private static String user;
 	private static String stock_id;
-	private String[] stocks = {"Loading stocks..."};
+	private ArrayList<String> stocks = new ArrayList<>();
 	private HashMap<String, Double> stockQuantityMap = new HashMap<>();
 
-	Button buyButton;
-	Button sellButton;
-	Button backButton;
+	JButton buyButton;
+	JButton sellButton;
+	JButton backButton;
 	JComboBox<String> stocksComboBox;
 	
 	
 	static JTextField amount;
 
 	public BuyStocksPage() {
-		buyButton = new Button();
-		sellButton = new Button();
-		backButton = new Button();
-		stocksComboBox = new JComboBox<>(stocks);
+		buyButton = new JButton("Buy");
+		sellButton = new JButton("Sell");
+		backButton = new JButton("Back");
+		stocks.add("Loading stock accounts...");
+		stocksComboBox = new JComboBox<>(stocks.toArray(new String[stocks.size()]));
 		RetrievalQuery getStocks = new RetrievalQuery("SELECT stock_symbol, StockBalance FROM stock_account WHERE AccountID = "+user+" ") {
 			@Override
 			public void onComplete(ResultSet result) {
-				System.out.println(result.toString());
+				try {
+					int results = 0;
+					stocksComboBox.removeAll();
+					while (result.next()) {
+						results++;
+						stocksComboBox.addItem(result.getString("stock_symbol"));
+					}
+					if (results == 0) {
+						sellButton.setText("Sell (no stocks owned)");
+						sellButton.setEnabled(false);
+					}
+				} catch (SQLException e) {
+					System.out.println("Failed to get current stocks");
+					e.printStackTrace();
+				}
 			}
 		};
 		DbClient.getInstance().runQuery(getStocks);
@@ -46,39 +62,40 @@ public class BuyStocksPage {
 	
 	public void createStocksPage() {
 		user = CustomerDashboard.getUser();
-		stock_id = CustomerDashboard.get_stock_account();
-		
-		if(stock_id.equals("")) {
-			//create stock account
-			//create new stock account
-			String stock_id_string = Integer.toString(StarsRUs.global_stock);
-			StarsRUs.global_stock += 1;
-			BuyStocksPage.set_stock_id(stock_id_string);
-//			try {
-//				PreparedStatement statement = DbClient.getInstance().getMainConnection().prepareStatement("" +
-//						"INSERT INTO stock_account VALUES (?, ?, ?, ?)");
-//				statement.setString(1, stock_id_string);
-//				statement.setDouble(2, 3);
-//				statement.setString(3, user);
-//				statement.setString(4, )
-//			} catch (SQLException e) {
-//				System.out.println("Failed to create statement");
-//				e.printStackTrace();
-//			}
-
-			StringBuilder create_stock_account = new StringBuilder("INSERT INTO stock_account VALUES(")
-					.append("'").append(stock_id_string).append("'").append(",").append("0")
-					.append(",").append("'").append(user).append("'").append(")");
-			build_frame();
-			DbClient.getInstance().runQuery(new UpdateQuery(create_stock_account.toString()) {
-				@Override
-				public void onComplete(int result) {
-					System.out.println("created stock account");
-				}
-			});
-		}else {
-			build_frame();
-		}
+		build_frame();
+//		stock_id = CustomerDashboard.get_stock_account();
+//
+//		if(stock_id.equals("")) {
+//			//create stock account
+//			//create new stock account
+//			String stock_id_string = Integer.toString(StarsRUs.global_stock);
+//			StarsRUs.global_stock += 1;
+//			BuyStocksPage.set_stock_id(stock_id_string);
+////			try {
+////				PreparedStatement statement = DbClient.getInstance().getMainConnection().prepareStatement("" +
+////						"INSERT INTO stock_account VALUES (?, ?, ?, ?)");
+////				statement.setString(1, stock_id_string);
+////				statement.setDouble(2, 3);
+////				statement.setString(3, user);
+////				statement.setString(4, )
+////			} catch (SQLException e) {
+////				System.out.println("Failed to create statement");
+////				e.printStackTrace();
+////			}
+//
+//			StringBuilder create_stock_account = new StringBuilder("INSERT INTO stock_account VALUES(")
+//					.append("'").append(stock_id_string).append("'").append(",").append("0")
+//					.append(",").append("'").append(user).append("'").append(")");
+//			build_frame();
+//			DbClient.getInstance().runQuery(new UpdateQuery(create_stock_account.toString()) {
+//				@Override
+//				public void onComplete(int result) {
+//					System.out.println("created stock account");
+//				}
+//			});
+//		}else {
+//			build_frame();
+//		}
 
 		//now that stock_id has the stock id, do something
 	}
