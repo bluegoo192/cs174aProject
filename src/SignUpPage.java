@@ -120,18 +120,7 @@ public class SignUpPage {
 			//generate taxID
 			
 			//after confirming validity of the entered information, create new account in sql
-			
-		    /*
-			 * CREATE TABLE IF NOT EXISTS Customers (" +
-					"	Username CHAR(20)," +
-					"	Name CHAR(40),"+
-					"	State CHAR(2)," +
-					"	Email CHAR(254) UNIQUE," +
-					"	TaxID CHAR(9) UNIQUE," +
-					"	Phone CHAR(10)," +
-					"	Password CHAR(20)," +
-					"	PRIMARY KEY (Username))
-			 */
+	
 		    
 			StringBuilder addEntry = new StringBuilder("INSERT INTO Customers VALUES (")
 					.append("'").append(username.getText()).append("'").append(",")
@@ -156,11 +145,27 @@ public class SignUpPage {
 		private void addAccount() {
 			
 			
+			/*
+			 * "CREATE TABLE IF NOT EXISTS Market_Account (" +
+					"	AccountID CHAR(20)," +
+					"	Balance REAL CHECK (Balance >= 0)," +
+					"	Username CHAR(20) NOT NULL,\n" +
+					"	old_ADB REAL," +  // old average daily balance (until the most recent balance change)
+					"	last_changed DATE," +
+					"	last_interest_accrual DATE," +
+					"	Original_Monthly_Balance REAL,"+
+					"	FOREIGN KEY(username) REFERENCES Customers(username)" +
+					"ON DELETE CASCADE ON UPDATE CASCADE," +
+					"	PRIMARY KEY (AccountID) )",
+			 * 
+			 */
+			
 			String account_id = Integer.toString(StarsRUs.global_mark);
 			StarsRUs.global_mark += 1;
 			StringBuilder addMarketAccount = new StringBuilder("INSERT INTO Market_Account VALUES( ")
 					.append("'").append(account_id).append("'").append(",").append("1000").append(",").append("'").append(username.getText()).append("'")
 					.append(",").append("1000").append(",").append("'").append(StarsRUs.global_date).append("'")
+					.append(", '").append(StarsRUs.global_date).append("', 1000")
 					.append(")");
 			DbClient.getInstance().runQuery(new UpdateQuery(addMarketAccount.toString()) {
 				@Override
@@ -171,19 +176,6 @@ public class SignUpPage {
 			});
 			
 			
-			
-			String deposit_id = Integer.toString(StarsRUs.global_deposit);
-			StarsRUs.global_deposit += 1;
-			//add to deposit table
-			StringBuilder add_initial_deposit = new StringBuilder("INSERT INTO Deposit VALUES (")
-					.append("'").append(account_id).append("','").append(deposit_id).append("','").append(username.getText()).append("',")
-					.append("1000").append(",'").append(StarsRUs.global_date).append(",").append("0").append("')");
-			DbClient.getInstance().runQuery(new UpdateQuery(add_initial_deposit.toString()) {
-				@Override
-				public void onComplete(int result) {
-					System.out.println("Initial Deposit created successfully");
-				}
-			});
 			
 			//go to new page
 			frame.setVisible(false);

@@ -134,6 +134,7 @@ public class DbClient {
 	public void adjustMarketAccountBalance(String accountID, long change) throws SQLException {
 		PreparedStatement statement = getAdjustBalanceStatement(accountID, change);
 		UpdateQuery adjustQuery = new UpdateQuery(statement);
+		System.out.println(statement.toString());
 		this.runQuery(adjustQuery);
 	}
 
@@ -142,18 +143,20 @@ public class DbClient {
 		// (   (old_avg_daily_balance / <num days it was an average over>)
 		//   + (old_balance * <days balance was at old_balance>)  )
 		//  / (total days)
+		System.out.println(TODAY.toString());
+		
 		PreparedStatement statement = connection.prepareStatement(
 				"UPDATE Market_Account " +
 						"SET" +
 						" old_ADB = ( (old_ADB / (last_changed - last_interest_accrual)) + (Balance * (? - last_changed)) )" +
-							"/ (? - last_interest_accrual)" +
-						" Balance = Balance + ?" +
-						" last_changed = ?," +
-						" WHERE AccountID = ?");
-		statement.setDate(1, TODAY);
-		statement.setDate(2, TODAY);
+							"/ (? - last_interest_accrual)," +
+						" Balance = Balance + ?," +
+						" last_changed = ? " +
+						" WHERE AccountID = ? ");
+		statement.setString(1, TODAY.toString());
+		statement.setString(2, TODAY.toString());
 		statement.setLong(3, change);
-		statement.setDate(4, TODAY);
+		statement.setString(4, TODAY.toString());
 		statement.setString(5, accountID);
 		return statement;
 	}
@@ -232,6 +235,7 @@ public class DbClient {
 					"	old_ADB REAL," +  // old average daily balance (until the most recent balance change)
 					"	last_changed DATE," +
 					"	last_interest_accrual DATE," +
+					"	Original_Monthly_Balance REAL,"+
 					"	FOREIGN KEY(username) REFERENCES Customers(username)" +
 					"ON DELETE CASCADE ON UPDATE CASCADE," +
 					"	PRIMARY KEY (AccountID) )",
