@@ -1,7 +1,5 @@
 package Database;
 
-import com.mysql.cj.x.protobuf.MysqlxCrud;
-
 import java.sql.*;
 import java.sql.Date;
 import java.util.*;
@@ -19,7 +17,8 @@ import java.util.*;
 public class DbClient {
 
 	// Connection status
-	Connection connection;
+	Connection mainConnection;
+	Connection moviesConnection;
 	boolean connected = false;
 	private Queue<DbQuery> queryQueue = new LinkedList<>();
 	private boolean isRunning = false;
@@ -28,6 +27,7 @@ public class DbClient {
 
 	// Connection setup
 	static final String JDBC_DRIVER = "com.mysql.cj.jdbc.Driver";
+	public static final String MOVIESDB_URL = "jdbc:mysql://cs174a.engr.ucsb.edu:3306/moviesDB?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC";
 	public static final String DB_URL_ARTHUR = "jdbc:mysql://cs174a.engr.ucsb.edu:3306/silversteinDB?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC";
 	public static final String USER_ARTHUR = "silverstein";
 	public static final String PASS_ARTHUR = "954";
@@ -41,8 +41,8 @@ public class DbClient {
 		return ourInstance;
 	}
 
-	public Connection getConnection() {
-		return connection;
+	public Connection getMainConnection() {
+		return mainConnection;
 	}
 
 	public void run() {
@@ -61,7 +61,7 @@ public class DbClient {
 		DbQuery currentQuery;
 		Statement statement;
 		try {
-			statement = connection.createStatement();
+			statement = mainConnection.createStatement();
 		} catch (Exception e) {
 			System.out.println("Failed to create Statement object.  Retry later.");
 			e.printStackTrace();
@@ -87,19 +87,33 @@ public class DbClient {
 
 	/**
 	 * Connect to the database.
-	 * @return Whether or not the connection was successful
+	 * @return Whether or not the mainConnection was successful
 	 */
 	private boolean connect() {
-		try {
-			System.out.println("Trying to connect");
-			Class.forName(JDBC_DRIVER);
-			connection = DriverManager.getConnection(DB_URL_ARTHUR, USER_ARTHUR, PASS_ARTHUR);
-			System.out.println("Connected to database");
-			return true;
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
+		int failures = 0;
+		if (mainConnection == null) {
+			try {
+				System.out.println("Trying to connect");
+				Class.forName(JDBC_DRIVER);
+				mainConnection = DriverManager.getConnection(DB_URL_ARTHUR, USER_ARTHUR, PASS_ARTHUR);
+				System.out.println("Connected to main database");
+			} catch (Exception e) {
+				e.printStackTrace();
+				failures++;
+			}
 		}
+		if (moviesConnection == null) {
+			try {
+				System.out.println("Trying to connect");
+				Class.forName(JDBC_DRIVER);
+				moviesConnection = DriverManager.getConnection(MOVIESDB_URL, USER_ARTHUR, PASS_ARTHUR);
+				System.out.println("Connected to movies database");
+			} catch (Exception e) {
+				e.printStackTrace();
+				failures++;
+			}
+		}
+		return (failures == 0);
 	}
 
 	// Try to connect over and over until we are successful
@@ -145,7 +159,7 @@ public class DbClient {
 		//  / (total days)
 		System.out.println(TODAY.toString());
 		
-		PreparedStatement statement = connection.prepareStatement(
+		PreparedStatement statement = mainConnection.prepareStatement(
 				"UPDATE Market_Account " +
 						"SET" +
 						" old_ADB = ( (old_ADB / (last_changed - last_interest_accrual)) + (Balance * (? - last_changed)) )" +
@@ -179,7 +193,7 @@ public class DbClient {
 							long interest = result.getLong("old_ADB") * result.getLong("interest_rate");
 
 							/* Step 3: update market account and record transaction in Accrue_Interest */
-							PreparedStatement marketAccountStatement = connection.prepareStatement("UPDATE Market_Account " +
+							PreparedStatement marketAccountStatement = mainConnection.prepareStatement("UPDATE Market_Account " +
 									"SET Balance = Balance + ?" +
 									" last_interest_accrual = ?" +
 									" old_ADB = Balance" +
@@ -189,7 +203,7 @@ public class DbClient {
 							marketAccountStatement.setDate(2, TODAY);
 							marketAccountStatement.setDate(3, TODAY);
 							marketAccountStatement.setString(4, accountID);
-							PreparedStatement accrueInterestStatement = connection.prepareStatement("INSERT INTO " +
+							PreparedStatement accrueInterestStatement = mainConnection.prepareStatement("INSERT INTO " +
 									"Accrue_Interest (AccountID, MONTH, MoneyAdded)" +
 									" VALUES (?, ?, ?)");
 							accrueInterestStatement.setString(1, accountID);

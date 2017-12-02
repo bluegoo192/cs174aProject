@@ -55,7 +55,7 @@ public class BuyStocksPage {
 			StarsRUs.global_stock += 1;
 			BuyStocksPage.set_stock_id(stock_id_string);
 //			try {
-//				PreparedStatement statement = DbClient.getInstance().getConnection().prepareStatement("" +
+//				PreparedStatement statement = DbClient.getInstance().getMainConnection().prepareStatement("" +
 //						"INSERT INTO stock_account VALUES (?, ?, ?, ?)");
 //				statement.setString(1, stock_id_string);
 //				statement.setDouble(2, 3);
