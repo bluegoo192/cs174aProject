@@ -89,34 +89,64 @@ public class DemoActionsPage{
 
 			//change settings to 1
 			StarsRUs.open_or_closed = true;
-			
+
 			StringBuilder update_settings = new StringBuilder("UPDATE Settings SET market_open = 1").append(" WHERE setting_id = 1");
 			DbClient.getInstance().runQuery(new UpdateQuery(update_settings.toString()));
-			
+
 		}
 	}
-	
+
 	private class CloseListener implements ActionListener{
 
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
 			// TODO Auto-generated method stub
+			if(!StarsRUs.open_or_closed) {
+				return;
+			}
 			StarsRUs.open_or_closed = false;
 			
+
 			StringBuilder update_settings = new StringBuilder("UPDATE Settings SET market_open = 0").append(" WHERE setting_id = 1");
 			DbClient.getInstance().runQuery(new UpdateQuery(update_settings.toString()));
+			
+			//record all stock closing prices
+			StringBuilder update_stocks = new StringBuilder("UPDATE Actor_Stock SET closing_prices_log = closing_prices_log + ', ' + current_stock_price");
+			DbClient.getInstance().runQuery(new UpdateQuery(update_stocks.toString()));
 		}
-		
+
 	}
-	
+
 	private class SetStockListener implements ActionListener{
 
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
 			// TODO Auto-generated method stub
+
+			//get stock
+			String stock = stock_symbol.getText();
+
+
+			if(stock.length() != 3 || !stock.matches("[a-zA-Z]+")) {
+				JOptionPane.showMessageDialog(null, "Stock Symbol must be of size 3 and can only contain letters", "Stock Error", 0);
+				return;
+			}
 			
+			String num = new_price.getText();
+			System.out.println("got price");
+			
+			if(!num.matches("[0-9]+")) {
+				JOptionPane.showMessageDialog(null, "Must be a real number", "Stock Error", 0);
+				return;
+			}
+			int price = Integer.parseInt(num);
+			
+			StringBuilder update_stock= new StringBuilder("UPDATE Actor_Stock SET current_stock_price = '")
+					.append(price).append("' WHERE stock_symbol = '").append(stock).append("'");
+			DbClient.getInstance().runQuery(new UpdateQuery(update_stock.toString()));
+
 		}
-		
+
 	}
 
 	private class SetDateListener implements ActionListener{
@@ -127,27 +157,27 @@ public class DemoActionsPage{
 			//check date is legit
 			String new_date_string = new_date.getText();
 			System.out.println(new_date_string);
-			
+
 			try {
 				dateformat.parse(new_date_string);
 				//it will go to catch new_date_string is not a valid date; thus, anything after this can assume that it is a valid date
-				
+
 				StarsRUs.global_date = new_date_string;
-				
+
 				StringBuilder update_settings = new StringBuilder("UPDATE Settings SET Date = '")
-				.append(StarsRUs.global_date).append("' WHERE setting_id = 1");
+						.append(StarsRUs.global_date).append("' WHERE setting_id = 1");
 				DbClient.getInstance().runQuery(new UpdateQuery(update_settings.toString()));
-				
+
 			}catch(Exception e){
 				JOptionPane.showMessageDialog(null, "INVALID DATE", "Error Message", 0);
 				return;
 			}
-		
-			
-			
-			
+
+
+
+
 		}
-		
+
 	}
 
 }
