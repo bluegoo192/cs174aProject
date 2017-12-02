@@ -129,34 +129,37 @@ public class DbClient {
 	 //* @param accountID: id of the market account
 	 //* @param change: quantity to adjust by.  Negative for withdrawal, positive for deposit
 	 */
-	public void adjustBalance(String accountID, long change) {
-		try {
-			Connection connection = DbClient.getInstance().getConnection();
+	public void adjustBalance(String accountID, long change) throws SQLException {
+		Connection connection = DbClient.getInstance().getConnection();
 
-			// new avg_daily_balance =
-			// (   (old_avg_daily_balance / <num days it was an average over>)
-			//   + (old_balance * <days balance was at old_balance>)  )
-			//  / (total days)
-			PreparedStatement statement = connection.prepareStatement(
-					"UPDATE Market_Account " +
-							"SET " +
-							"old_ADB = ( (old_ADB / (last_changed - last_interest_accrual)) + (Balance * (? - last_changed)) ) " +
-										"/ (? - last_interest_accrual)" +
-							"Balance = Balance + ?" +
-							"last_changed = ?, " +
-							"WHERE AccountID = ?");
-
-			statement.setDate(1, TODAY);
-			statement.setDate(2, TODAY);
-			statement.setLong(3, change);
-			statement.setDate(4, TODAY);
-			statement.setString(5, accountID);
-			UpdateQuery adjustQuery = new UpdateQuery(statement);
-			this.runQuery(adjustQuery);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		// new avg_daily_balance =
+		// (   (old_avg_daily_balance / <num days it was an average over>)
+		//   + (old_balance * <days balance was at old_balance>)  )
+		//  / (total days)
+		PreparedStatement statement = connection.prepareStatement(
+				"UPDATE Market_Account " +
+						"SET " +
+						"old_ADB = ( (old_ADB / (last_changed - last_interest_accrual)) + (Balance * (? - last_changed)) ) " +
+							"/ (? - last_interest_accrual)" +
+						"Balance = Balance + ?" +
+						"last_changed = ?, " +
+						"WHERE AccountID = ?");
+		statement.setDate(1, TODAY);
+		statement.setDate(2, TODAY);
+		statement.setLong(3, change);
+		statement.setDate(4, TODAY);
+		statement.setString(5, accountID);
+		UpdateQuery adjustQuery = new UpdateQuery(statement);
+		this.runQuery(adjustQuery);
 	}
+
+//	public void accrueInterest(String accountID) throws SQLException {
+//		// Update the average daily balance
+//		adjustBalance(accountID, 0);
+//		double interestRate = 0.01;
+//		String getDataQuery = "Select () FROM Market_Account A, "
+//
+//	}
 
 	public void createEntryCustomers(String username, String password, String taxId, String state, String phone, String email) {
 		StringBuilder addEntry = new StringBuilder("INSERT INTO CUSTOMERS VALUES (")
@@ -298,6 +301,7 @@ public class DbClient {
 					"	setting_id INTEGER," +
 					"	Date DATE," +
 					"	market_open BIT," +
+					"	interest_rate REAL," +
 					"	curr_mark_account_id INTEGER," +
 					"	curr_stock_account_id INTEGER,"+
 					"	curr_deposit_id INTEGER,"+
