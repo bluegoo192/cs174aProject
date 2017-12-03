@@ -14,7 +14,7 @@ import java.sql.*;
 public class StarsRUs {
 
 	public static String global_date;
-	public static int global_mark;
+	public static int global_mark;	//current market account iterator
 	public static int global_stock;
 	public static int global_deposit;
 	public static int global_buy;

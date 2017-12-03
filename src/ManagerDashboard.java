@@ -138,7 +138,7 @@ public class ManagerDashboard{
 					Vector<String> first_query = new Vector<String>();
 					try {
 						if(!result.next()) {
-							first_query.add("NO TRANSACTIONS RECORDED FOR THIS MONTH FOR THIS CUSTOMER");
+							first_query.add("NO PROFITS RECORDED FOR THIS MONTH FOR THIS CUSTOMER");
 						}else {
 							first_query.add(result.getString(1).toString());
 						}
@@ -157,13 +157,9 @@ public class ManagerDashboard{
 
 		private void get_commision(Vector<String> first_query) {
 			//get commision information
-			StringBuilder combine = new StringBuilder("SELECT nested_shares.sum_comm FROM  (SELECT marketIDs.MarketID, SUM(COALESCE(Buy_Stock.Commission, 0) + COALESCE(Sell_Stock.Commission, 0)) as sum_comm, Buy_Stock.MarketID as ID ")
-					.append("FROM( SELECT DISTINCT(MarketID) FROM (SELECT MarketID FROM Buy_Stock UNION SELECT MarketID FROM Sell_Stock) tmp ")
-					.append(") marketIDs")
-					.append(" LEFT JOIN Sell_Stock ON Sell_Stock.MarketID = marketIDs.MarketID ")
-					.append("LEFT JOIN Buy_Stock ON Buy_Stock.MarketID = marketIDs.MarketID")
-					.append(" GROUP BY Buy_Stock.MarketID HAVING sum_comm >= 1000) as nested_shares, Market_Account M")
-					.append(" WHERE nested_shares.ID = M.AccountID AND M.Username = '").append(customer_report.getText()).append("'");
+			StringBuilder combine = new StringBuilder("SELECT (buy.buy_count + sell.sell_count) FROM (SELECT COUNT(*) as buy_count FROM Buy_Stock B, Market_Account M WHERE B.MarketID = M.AccountID AND M.Username = '")
+					.append(customer_report.getText()).append("') as buy, (SELECT COUNT(*) as sell_count FROM Sell_Stock S, Market_Account M WHERE S.MarketID = M.AccountID AND M.Username = '") 
+					.append(customer_report.getText()).append("') as sell");
 			DbClient.getInstance().runQuery(new RetrievalQuery(combine.toString()) {
 
 				@Override
@@ -175,7 +171,8 @@ public class ManagerDashboard{
 							commission = "NO COMMISSIONS FOR THIS CUSTOMER";
 
 						}else {
-							commission = result.getString(1).toString();
+							commission = "Total Commission:$";
+							commission += (20*result.getInt(1));
 						}
 
 						get_transactions(first_query, commission);
