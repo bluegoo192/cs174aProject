@@ -36,6 +36,8 @@ public class BuyStocksPage {
 	static JTextField amount;
 
 	public BuyStocksPage() {
+		
+		
 		buyButton = new JButton("Buy");
 		buyButton.addActionListener(new ActionListener() {
 			@Override
@@ -139,14 +141,14 @@ public class BuyStocksPage {
 			@Override
 			public void onComplete(ResultSet result) {
 				final Integer currentBuyId;
-				final Integer marketId;
+				final String marketId;
 				final Integer currentStockId;
 				final Double balance;
 				final Double price;
 				try {
 					if (result.next()) {
 						currentBuyId = result.getInt("curr_buy_id");
-						marketId = result.getInt("marketID");
+						marketId = result.getString("marketID");
 						currentStockId = result.getInt("curr_stock_id");
 						balance = result.getDouble("balance");
 						price = result.getDouble("price");
@@ -157,7 +159,7 @@ public class BuyStocksPage {
 						System.out.println("sf" + currentBuyId+"  "+marketId);
 					} else {
 						currentBuyId = 1;
-						marketId = 1;
+						marketId = "";
 						currentStockId = 1;
 						balance = 0.0;
 						price = 100.0;
@@ -170,20 +172,27 @@ public class BuyStocksPage {
 					@Override
 					public void onComplete(ResultSet result2) {
 						try {
+							System.out.println("SUBMITTING TO BUY_STOCK");
 							// Update Buy_Stock and stock_account
 							PreparedStatement statement = DbClient.getInstance().getMainConnection().prepareStatement(
 									"INSERT INTO Buy_Stock VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
-							statement.setString(1, Integer.toString(currentBuyId+1));
-							statement.setInt(2, quantity);
+							statement.setString(1, Integer.toString(StarsRUs.global_buy+1));
+							statement.setInt(2, quantity); 
 							statement.setString(3, symbol);
-							statement.setString(4, Integer.toString(marketId));
+							statement.setString(4, marketId);
+							statement.setString(5, user+":"+symbol);
 							statement.setDate(6, DbClient.getInstance().TODAY);
 							statement.setDouble(7, DbClient.getInstance().commission);
 							statement.setInt(8, quantity);
 							statement.setDouble(9, price);
+							StarsRUs.global_buy++;
 							if (result2.next()) { // if they already have a stock account
-								statement.setString(5, result2.getString("AccountID"));
-								DbClient.getInstance().runQuery(new UpdateQuery(statement));
+								//statement.setString(5, result2.getString("AccountID"));
+								DbClient.getInstance().runQuery(new UpdateQuery(statement) {
+									public void onComplete(int numChanged) {
+										System.out.println("BUYING QUERY SUCCESSFULL");
+									}
+								});
 								PreparedStatement updateAccount = DbClient.getInstance().getMainConnection().prepareStatement(
 										"UPDATE stock_account SET StockBalance = StockBalance + ? WHERE AccountID = ?"
 								);
@@ -191,24 +200,26 @@ public class BuyStocksPage {
 								updateAccount.setString(2, result2.getString("AccountID"));
 								DbClient.getInstance().runQuery(new UpdateQuery(updateAccount));
 							} else { // if they don't, make one first
+								//add to Buy_Stock account when done
 								PreparedStatement createAccount = DbClient.getInstance().getMainConnection().prepareStatement(
 										"INSERT INTO stock_account VALUES (?,?,?,?)");
-								createAccount.setString(1, Integer.toString(currentStockId+1));
+								createAccount.setString(1, user+":"+symbol);
 								createAccount.setDouble(2, quantity);
 								createAccount.setString(3, user);
 								createAccount.setString(4, symbol);
-
-								statement.setString(5, Integer.toString(currentStockId+1));
+								//statement.setString(5, Integer.toString(currentStockId+1));
 								UpdateQuery createAccountQuery = new UpdateQuery(createAccount) {
 									@Override
 									public void onComplete(int numRowsAffected) {
+										
 										DbClient.getInstance().runQuery(new UpdateQuery(statement));
+										
 									}
 								};
 								DbClient.getInstance().runQuery(createAccountQuery);
 							}
 							// Update balance
-							DbClient.getInstance().adjustMarketAccountBalance(Integer.toString(marketId), (long) -((quantity * price)+DbClient.getInstance().commission));
+							DbClient.getInstance().adjustMarketAccountBalance(marketId, (long) -((quantity * price)+DbClient.getInstance().commission));
 						} catch (SQLException e) {
 							e.printStackTrace();
 							return;

@@ -205,6 +205,12 @@ public class CustomerDashboard{
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
 			//go to buy/sell page
+			System.out.println("MARKET IS " + StarsRUs.open_or_closed);
+			
+			if(!StarsRUs.open_or_closed) {
+				JOptionPane.showMessageDialog(null, "MARKET IS CURRENTLY CLOSESD; CANNOT BUY/SELL AT THIS TIME", "Error Message", 0);
+				return;
+			}
 			
 			frame.setVisible(false);
 			frame.dispose();

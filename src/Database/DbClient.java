@@ -390,7 +390,6 @@ public class DbClient {
 			"CREATE TABLE IF NOT EXISTS Settings("+
 					"	setting_id INTEGER," +
 					"	Date DATE," +
-					"	market_open BIT," +
 					"	interest_rate REAL," +
 					"	curr_mark_account_id INTEGER," +
 					"	curr_stock_account_id INTEGER,"+
@@ -398,6 +397,7 @@ public class DbClient {
 					"	curr_withdraw_id INTEGER, "+
 					"	curr_buy_id INTEGER,"+
 					"	curr_sell_id INTEGER,"+
+					"	market_open BIT," +
 					"	PRIMARY KEY(setting_id)"+
 					")"
 	};

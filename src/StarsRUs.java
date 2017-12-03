@@ -105,11 +105,12 @@ public class StarsRUs {
 		{
 			public void run()
 			{
-				System.out.println("In shutdown hook");
+				
 				//update settings
 				StringBuilder update_settings = new StringBuilder("UPDATE Settings SET curr_mark_account_id = ")
 						.append(global_mark).append(", curr_stock_account_id = ").append(global_stock).append(", curr_deposit_id = ")
-						.append(global_deposit).append(", curr_buy_id = ").append(global_buy).append(", curr_sell_id = ").append(global_sell).append(" WHERE setting_id = 1");
+						.append(global_deposit).append(", curr_buy_id = ").append(global_buy).append(", curr_sell_id = ").append(global_sell)
+						.append(" WHERE setting_id = 1");
 				try {
 					Class.forName("com.mysql.cj.jdbc.Driver");
 					Connection connection = DriverManager.getConnection(DbClient.DB_URL_ARTHUR, DbClient.USER_ARTHUR, DbClient.PASS_ARTHUR);
@@ -159,7 +160,13 @@ public class StarsRUs {
 					global_withdraw = result.getInt(5);
 					global_buy = result.getInt(6);
 					global_sell = result.getInt(7);
-					open_or_closed = result.getBoolean(7);
+					int temp = result.getInt(8);
+					System.out.println(temp);
+					if(temp == 1) {
+						open_or_closed = true;
+					}else {
+						open_or_closed = false;
+					}
 				} catch (SQLException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();

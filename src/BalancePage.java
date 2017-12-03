@@ -62,19 +62,7 @@ public class BalancePage {
 	private static void findStockAccounts(String mark_balance) {
 
 
-		/**
-		 * 
-			"CREATE TABLE IF NOT EXISTS stock_account (" +
-					"	AccountID CHAR(20)," +
-					"	StockBalance REAL CHECK (StockBalance >= 0), " +
-					"	stock_symbol CHAR(3) NOT NULL, " +
-					"	Username CHAR(20) NOT NULL," +
-					"	FOREIGN KEY(Username) REFERENCES Customers(Username)" +
-					"		ON DELETE CASCADE ON UPDATE CASCADE," +
-					"	FOREIGN KEY (stock_symbol) REFERENCES Actor_Stock(stock_symbol)," +
-					"	PRIMARY KEY (AccountID))" ,
-		 * 
-		 */
+		
 		StringBuilder findStocks = new StringBuilder("SELECT S.stock_symbol, S.StockBalance ")
 				.append("FROM stock_account S ").append("WHERE ")
 				.append("S.Username = ").append("'").append(user)
@@ -91,13 +79,16 @@ public class BalancePage {
 
 						return;
 					}else {
+						int counter = 0;
 						do {
+							counter++;
 							String curr_result;
 							curr_result = result.getString(1);
 							curr_result += ", ";
 							curr_result += result.getString(2);
 							stock_info.add(curr_result);
 						}while(result.next());
+						System.out.println("COUNTER: " + counter);
 						create_frame(mark_balance, stock_info);
 						return;
 					}
@@ -124,6 +115,7 @@ public class BalancePage {
         stock_label.setVerticalAlignment(JLabel.CENTER);
         
         JList stock_list = new JList(stock_info);
+        stock_list.setLayoutOrientation(JList.VERTICAL_WRAP);
         
         stock_list.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
         stock_list.setLayoutOrientation(JList.HORIZONTAL_WRAP);

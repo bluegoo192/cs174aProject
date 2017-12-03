@@ -89,9 +89,12 @@ public class DemoActionsPage{
 
 			//change settings to 1
 			StarsRUs.open_or_closed = true;
+			System.out.println("MARKET IS " + StarsRUs.open_or_closed);
 
 			StringBuilder update_settings = new StringBuilder("UPDATE Settings SET market_open = 1").append(" WHERE setting_id = 1");
-			DbClient.getInstance().runQuery(new UpdateQuery(update_settings.toString()));
+			DbClient.getInstance().runQuery(new UpdateQuery(update_settings.toString()) {
+				
+			});
 
 		}
 	}
@@ -110,8 +113,9 @@ public class DemoActionsPage{
 			StringBuilder update_settings = new StringBuilder("UPDATE Settings SET market_open = 0").append(" WHERE setting_id = 1");
 			DbClient.getInstance().runQuery(new UpdateQuery(update_settings.toString()));
 			
+			
 			//record all stock closing prices
-			StringBuilder update_stocks = new StringBuilder("UPDATE Actor_Stock SET closing_prices_log = closing_prices_log + ', ' + current_stock_price");
+			StringBuilder update_stocks = new StringBuilder("UPDATE Actor_Stock SET closing_prices_log = (closing_prices_log + current_stock_price)");
 			DbClient.getInstance().runQuery(new UpdateQuery(update_stocks.toString()));
 		}
 

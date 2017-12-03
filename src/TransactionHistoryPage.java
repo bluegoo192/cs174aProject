@@ -110,11 +110,11 @@ public class TransactionHistoryPage {
 	
 	private static void initialize_all_lists() {
 		//get deposit list
-		
+		System.out.println("MARKET ID IS: " + market_account);
 		//get buy list
 		StringBuilder get_buy_list = new StringBuilder("SELECT  B.stock_symbol, B.NumShares, B.Date")
 				.append(" FROM Buy_Stock B ").append("WHERE B.MarketID = '")
-				.append(market_account).append("'").append(" AND B.StockID = '").append(stock_account).append("'");
+				.append(market_account).append("'");
 		DbClient.getInstance().runQuery(new RetrievalQuery(get_buy_list.toString()) {
 			@Override
 			public void onComplete(ResultSet result) {
@@ -152,8 +152,8 @@ public class TransactionHistoryPage {
 	private static void initialize_sell() {
 		//get sell list
 				StringBuilder get_sell_list = new StringBuilder("SELECT  S.stock_symbol, S.NumShares, S.Date")
-						.append(" FROM Sell_Stock S ").append("WHERE S.MarketID = '")
-						.append(market_account).append("'").append(" AND S.StockID = '").append(stock_account).append("'");
+						.append(" FROM Sell_Stock S, stock_account SA ").append(" WHERE SA.Username = '").append(user).append("'")
+						.append(" AND SA.AccountID  = S.StockID");
 				DbClient.getInstance().runQuery(new RetrievalQuery(get_sell_list.toString()) {
 					@Override
 					public void onComplete(ResultSet result) {
