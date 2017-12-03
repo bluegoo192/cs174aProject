@@ -57,8 +57,25 @@ fs.readFile("./stocks.csv", function (err, fileData) {
         stock.ACTORID+"')";
         console.log(query);
       con.query(query, function (error, results, fields) {
+        //if (error) throw error;
+        //console.log("inserted "+stock.TAXID);
+      });
+    });
+  })
+})
+
+// Market Accounts
+fs.readFile("./marketAccounts.csv", function (err, fileData) {
+  console.log(taxIdMap);
+  parse(fileData, {columns: true, trim: true}, function(err, rows) {
+    rows.forEach(function (ma) {
+      let query = "INSERT INTO Market_Account VALUES ('"+ma.MARKETACCOUNTID+"', "+
+        ma.BALANCE+", '"+taxIdMap[ma.TAXID]+"', "+ma.BALANCE+", STR_TO_DATE('"+moment().format('DD/MM/YYYY')+"', '%d/%m/%Y')"
+        +", STR_TO_DATE('"+moment().format('DD/MM/YYYY')+"', '%d/%m/%Y'),0)";
+        console.log(query);
+      con.query(query, function (error, results, fields) {
         if (error) throw error;
-        console.log("inserted "+stock.TAXID);
+        console.log("inserted "+ma.TAXID);
       });
     });
   })
