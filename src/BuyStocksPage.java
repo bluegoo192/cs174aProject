@@ -242,8 +242,10 @@ public class BuyStocksPage {
 				int q = quantity; // so we can edit from within inner class
 				double commission = DbClient.getInstance().commission;
 				try {
+					System.out.println("IN TRY STATEMENT");
 					while (result.next() && q > 0) {
-						int currentSellId = result.getInt("curr_sell_id");
+						System.out.println("IN WHILE LOOP");
+						int currentSellId = StarsRUs.global_sell;
 						int numOwned = result.getInt("numStillOwned");
 						double price = result.getDouble("price");
 						PreparedStatement sell = DbClient.getInstance().getMainConnection().prepareStatement(
