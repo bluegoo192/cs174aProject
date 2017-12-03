@@ -121,44 +121,57 @@ public class SignUpPage {
 			
 			//after confirming validity of the entered information, create new account in sql
 	
-		    
-			StringBuilder addEntry = new StringBuilder("INSERT INTO Customers VALUES (")
-					.append("'").append(username.getText()).append("'").append(",")
-					.append("'").append(state_list.getSelectedItem()).append("'").append(",")
-					.append("'").append(email_address.getText()).append("'").append(",")
-					.append("'").append(taxID.getText()).append("'").append(",")
-					.append("'").append(phone_number.getText()).append("'").append(",")
-					.append("'").append(password.getText()).append("'").append(",")
-					.append("'").append(name.getText()).append("'").append(")");
+		    StringBuilder checkID = new StringBuilder("SELECT * FROM Customers C WHERE C.TaxID = '" ).append(taxID.getText()).append("'");
+		    DbClient.getInstance().runQuery(new RetrievalQuery(checkID.toString()) {
 
-			DbClient.getInstance().runQuery(new UpdateQuery(addEntry.toString()) {
 				@Override
-				public void onComplete(int result) {
-					System.out.println("Added "+username+" successfully.");
-					addAccount();
+				public void onComplete(ResultSet result) {
+					// TODO Auto-generated method stub
+					try {
+						if(result.next()) {
+							JOptionPane.showMessageDialog(null, "TAX ID MUST BE UNIQUE", "Error Message", 0);
+							return;
+						}else {
+							addCustomers();
+						}
+					} catch (HeadlessException | SQLException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					
 				}
-			});
+		    	
+		    	
+		    });
+		    
+		
 		
 		}
 		
 		
+		private void addCustomers() {
+		    
+		    
+					StringBuilder addEntry = new StringBuilder("INSERT INTO Customers VALUES (")
+							.append("'").append(username.getText()).append("'").append(",")
+							.append("'").append(state_list.getSelectedItem()).append("'").append(",")
+							.append("'").append(email_address.getText()).append("'").append(",")
+							.append("'").append(taxID.getText()).append("'").append(",")
+							.append("'").append(phone_number.getText()).append("'").append(",")
+							.append("'").append(password.getText()).append("'").append(",")
+							.append("'").append(name.getText()).append("'").append(")");
+
+					DbClient.getInstance().runQuery(new UpdateQuery(addEntry.toString()) {
+						@Override
+						public void onComplete(int result) {
+							System.out.println("Added "+username+" successfully.");
+							addAccount();
+						}
+					});
+		}
+		
 		private void addAccount() {
 			
-			
-			/*
-			 * "CREATE TABLE IF NOT EXISTS Market_Account (" +
-					"	AccountID CHAR(20)," +
-					"	Balance REAL CHECK (Balance >= 0)," +
-					"	Username CHAR(20) NOT NULL,\n" +
-					"	old_ADB REAL," +  // old average daily balance (until the most recent balance change)
-					"	last_changed DATE," +
-					"	last_interest_accrual DATE," +
-					"	Original_Monthly_Balance REAL,"+
-					"	FOREIGN KEY(username) REFERENCES Customers(username)" +
-					"ON DELETE CASCADE ON UPDATE CASCADE," +
-					"	PRIMARY KEY (AccountID) )",
-			 * 
-			 */
 			
 			String account_id = Integer.toString(StarsRUs.global_mark);
 			StarsRUs.global_mark += 1;

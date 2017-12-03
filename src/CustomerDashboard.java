@@ -221,39 +221,7 @@ public class CustomerDashboard{
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
 			//show balance
-			//get balance using username
-			StringBuilder addEntry = new StringBuilder("SELECT M.balance ")
-					.append("FROM Market_Account M ")
-					.append("WHERE M.username = ").append("'").append(user)
-					.append("'");
-			DbClient.getInstance().runQuery(new RetrievalQuery(addEntry.toString()) {
-				@Override
-				public void onComplete(ResultSet result) {
-					String balance = "";
-					
-					try {
-						if(!result.next()) {
-							JOptionPane.showMessageDialog(null, "no accounts shown for given username", "Show Balance", 1);
-							return;
-						}
-					} catch (HeadlessException | SQLException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					}
-					
-					try {
-						balance = result.getString(1);
-					} catch (SQLException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-					String display_string = "Balance is " + balance + " dollars";
-					JOptionPane.showMessageDialog(null, display_string, "Show Balance", 1);
-				}
-			});
-			
-			
-			return;
+			BalancePage.createBalancePage();
 		}
 		
 	}

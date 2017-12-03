@@ -104,7 +104,25 @@ public class BuyStocksPage {
 		panel.add(buyButton);
 		panel.add(stocksComboBox);
 		panel.add(sellButton);
+		
+		JButton backButton = new JButton("Back to Dash");
+		backButton.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				// TODO Auto-generated method stub
+				CustomerDashboard.createDashboard(user);
+				
+				BuyStocksPage.frame.setVisible(false);
+				BuyStocksPage.frame.dispose();
+
+			}
+
+
+		});
+		
 		panel.add(backButton);
+
 
 
 		BuyStocksPage.frame.setContentPane(panel);
