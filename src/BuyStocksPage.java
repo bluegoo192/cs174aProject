@@ -193,13 +193,44 @@ public class BuyStocksPage {
 		DbClient.getInstance().runQuery(mainQuery);
 	}
 
-	private void sellStock(String symbol, double quantity) {
-//		DbQuery getStockOwnership = new RetrievalQuery("SELECT * FROM Buy_Stock B, Customers C WHERE numStillOwned > 0 AND Market") {
-//			@Override
-//			public void onComplete(ResultSet result) {
-//
-//			}
-//		}
+	private void sellStock(String symbol, final int quantity) {
+		DbQuery getStockOwnership = new RetrievalQuery("SELECT * FROM Buy_Stock B, Actor_Stock A, Market_Account M, Settings S" +
+				" WHERE B.numStillOwned > 0 AND S.setting_id = 1 AND B.MarketID = M.AccountID AND M.Username = '"+user+"'" +
+				" AND B.stock_symbol = '"+symbol+"' AND A.stock_symbol = '"+symbol+"'") {
+			@Override
+			public void onComplete(ResultSet result) {
+				int q = quantity; // so we can edit from within inner class
+				try {
+					int currentSellId = result.getInt("curr_sell_id");
+					while (result.next() && q > 0) {
+						int numOwned = result.getInt("numStillOwned");
+						double price = result.getDouble("price");
+						PreparedStatement sell = DbClient.getInstance().getMainConnection().prepareStatement(
+								"INSERT INTO Sell_Stock VALUE (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+						sell.setString(1, Integer.toString(currentSellId+1)); // SellID
+						sell.setString(3, symbol); // stock_symbol
+						sell.setString(4, result.getString("MarketID")); // MarketID
+						sell.setString(5, result.getString("StockID")); // StockID
+						sell.setDate(6, DbClient.getInstance().TODAY); // Date
+						sell.setDouble(7, result.getDouble("price")); // OriginalBuyingPrice
+						sell.setDouble(8, result.getDouble("current_stock_price")); // Selling_Price
+						sell.setDouble(9, result.getDouble("current_stock_price") - price); // Profit
+						sell.setDouble(10, DbClient.getInstance().commission); // Commmission
+						if (result.getInt("numStillOwned") > q) {
+							// SELL Q
+							q = 0; // update q
+							sell.setInt(2, q); // NumShares
+						} else {
+							// SELL NUMBER OWNED
+							q -= numOwned; // update q
+							sell.setInt(2, numOwned); // NumShares
+						}
+					}
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+		};
 	}
 	
 	static void set_stock_id(String input) {
