@@ -332,7 +332,7 @@ public class BuyStocksPage {
 							buy_ids_to_use.add(result.getString(1));
 							buy_id_prices.add(result.getInt(3));
 							buy_num_shares.add(result.getInt(2));
-							profit = curr_price*(curr) - (result.getInt(3)*curr);
+							profit += curr_price*(curr) - (result.getInt(3)*curr);
 						}while(result.next());
 						System.out.println("TEST NUM " + test_num);
 						if(test_num > 0) {
@@ -351,6 +351,7 @@ public class BuyStocksPage {
 			}
 
 			private void add_to_sell_stocks(String MarketID, String StockID, Vector<String> buy_ids, Vector<Integer> buy_prices, Vector<Integer> buy_num_shares, final int quantity, double curr_price, double profit) {
+				StarsRUs.global_sell++;
 				String sell_id = Integer.toString(StarsRUs.global_sell);
 				StarsRUs.global_sell++;
 

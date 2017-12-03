@@ -118,18 +118,25 @@ public class ManagerDashboard{
 
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
+			System.out.println("in action performed");
 			// Generate Monthly statement
 
+			/*
+			 * 
+			StringBuilder combine = new StringBuilder("SELECT M.Username, nested_shares.sum_shares FROM  (SELECT marketIDs.MarketID, SUM(COALESCE(Buy_Stock.NumShares, 0) +")
+					.append(" COALESCE(Sell_Stock.NumShares, 0)) as sum_shares, Buy_Stock.MarketID as ID ")
+					.append("FROM( SELECT DISTINCT(MarketID) FROM (SELECT MarketID FROM Buy_Stock WHERE archived=0 UNION SELECT MarketID FROM Sell_Stock) tmp ")
+					.append(") marketIDs")
+					.append(" LEFT JOIN Sell_Stock ON Sell_Stock.MarketID = marketIDs.MarketID ")
+					.append("LEFT JOIN Buy_Stock ON Buy_Stock.MarketID = marketIDs.MarketID")
+					.append(" GROUP BY Buy_Stock.MarketID HAVING sum_shares >= 1000) as nested_shares, Market_Account M")
+					.append(" WHERE nested_shares.ID = M.AccountID");
+			 */
 
-			StringBuilder get_profits = new StringBuilder("SELECT nested_query.total_earnings FROM (SELECT marketIDs.ID as ID, SUM(COALESCE(Sell_Stock.Profit, 0)")
-					.append("+ COALESCE(Accrue_Interest.MoneyAdded, 0)) as total_earnings ")
-					.append("FROM( SELECT DISTINCT(MarketID) as ID FROM (SELECT MarketID FROM Sell_Stock UNION SELECT AccountID FROM Accrue_Interest) tmp ")
-					.append(") marketIDs ")
-					.append("LEFT JOIN Sell_Stock ON Sell_Stock.MarketID = marketIDs.ID ")
-					.append("LEFT JOIN Accrue_Interest ON Accrue_Interest.AccountID = marketIDs.ID")
-					.append(" GROUP BY Sell_Stock.MarketID HAVING total_earnings >= 10000) as nested_query, Market_Account M, Customers C ")
-					.append(" WHERE M.Username = '").append(customer_report.getText()).append("' AND nested_query.ID = M.AccountID ")
-					.append("AND M.Username = C.Username");		
+			StringBuilder get_profits = new StringBuilder("SELECT S.Profit FROM Sell_Stock S,  Market_Account MA WHERE ")
+					.append("MA.Username = '").append(customer_report.getText()).append("' AND S.MarketID = MA.AccountID");		
+			
+			System.out.println(get_profits.toString());
 			DbClient.getInstance().runQuery(new RetrievalQuery(get_profits.toString()) {
 
 				@Override
@@ -140,10 +147,45 @@ public class ManagerDashboard{
 						if(!result.next()) {
 							first_query.add("NO PROFITS RECORDED FOR THIS MONTH FOR THIS CUSTOMER");
 						}else {
-							first_query.add(result.getString(1).toString());
+							int total = 0;
+							do {
+								total += result.getDouble(1);
+							}while(result.next());
+							
+							
+							first_query.add(Integer.toString(total));
+							
 						}
+						
+						//get Accrue Interest
+						StringBuilder get_interest = new StringBuilder("SELECT AI.MoneyAdded FROM Accrue_Interest AI,  Market_Account MA WHERE ")
+								.append("MA.Username = '").append(customer_report.getText()).append("' AND AI.AccountID = MA.AccountID");	
+						DbClient.getInstance().runQuery(new RetrievalQuery(get_interest.toString()) {
 
-						get_commision(first_query);
+							@Override
+							public void onComplete(ResultSet result) {
+								try {
+									if(result.next()) {
+										//not 0
+										int total = 0;
+										do {
+											total += result.getDouble(1);
+										}while(result.next());
+										first_query.add(first_query.get(0) + total);
+									}
+								
+									first_query.add("PROFITS SO FAR: " + first_query.get(0));
+									
+									get_commision(first_query);
+								} catch (SQLException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
+								
+								
+							}
+						});
+						
 					} catch (SQLException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -156,6 +198,7 @@ public class ManagerDashboard{
 		}
 
 		private void get_commision(Vector<String> first_query) {
+			System.out.println("in get_commission");
 			//get commision information
 			StringBuilder combine = new StringBuilder("SELECT (buy.buy_count + sell.sell_count) FROM (SELECT COUNT(*) as buy_count FROM Buy_Stock B, Market_Account M WHERE B.archived = 0 AND B.MarketID = M.AccountID AND M.Username = '")
 					.append(customer_report.getText()).append("') as buy, (SELECT COUNT(*) as sell_count FROM Sell_Stock S, Market_Account M WHERE S.MarketID = M.AccountID AND M.Username = '") 
@@ -192,8 +235,9 @@ public class ManagerDashboard{
 		private void get_transactions(Vector<String> first_query, String commission) {
 			//get deposit list
 
+			System.out.println("in transaction");
 			//get buy list
-			StringBuilder get_buy_list = new StringBuilder("SELECT  B.stock_symbol, B.NumShares, B.Date")
+			StringBuilder get_buy_list = new StringBuilder("SELECT  B.stock_symbol, B.NumShares, B.Date, B.price")
 					.append(" FROM Buy_Stock B, Market_Account M ").append("WHERE M.Username = '")
 					.append(customer_report.getText()).append("' AND B.MarketID = M.AccountID AND archived = 0");
 			DbClient.getInstance().runQuery(new RetrievalQuery(get_buy_list.toString()) {
@@ -216,9 +260,12 @@ public class ManagerDashboard{
 							curr_result = result.getString(1);
 							curr_result += ", ";
 							curr_result += result.getString(2);
+							curr_result += ", ";
+							curr_result += result.getString(3);
+							curr_result += ", ";
+							curr_result += result.getString(4);
 							buy_list.add(curr_result);
 						}while(result.next()) ;
-						TransactionHistoryPage.set_buy(buy_list);
 						initialize_sell(first_query, commission, buy_list);
 					} catch (SQLException e) {
 						// TODO Auto-generated catch block
@@ -230,8 +277,9 @@ public class ManagerDashboard{
 		}
 
 		private void initialize_sell(Vector<String> first_query, String commission, Vector<String> buy_list) {
+			System.out.println("in initialize sell");
 			//get sell list
-			StringBuilder get_sell_list = new StringBuilder("SELECT  S.stock_symbol, S.NumShares, S.Date")
+			StringBuilder get_sell_list = new StringBuilder("SELECT  S.stock_symbol, S.NumShares, S.Date, S.Selling_Price, S.Profit")
 					.append(" FROM Sell_Stock S, Market_Account M ").append("WHERE M.Username = '")  
 					.append(customer_report.getText()).append("' AND S.MarketID = M.AccountID");
 			DbClient.getInstance().runQuery(new RetrievalQuery(get_sell_list.toString()) {
@@ -243,6 +291,22 @@ public class ManagerDashboard{
 							sell_list.add("YOU HAVE NOT SOLD ANY STOCKS THIS MONTH");
 							get_info(first_query, commission, buy_list, sell_list);
 							return;
+						}else {
+							do{
+								String curr_result;
+								curr_result = result.getString(1);
+								curr_result += ", ";
+								curr_result += result.getString(2);
+								curr_result += ", ";
+								curr_result += result.getString(3);
+								curr_result += ", ";
+								curr_result += result.getString(4);
+								curr_result += ", ";
+								curr_result += result.getString(5);
+
+								sell_list.add(curr_result);
+							}while(result.next()) ;
+							get_info(first_query, commission, buy_list, sell_list);
 						}
 					}catch(SQLException e1) {
 						e1.printStackTrace();
@@ -253,6 +317,7 @@ public class ManagerDashboard{
 		}
 
 		private void get_info(Vector<String> first_query, String commission, Vector<String> buy_list, Vector<String> sell_list) {
+			System.out.println("in get info");
 			StringBuilder get_info = new StringBuilder(" SELECT C.Name, C.Username, C.Email, M.balance, M.Original_Monthly_Balance FROM Customers C, Market_Account M ")
 					.append("WHERE M.Username = C.Username AND C.Username = '").append(customer_report.getText()).append("'");
 			DbClient.getInstance().runQuery(new RetrievalQuery(get_info.toString()) {
@@ -309,7 +374,7 @@ public class ManagerDashboard{
 	        JScrollPane infoScroller = new JScrollPane(info_list);
 	        infoScroller.setPreferredSize(new Dimension(250, 80));
 	        
-	        JLabel trans_label = new JLabel("TRANSACTION INFORMATION");
+	        JLabel trans_label = new JLabel("PROFIT INFORMATION (from selling and interest)");
 	        	trans_label.setVerticalAlignment(JLabel.CENTER);
 	        JList trans_list = new JList(first_query);
 	        
@@ -324,7 +389,7 @@ public class ManagerDashboard{
 	        comm.setVerticalAlignment(JLabel.CENTER);
 	        
 	        //create buy list and label
-	        JLabel buy_label = new JLabel("Buy:");
+	        JLabel buy_label = new JLabel("Buy (stock symbol, number of stocks, date, price):");
 	        buy_label.setVerticalAlignment(JLabel.CENTER);
 	        JList buy_list = new JList(buy);
 	        
@@ -336,7 +401,7 @@ public class ManagerDashboard{
 	        buyScroller.setPreferredSize(new Dimension(250, 80));
 	        
 	        //create sell list and label
-	        JLabel sell_label = new JLabel("Sell:");
+	        JLabel sell_label = new JLabel("Sell (stock symbol, number of stocks, date, price, profit):");
 	        sell_label.setVerticalAlignment(JLabel.CENTER);
 	        JList sell_list = new JList(sell);
 	        
