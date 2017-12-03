@@ -114,7 +114,7 @@ public class TransactionHistoryPage {
 		//get buy list
 		StringBuilder get_buy_list = new StringBuilder("SELECT  B.stock_symbol, B.NumShares, B.Date")
 				.append(" FROM Buy_Stock B ").append("WHERE B.MarketID = '")
-				.append(market_account).append("'");
+				.append(market_account).append("' AND B.archived = 0");
 		DbClient.getInstance().runQuery(new RetrievalQuery(get_buy_list.toString()) {
 			@Override
 			public void onComplete(ResultSet result) {

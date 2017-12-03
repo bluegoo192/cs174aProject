@@ -157,7 +157,7 @@ public class ManagerDashboard{
 
 		private void get_commision(Vector<String> first_query) {
 			//get commision information
-			StringBuilder combine = new StringBuilder("SELECT (buy.buy_count + sell.sell_count) FROM (SELECT COUNT(*) as buy_count FROM Buy_Stock B, Market_Account M WHERE B.MarketID = M.AccountID AND M.Username = '")
+			StringBuilder combine = new StringBuilder("SELECT (buy.buy_count + sell.sell_count) FROM (SELECT COUNT(*) as buy_count FROM Buy_Stock B, Market_Account M WHERE B.archived = 0 AND B.MarketID = M.AccountID AND M.Username = '")
 					.append(customer_report.getText()).append("') as buy, (SELECT COUNT(*) as sell_count FROM Sell_Stock S, Market_Account M WHERE S.MarketID = M.AccountID AND M.Username = '") 
 					.append(customer_report.getText()).append("') as sell");
 			DbClient.getInstance().runQuery(new RetrievalQuery(combine.toString()) {
@@ -195,7 +195,7 @@ public class ManagerDashboard{
 			//get buy list
 			StringBuilder get_buy_list = new StringBuilder("SELECT  B.stock_symbol, B.NumShares, B.Date")
 					.append(" FROM Buy_Stock B, Market_Account M ").append("WHERE M.Username = '")
-					.append(customer_report.getText()).append("' AND B.MarketID = M.AccountID");
+					.append(customer_report.getText()).append("' AND B.MarketID = M.AccountID AND archived = 0");
 			DbClient.getInstance().runQuery(new RetrievalQuery(get_buy_list.toString()) {
 				@Override
 				public void onComplete(ResultSet result) {
@@ -392,8 +392,9 @@ public class ManagerDashboard{
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
 
-			StringBuilder combine = new StringBuilder("SELECT M.Username, nested_shares.sum_shares FROM  (SELECT marketIDs.MarketID, SUM(COALESCE(Buy_Stock.NumShares, 0) + COALESCE(Sell_Stock.NumShares, 0)) as sum_shares, Buy_Stock.MarketID as ID ")
-					.append("FROM( SELECT DISTINCT(MarketID) FROM (SELECT MarketID FROM Buy_Stock UNION SELECT MarketID FROM Sell_Stock) tmp ")
+			StringBuilder combine = new StringBuilder("SELECT M.Username, nested_shares.sum_shares FROM  (SELECT marketIDs.MarketID, SUM(COALESCE(Buy_Stock.NumShares, 0) +")
+					.append(" COALESCE(Sell_Stock.NumShares, 0)) as sum_shares, Buy_Stock.MarketID as ID ")
+					.append("FROM( SELECT DISTINCT(MarketID) FROM (SELECT MarketID FROM Buy_Stock WHERE archived=0 UNION SELECT MarketID FROM Sell_Stock) tmp ")
 					.append(") marketIDs")
 					.append(" LEFT JOIN Sell_Stock ON Sell_Stock.MarketID = marketIDs.MarketID ")
 					.append("LEFT JOIN Buy_Stock ON Buy_Stock.MarketID = marketIDs.MarketID")
@@ -755,7 +756,7 @@ public class ManagerDashboard{
 			});
 
 			//delete everything in buy stock
-			StringBuilder delete_stock_buys = new StringBuilder("TRUNCATE TABLE Buy_Stock");
+			StringBuilder delete_stock_buys = new StringBuilder("UPDATE Buy_Stock SET archived = 1;");
 			DbClient.getInstance().runQuery(new UpdateQuery(delete_stock_buys.toString()) {
 				@Override
 				public void onComplete(int numRowsAffected) {
