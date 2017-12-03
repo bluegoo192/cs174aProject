@@ -34,7 +34,7 @@ public class DbClient {
 	public static final String DB_URL_ARTHUR = "jdbc:mysql://cs174a.engr.ucsb.edu:3306/silversteinDB?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC";
 	public static final String USER_ARTHUR = "silverstein";
 	public static final String PASS_ARTHUR = "954";
-	static final String DB_URL_MAGGIE = "jdbc:mysql://cs174a.engr.ucsb.edu:3066/mschmitDB";
+	static final String DB_URL_MAGGIE = "jdbc:mysql://cs174a.engr.ucsb.edu:3306/mschmitDB";
 	static final String USER_MAGGIE = "mschmit";
 	static final String PASS_MAGGIE = "798";
 
@@ -120,7 +120,7 @@ public class DbClient {
 			try {
 				System.out.println("Trying to connect");
 				Class.forName(JDBC_DRIVER);
-				mainConnection = DriverManager.getConnection(DB_URL_MAGGIE, USER_MAGGIE, PASS_MAGGIE);
+				mainConnection = DriverManager.getConnection(DB_URL_ARTHUR, USER_ARTHUR, PASS_ARTHUR);
 				System.out.println("Connected to main database");
 			} catch (Exception e) {
 				e.printStackTrace();
