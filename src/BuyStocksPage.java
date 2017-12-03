@@ -225,6 +225,7 @@ public class BuyStocksPage {
 							q -= numOwned; // update q
 							sell.setInt(2, numOwned); // NumShares
 						}
+						DbClient.getInstance().runQuery(new UpdateQuery(sell));
 					}
 				} catch (SQLException e) {
 					e.printStackTrace();
