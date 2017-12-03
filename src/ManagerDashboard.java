@@ -734,6 +734,7 @@ public class ManagerDashboard{
 
 
 	}
+	//also, this function updates the original monthly balance used to generate the monthly statement
 	private class DeleteListener implements ActionListener{
 
 		@Override
