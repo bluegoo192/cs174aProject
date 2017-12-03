@@ -15,19 +15,19 @@ var con = mysql.createConnection({
 con.connect();
 
 // Actors
-// fs.readFile("./actors.csv", function (err, fileData) {
-//   parse(fileData, {columns: true, trim: true}, function(err, rows) {
-//     //console.log(rows);
-//     rows.forEach(function (actor) {
-//       let query = "INSERT INTO Actor_Stock VALUES ('"+actor.NAME+"', STR_TO_DATE('"+moment(actor.DOB).format('DD/MM/YYYY')+"', '%d/%m/%Y'), '"+
-//         actor.ACTORID+"', "+actor.CURRENTPRICE+", 'whatever')";
-//       con.query(query, function (error, results, fields) {
-//         if (error) throw error;
-//         console.log("inserted "+actor.NAME);
-//       });
-//     });
-//   })
-// })
+fs.readFile("./actors.csv", function (err, fileData) {
+  parse(fileData, {columns: true, trim: true}, function(err, rows) {
+    //console.log(rows);
+    rows.forEach(function (actor) {
+      let query = "INSERT INTO Actor_Stock VALUES ('"+actor.NAME+"', STR_TO_DATE('"+moment(actor.DOB).format('DD/MM/YYYY')+"', '%d/%m/%Y'), '"+
+        actor.ACTORID+"', "+actor.CURRENTPRICE+", 'whatever')";
+      con.query(query, function (error, results, fields) {
+        //if (error) throw error;
+        console.log("inserted "+actor.NAME);
+      });
+    });
+  })
+})
 
 // Customers
 fs.readFile("./customers.csv", function (err, fileData) {
@@ -58,7 +58,7 @@ fs.readFile("./stocks.csv", function (err, fileData) {
         console.log(query);
       con.query(query, function (error, results, fields) {
         //if (error) throw error;
-        //console.log("inserted "+stock.TAXID);
+        console.log("inserted stock "+stock.TAXID);
       });
     });
   })
@@ -74,8 +74,8 @@ fs.readFile("./marketAccounts.csv", function (err, fileData) {
         +", STR_TO_DATE('"+moment().format('DD/MM/YYYY')+"', '%d/%m/%Y'),0)";
         console.log(query);
       con.query(query, function (error, results, fields) {
-        if (error) throw error;
-        console.log("inserted "+ma.TAXID);
+        //if (error) throw error;
+        console.log("inserted MA "+ma.TAXID);
       });
     });
   })
