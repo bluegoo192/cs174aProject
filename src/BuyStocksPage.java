@@ -46,10 +46,20 @@ public class BuyStocksPage {
 				} catch (Exception ex) {
 					quantityField.setText("Must be a number!");
 				}
-
 			}
 		});
 		sellButton = new JButton("Sell");
+		sellButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				try {
+					Integer quantity = Integer.parseInt(quantityField.getText());
+					sellStock(((String) stocksComboBox.getSelectedItem()).split(" ")[0], quantity);
+				} catch (Exception ex) {
+					quantityField.setText("Must be a number!");
+				}
+			}
+		});
 		backButton = new JButton("Back");
 		stocksComboBox = new JComboBox<>();
 	}
@@ -217,10 +227,12 @@ public class BuyStocksPage {
 				" AND B.stock_symbol = '"+symbol+"' AND A.stock_symbol = '"+symbol+"'") {
 			@Override
 			public void onComplete(ResultSet result) {
+				System.out.println(this.getQuery());
 				int q = quantity; // so we can edit from within inner class
+				double commission = DbClient.getInstance().commission;
 				try {
-					int currentSellId = result.getInt("curr_sell_id");
 					while (result.next() && q > 0) {
+						int currentSellId = result.getInt("curr_sell_id");
 						int numOwned = result.getInt("numStillOwned");
 						double price = result.getDouble("price");
 						PreparedStatement sell = DbClient.getInstance().getMainConnection().prepareStatement(
@@ -238,10 +250,12 @@ public class BuyStocksPage {
 							// SELL Q
 							q = 0; // update q
 							sell.setInt(2, q); // NumShares
+							DbClient.getInstance().adjustMarketAccountBalance(result.getString("MarketID"), (long) (commission + (q * result.getDouble("current_stock_price"))));
 						} else {
 							// SELL NUMBER OWNED
 							q -= numOwned; // update q
 							sell.setInt(2, numOwned); // NumShares
+							DbClient.getInstance().adjustMarketAccountBalance(result.getString("MarketID"), (long) (commission + (numOwned * result.getDouble("current_stock_price"))));
 						}
 						DbClient.getInstance().runQuery(new UpdateQuery(sell));
 					}
@@ -250,6 +264,7 @@ public class BuyStocksPage {
 				}
 			}
 		};
+		DbClient.getInstance().runQuery(getStockOwnership);
 	}
 	
 	static void set_stock_id(String input) {
