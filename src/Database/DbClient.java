@@ -120,7 +120,7 @@ public class DbClient {
 			try {
 				System.out.println("Trying to connect");
 				Class.forName(JDBC_DRIVER);
-				mainConnection = DriverManager.getConnection(DB_URL_ARTHUR, USER_ARTHUR, PASS_ARTHUR);
+				mainConnection = DriverManager.getConnection(DB_URL_MAGGIE, USER_MAGGIE, PASS_MAGGIE);
 				System.out.println("Connected to main database");
 			} catch (Exception e) {
 				e.printStackTrace();

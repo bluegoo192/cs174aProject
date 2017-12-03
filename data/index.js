@@ -2,26 +2,25 @@ const fs = require('fs');
 const parse = require('csv-parse')
 const mysql = require('mysql');
 const files = ["actors", "admins", "customers", "marketAccounts", "stocks"];
-const objects = {};
 
 var con = mysql.createConnection({
   host: "cs174a.engr.ucsb.edu",
-  user: "silverstein",
-  password: "954",
-  database: "silverteinDB"
+  user: "mschmit",
+  password: "798",
+  database: 'mschmitDB'
 });
 
-con.connect(function(err) {
-  if (err) throw err;
-  // Enter actors
-});
+con.connect();
 
-files.forEach(function(name) {
-  fs.readFile("./"+name+".csv", function (err, fileData) {
-    parse(fileData, {columns: true, trim: true}, function(err, rows) {
-      // Your CSV data is in an array of arrys passed to this callback as rows.
-      if (err) throw err;
-      objects[name] = rows;
-    })
+fs.readFile("./actors.csv", function (err, fileData) {
+  parse(fileData, {columns: true, trim: true}, function(err, rows) {
+    console.log(rows[0]);
+    for (const actor in rows) {
+      let query = 'INSERT INTO Actor_Stock VALUES ('+actor.NAME+', '+actor.DOB+', '+
+        actor.ACTORID+', '+actor.CURRENTPRICE+', "whatever")';
+      con.query(query, function (error, results, fields) {
+        if (error) throw error;
+      });
+    }
   })
-});
+})
