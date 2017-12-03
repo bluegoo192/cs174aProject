@@ -13,21 +13,35 @@ var con = mysql.createConnection({
 
 con.connect();
 
-fs.readFile("./actors.csv", function (err, fileData) {
-  parse(fileData, {columns: true, trim: true}, function(err, rows) {
-    //console.log(rows);
-    rows.forEach(function (actor) {
-      console.log(actor.NAME);
-      console.log(actor.DOB);
-      console.log(actor.ACTORID);
-      console.log(actor.CURRENTPRICE);
-      let query = "INSERT INTO Actor_Stock VALUES ('"+actor.NAME+"', STR_TO_DATE('"+moment(actor.DOB).format('DD/MM/YYYY')+"', '%d/%m/%Y'), '"+
-        actor.ACTORID+"', "+actor.CURRENTPRICE+", 'whatever')";
-        console.log(query);
-      con.query(query, function (error, results, fields) {
-        if (error) throw error;
-        console.log("inserted "+actor.NAME);
-      });
-    });
-  })
-})
+// Actors
+// fs.readFile("./actors.csv", function (err, fileData) {
+//   parse(fileData, {columns: true, trim: true}, function(err, rows) {
+//     //console.log(rows);
+//     rows.forEach(function (actor) {
+//       let query = "INSERT INTO Actor_Stock VALUES ('"+actor.NAME+"', STR_TO_DATE('"+moment(actor.DOB).format('DD/MM/YYYY')+"', '%d/%m/%Y'), '"+
+//         actor.ACTORID+"', "+actor.CURRENTPRICE+", 'whatever')";
+//       con.query(query, function (error, results, fields) {
+//         if (error) throw error;
+//         console.log("inserted "+actor.NAME);
+//       });
+//     });
+//   })
+// })
+
+// Customers
+// fs.readFile("./customers.csv", function (err, fileData) {
+//   parse(fileData, {columns: true, trim: true}, function(err, rows) {
+//     //console.log(rows);
+//     rows.forEach(function (customer) {
+//       let query = "INSERT INTO Customers VALUES ('"+customer.username+"', '"+customer.STATE+"', '"+
+//         customer.email+"', "+customer.TAXID+", '"+
+//         customer.Phone.replace("(","").replace(")","")+"', '"+
+//         customer.password+"', '"+customer.Name+"')";
+//         console.log(query);
+//       con.query(query, function (error, results, fields) {
+//         if (error) throw error;
+//         console.log("inserted "+customer.Name);
+//       });
+//     });
+//   })
+// })
