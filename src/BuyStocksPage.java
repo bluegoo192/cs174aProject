@@ -296,7 +296,7 @@ public class BuyStocksPage {
 		StringBuilder check_buy_stocks = new StringBuilder("SELECT B.BuyID, B.numStillOwned, B.price, M.AccountID, S.AccountID, A.current_stock_price FROM Buy_Stock B, Market_Account M, stock_account S, Actor_Stock A ")
 				.append("WHERE B.stock_symbol = '").append(symbol).append("'").append(" AND B.MarketID = M.AccountID AND ")
 				.append("M.Username = '").append(user).append("'").append(" AND S.Username = '").append(user).append("'")
-				.append(" AND A.stock_symbol = '").append(symbol).append("'");
+				.append(" AND A.stock_symbol = '").append(symbol).append("'").append(" AND S.stock_symbol = '").append(symbol).append("'");
 		System.out.println(check_buy_stocks.toString());
 		//run query
 		DbClient.getInstance().runQuery(new RetrievalQuery(check_buy_stocks.toString()) {
@@ -322,8 +322,10 @@ public class BuyStocksPage {
 						Vector<Integer> buy_num_shares = new Vector<Integer>();
 						double profit = 0;
 						System.out.println(test_num);
+						//going through each value twice???
 						do {
 							//calculate profit here as well
+							System.out.println(result.getString(1) + ", " + result.getString(2) + ", " + result.getString(3) + ", " + result.getString(4) + ", " + result.getString(5) + ", " + result.getString(6) );
 							int curr = result.getInt(2);
 							System.out.println(curr + ", " + result.getString(1));
 							test_num -= curr;
@@ -331,8 +333,8 @@ public class BuyStocksPage {
 							buy_id_prices.add(result.getInt(3));
 							buy_num_shares.add(result.getInt(2));
 							profit = curr_price*(curr) - (result.getInt(3)*curr);
-						}while(result.next() && test_num >0);
-						System.out.println(test_num);
+						}while(result.next());
+						System.out.println("TEST NUM " + test_num);
 						if(test_num > 0) {
 							JOptionPane.showMessageDialog(null, "ATTEMPT TO SELL MORE STOCKS THAN OWNED RESULTS IN FAILURE", "Error Message", 0);
 							return;
