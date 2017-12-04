@@ -264,7 +264,7 @@ public class BuyStocksPage {
 						sell.setString(3, symbol); // stock_symbol
 						sell.setString(4, result.getString("MarketID")); // MarketID
 						sell.setString(5, result.getString("StockID")); // StockID
-						sell.setDate(6, DbClient.getInstance().TODAY); // Date
+						sell.setString(6, StarsRUs.global_date); // Date
 						sell.setDouble(7, result.getDouble("price")); // OriginalBuyingPrice
 						sell.setDouble(8, result.getDouble("current_stock_price")); // Selling_Price
 						sell.setDouble(9, result.getDouble("current_stock_price") - price); // Profit

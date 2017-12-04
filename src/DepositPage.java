@@ -149,7 +149,8 @@ public class DepositPage {
 			// update user market account
 			//update user market account
 			int withdraw_amount = -1*Integer.parseInt(amount.getText());
-			int set_amount = beginning_balance-withdraw_amount;
+			
+			int set_amount = beginning_balance+withdraw_amount;
 			
 			if(set_amount <0) {
 				JOptionPane.showMessageDialog(null, "Cannot have balance below $0", "Error with Deposit/Withdraw", 0);
