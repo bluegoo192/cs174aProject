@@ -76,7 +76,7 @@ public class BalancePage {
 					if(!result.next()) {
 						String stocks = "YOU HAVE NO STOCK ACCOUNTS";
 						stock_info.add(stocks);
-
+						create_frame(mark_balance, stock_info);
 						return;
 					}else {
 						int counter = 0;
