@@ -135,7 +135,7 @@ public class ManagerDashboard{
 
 			StringBuilder get_profits = new StringBuilder("SELECT S.Profit FROM Sell_Stock S,  Market_Account MA WHERE ")
 					.append("MA.Username = '").append(customer_report.getText()).append("' AND S.MarketID = MA.AccountID");		
-			
+
 			System.out.println(get_profits.toString());
 			DbClient.getInstance().runQuery(new RetrievalQuery(get_profits.toString()) {
 
@@ -151,12 +151,12 @@ public class ManagerDashboard{
 							do {
 								total += result.getDouble(1);
 							}while(result.next());
-							
-							
+
+
 							first_query.add(Integer.toString(total));
-							
+
 						}
-						
+
 						//get Accrue Interest
 						StringBuilder get_interest = new StringBuilder("SELECT AI.MoneyAdded FROM Accrue_Interest AI,  Market_Account MA WHERE ")
 								.append("MA.Username = '").append(customer_report.getText()).append("' AND AI.AccountID = MA.AccountID");	
@@ -173,19 +173,19 @@ public class ManagerDashboard{
 										}while(result.next());
 										first_query.add(first_query.get(0) + total);
 									}
-								
+
 									first_query.add("PROFITS SO FAR: " + first_query.get(0));
-									
+
 									get_commision(first_query);
 								} catch (SQLException e) {
 									// TODO Auto-generated catch block
 									e.printStackTrace();
 								}
-								
-								
+
+
 							}
 						});
-						
+
 					} catch (SQLException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -340,7 +340,7 @@ public class ManagerDashboard{
 						e1.printStackTrace();
 					}
 
-					
+
 				}
 
 			});
@@ -357,62 +357,62 @@ public class ManagerDashboard{
 			System.out.println(info.get(4));
 			System.out.println(buy.get(0));
 			System.out.println(sell.get(0));
-			 
+
 			JFrame frame2 = new JFrame("MONTHLY REPORT");
 			frame2.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-	        Dimension d = new Dimension(800, 800);
-	        
-	      
-	        JLabel info_label = new JLabel("CUSTOMER INFO");
-	        info_label.setVerticalAlignment(JLabel.CENTER);
-	        JList info_list = new JList(info);
-	        
-	        info_list.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
-	        info_list.setLayoutOrientation(JList.HORIZONTAL_WRAP);
-	        info_list.setVisibleRowCount(-1);
-	        
-	        JScrollPane infoScroller = new JScrollPane(info_list);
-	        infoScroller.setPreferredSize(new Dimension(250, 80));
-	        
-	        JLabel trans_label = new JLabel("PROFIT INFORMATION (from selling and interest)");
-	        	trans_label.setVerticalAlignment(JLabel.CENTER);
-	        JList trans_list = new JList(first_query);
-	        
-	        trans_list.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
-	        trans_list.setLayoutOrientation(JList.HORIZONTAL_WRAP);
-	      	trans_list.setVisibleRowCount(-1);
-	        
-	        JScrollPane transScroller = new JScrollPane(trans_list);
-	        transScroller.setPreferredSize(new Dimension(250, 80));
-	        
-	        JLabel comm = new JLabel(commission);
-	        comm.setVerticalAlignment(JLabel.CENTER);
-	        
-	        //create buy list and label
-	        JLabel buy_label = new JLabel("Buy (stock symbol, number of stocks, date, price):");
-	        buy_label.setVerticalAlignment(JLabel.CENTER);
-	        JList buy_list = new JList(buy);
-	        
-	        buy_list.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
-	        buy_list.setLayoutOrientation(JList.HORIZONTAL_WRAP);
-	        buy_list.setVisibleRowCount(-1);
+			Dimension d = new Dimension(800, 800);
 
-	        JScrollPane  buyScroller = new JScrollPane( buy_list);
-	        buyScroller.setPreferredSize(new Dimension(250, 80));
-	        
-	        //create sell list and label
-	        JLabel sell_label = new JLabel("Sell (stock symbol, number of stocks, date, price, profit):");
-	        sell_label.setVerticalAlignment(JLabel.CENTER);
-	        JList sell_list = new JList(sell);
-	        
-	        sell_list.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
-	        sell_list.setLayoutOrientation(JList.HORIZONTAL_WRAP);
-	        sell_list.setVisibleRowCount(-1);
 
-	        JScrollPane sellScroller = new JScrollPane(sell_list);
-	        sellScroller.setPreferredSize(new Dimension(250, 80));
-	        
-	        JButton backButton = new JButton("Back to Dash");
+			JLabel info_label = new JLabel("CUSTOMER INFO");
+			info_label.setVerticalAlignment(JLabel.CENTER);
+			JList info_list = new JList(info);
+
+			info_list.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
+			info_list.setLayoutOrientation(JList.HORIZONTAL_WRAP);
+			info_list.setVisibleRowCount(-1);
+
+			JScrollPane infoScroller = new JScrollPane(info_list);
+			infoScroller.setPreferredSize(new Dimension(250, 80));
+
+			JLabel trans_label = new JLabel("PROFIT INFORMATION (from selling and interest)");
+			trans_label.setVerticalAlignment(JLabel.CENTER);
+			JList trans_list = new JList(first_query);
+
+			trans_list.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
+			trans_list.setLayoutOrientation(JList.HORIZONTAL_WRAP);
+			trans_list.setVisibleRowCount(-1);
+
+			JScrollPane transScroller = new JScrollPane(trans_list);
+			transScroller.setPreferredSize(new Dimension(250, 80));
+
+			JLabel comm = new JLabel(commission);
+			comm.setVerticalAlignment(JLabel.CENTER);
+
+			//create buy list and label
+			JLabel buy_label = new JLabel("Buy (stock symbol, number of stocks, date, price):");
+			buy_label.setVerticalAlignment(JLabel.CENTER);
+			JList buy_list = new JList(buy);
+
+			buy_list.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
+			buy_list.setLayoutOrientation(JList.HORIZONTAL_WRAP);
+			buy_list.setVisibleRowCount(-1);
+
+			JScrollPane  buyScroller = new JScrollPane( buy_list);
+			buyScroller.setPreferredSize(new Dimension(250, 80));
+
+			//create sell list and label
+			JLabel sell_label = new JLabel("Sell (stock symbol, number of stocks, date, price, profit):");
+			sell_label.setVerticalAlignment(JLabel.CENTER);
+			JList sell_list = new JList(sell);
+
+			sell_list.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
+			sell_list.setLayoutOrientation(JList.HORIZONTAL_WRAP);
+			sell_list.setVisibleRowCount(-1);
+
+			JScrollPane sellScroller = new JScrollPane(sell_list);
+			sellScroller.setPreferredSize(new Dimension(250, 80));
+
+			JButton backButton = new JButton("Back to Dash");
 			backButton.addActionListener(new ActionListener() {
 
 				@Override
@@ -423,30 +423,30 @@ public class ManagerDashboard{
 				}
 
 			});
-	      
-	        frame2.getContentPane().setPreferredSize(d);
-	        JPanel panel = new JPanel(new GridLayout(4,4,4,4));
-	        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-	        
-	        
-	        
-	        panel.add(info_label);
-	        panel.add(infoScroller);
-	        panel.add(trans_label);
-	        panel.add(transScroller);
-	        panel.add(comm);
-	        panel.add(buy_label);
-	        panel.add(buy_list);
-	        panel.add(buyScroller);
-	        panel.add(sell_label);
-	        panel.add(sellScroller);
-	        panel.add(backButton);
-	        
-	        frame2.setContentPane(panel);
-	        
-	        frame2.pack();
-	        frame2.setVisible(true);
-			
+
+			frame2.getContentPane().setPreferredSize(d);
+			JPanel panel = new JPanel(new GridLayout(4,4,4,4));
+			panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+
+
+
+			panel.add(info_label);
+			panel.add(infoScroller);
+			panel.add(trans_label);
+			panel.add(transScroller);
+			panel.add(comm);
+			panel.add(buy_label);
+			panel.add(buy_list);
+			panel.add(buyScroller);
+			panel.add(sell_label);
+			panel.add(sellScroller);
+			panel.add(backButton);
+
+			frame2.setContentPane(panel);
+
+			frame2.pack();
+			frame2.setVisible(true);
+
 		}
 
 	}
@@ -543,6 +543,7 @@ public class ManagerDashboard{
 
 	private class DTERListener implements ActionListener{
 
+
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
 			// TODO Auto-generated method stub
@@ -555,7 +556,7 @@ public class ManagerDashboard{
 					.append("LEFT JOIN Sell_Stock ON Sell_Stock.MarketID = marketIDs.MarketID ")
 					.append("LEFT JOIN Accrue_Interest ON Accrue_Interest.AccountID = marketIDs.MarketID")
 					.append(" GROUP BY Sell_Stock.MarketID HAVING total_earnings >= 10000) as nested_query, Market_Account M, Customers C ")
-					.append("WHERE C.Username = M.Username");
+					.append("WHERE C.Username = M.Username AND nested_query.MarketID = M.AccountID");
 			DbClient.getInstance().runQuery(new RetrievalQuery(combine.toString()) {
 				@Override
 				public void onComplete(ResultSet result) {
@@ -593,7 +594,7 @@ public class ManagerDashboard{
 
 
 		}
-		
+
 
 		private void build_dter_frame(Vector<String> users) {
 			JList user_list = new JList(users);
