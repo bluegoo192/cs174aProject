@@ -51,6 +51,18 @@ public class DemoActionsPage{
 		JButton closeMarket = new JButton("Close Market");
 		closeMarket.addActionListener(d.new CloseListener());
 
+		JButton accrueInterestForArthur = new JButton("Test accrue interest on as");
+		accrueInterestForArthur.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				try {
+					DbClient.getInstance().accrueInterest("as");
+				} catch (SQLException se) {
+					System.out.println("WTF");
+				}
+			}
+		});
+
 		stock_symbol = new JTextField("Type Stock Symbol you would like to update here");
 		new_price = new JTextField("Type new price of stock here");
 
@@ -66,6 +78,7 @@ public class DemoActionsPage{
 		panel.add(openMarket);
 		panel.add(closeMarket);
 		panel.add(stock_symbol);
+		panel.add(accrueInterestForArthur);
 		panel.add(new_price);
 		panel.add(setButton1);
 		panel.add(new_date);
