@@ -25,6 +25,9 @@ public class CustomerDashboard{
 	private static String market_accountID;
 	private static String stock_accountID = "";
 	
+	//used to get movie contracts
+	private static String curr_result;
+	
 	
 	//setter functions
 	public static void set_stock_account(String input) {
@@ -291,10 +294,9 @@ public class CustomerDashboard{
 							
 							actor_info = output_string;
 							
-							StringBuilder movie_info = new StringBuilder("SELECT M.Title, M.Year, C.Role, C.Total_Value  ")
-									.append("FROM Movie M, MovieContract C ")
-									.append("WHERE C.stock_symbol = '").append(CustomerDashboard.actor_stock.getText())
-									.append("' AND M.MovieID = C.MovieID");
+							StringBuilder movie_info = new StringBuilder("SELECT C.Role, C.Total_Value, C.MovieID  ")
+									.append("FROM MovieContract C ")
+									.append("WHERE C.stock_symbol = '").append(CustomerDashboard.actor_stock.getText()).append("'");
 							DbClient.getInstance().runQuery(new RetrievalQuery(movie_info.toString() ) {
 
 								@Override
@@ -312,12 +314,57 @@ public class CustomerDashboard{
 												String curr_result;
 												curr_result = result.getString(1);
 												curr_result += ", ";
-												curr_result += result.getString(2);
-												curr_result += ", ";
-												curr_result += result.getString(3);
+												curr_result += "Value: " +result.getString(2);
+												//curr_result += ", ";
+												//curr_result += result.getString(3);
 												output_string.add(curr_result);
+												int curr_id = result.getInt(3);
+												
+												//access movie database
+												CompletableFuture<ResultSet> info;
+												try {
+													info = DbClient.getMovieApi().getMovieInfo(curr_id);
+												} catch (NumberFormatException e) {
+													info = DbClient.getMovieApi().getMovieInfo(curr_id);
+												}
+						
+												info.thenAccept(result_movie -> {
+													System.out.println("accept info");
+													try {
+														String curr_result1;
+														if (result_movie.next()) {
+															System.out.println("RESULT HAS A NEXT");
+															
+															curr_result1 = "Title: " + result_movie.getString("title");
+															curr_result1 += ", ";
+															curr_result1 += "Rating: " + result_movie.getString("rating");
+															curr_result1 += ", ";
+															curr_result1 += "Year: " + result_movie.getString("production_year");
+															System.out.println(curr_result1);
+														} else {
+															curr_result1 = "Invalid movie id";
+														}
+														output_string.add(curr_result1);
+														
+													} catch (SQLException e) {
+														e.printStackTrace();
+													}
+
+												});
+												
+												try {
+													Thread.sleep(500);
+												} catch (InterruptedException e) {
+													// TODO Auto-generated catch block
+													e.printStackTrace();
+												}
+												
+												build_actor_frame(output_string);
 											}while(result.next());
-											build_actor_frame(output_string);
+											
+											
+											
+											
 											return;
 										}
 									} catch (SQLException e) {
@@ -417,7 +464,7 @@ public class CustomerDashboard{
 				try {
 					if (result.next()) {
 						movieInfo.add(new JLabel("Title: " + result.getString("title")));
-						movieInfo.add(new JLabel("Rating: " + result.getLong("rating")));
+						movieInfo.add(new JLabel("Rating: " + result.getFloat("rating")));
 						movieInfo.add(new JLabel("Production year: " + result.getInt("production_year")));
 						frame.validate();
 					} else {

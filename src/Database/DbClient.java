@@ -341,19 +341,13 @@ public class DbClient {
 					"	Type CHAR(20)," +
 					"	FOREIGN KEY(managerID) REFERENCES Manager(ManagerID) ON DELETE SET NULL," +
 					"	PRIMARY KEY (ReportID))",
-			"CREATE TABLE IF NOT EXISTS Movie (" +
-					"	MovieID CHAR(20)," +
-					"	Title CHAR(20)," +
-					"	Year CHAR(4)," +
-					"	PRIMARY KEY (MovieID)" +
-					")",
+		
 			"CREATE TABLE IF NOT EXISTS MovieContract(" +
 					"	stock_symbol CHAR(3) NOT NULL," +
-					"	MovieID CHAR(20) NOT NULL," +
+					"	MovieID INTEGER NOT NULL," +
 					"	Role CHAR(20)," +
 					"	Total_Value REAL," +
 					"	FOREIGN KEY(stock_symbol) REFERENCES Actor_Stock(stock_symbol) ON UPDATE CASCADE," +
-					"	FOREIGN KEY(MovieID) REFERENCES Movie(MovieID) ON DELETE CASCADE ON UPDATE CASCADE," +
 					"	PRIMARY KEY(stock_symbol, MovieID)" +
 					")",
 			"CREATE TABLE IF NOT EXISTS Buy_Stock(" +
