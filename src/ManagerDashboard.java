@@ -143,17 +143,17 @@ public class ManagerDashboard{
 				public void onComplete(ResultSet result) {
 					// TODO Auto-generated method stub
 					Vector<String> first_query = new Vector<String>();
+					String profits ;
 					try {
 						if(!result.next()) {
-							first_query.add("NO PROFITS RECORDED FOR THIS MONTH FOR THIS CUSTOMER");
+							profits = "NO PROFITS RECORDED FOR THIS MONTH FOR THIS CUSTOMER";
 						}else {
 							int total = 0;
 							do {
 								total += result.getDouble(1);
 							}while(result.next());
 
-
-							first_query.add(Integer.toString(total));
+							profits = Integer.toString(total);
 
 						}
 
@@ -171,10 +171,10 @@ public class ManagerDashboard{
 										do {
 											total += result.getDouble(1);
 										}while(result.next());
-										first_query.add(first_query.get(0) + total);
+										//first_query.add(first_query.get(0) + total);
 									}
 
-									first_query.add("PROFITS SO FAR: " + first_query.get(0));
+									first_query.add("PROFITS SO FAR: " + profits);
 
 									get_commision(first_query);
 								} catch (SQLException e) {

@@ -82,7 +82,7 @@ public class BuyStocksPage {
 					stocksComboBox.removeAll();
 					while (result.next()) {
 						results++;
-						stocksComboBox.addItem(result.getString("stock_symbol")+" ("+result.getInt("StockBalance")+")");
+						stocksComboBox.addItem(result.getString("stock_symbol")+" ("+result.getDouble("StockBalance")+")");
 						stockQuantityMap.put(result.getString("stock_symbol"), result.getInt("StockBalance"));
 					}
 					if (results == 0) {
@@ -318,7 +318,7 @@ public class BuyStocksPage {
 						//it returned something
 						int test_num = quantity;
 						Vector<String> buy_ids_to_use = new Vector<String>();
-						Vector<Integer> buy_id_prices = new Vector<Integer>();
+						Vector<Double> buy_id_prices = new Vector<Double>();
 						Vector<Integer> buy_num_shares = new Vector<Integer>();
 						double profit = 0;
 						System.out.println(test_num);
@@ -330,7 +330,7 @@ public class BuyStocksPage {
 							System.out.println(curr + ", " + result.getString(1));
 							test_num -= curr;
 							buy_ids_to_use.add(result.getString(1));
-							buy_id_prices.add(result.getInt(3));
+							buy_id_prices.add(result.getDouble(3));
 							buy_num_shares.add(result.getInt(2));
 							profit += curr_price*(curr) - (result.getInt(3)*curr);
 						}while(result.next());
@@ -350,7 +350,7 @@ public class BuyStocksPage {
 				}
 			}
 
-			private void add_to_sell_stocks(String MarketID, String StockID, Vector<String> buy_ids, Vector<Integer> buy_prices, Vector<Integer> buy_num_shares, final int quantity, double curr_price, double profit) {
+			private void add_to_sell_stocks(String MarketID, String StockID, Vector<String> buy_ids, Vector<Double> buy_prices, Vector<Integer> buy_num_shares, final int quantity, double curr_price, double profit) {
 				StarsRUs.global_sell++;
 				String sell_id = Integer.toString(StarsRUs.global_sell);
 				StarsRUs.global_sell++;

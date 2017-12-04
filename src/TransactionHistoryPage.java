@@ -112,7 +112,7 @@ public class TransactionHistoryPage {
 		//get deposit list
 		System.out.println("MARKET ID IS: " + market_account);
 		//get buy list
-		StringBuilder get_buy_list = new StringBuilder("SELECT  B.stock_symbol, B.NumShares, B.Date")
+		StringBuilder get_buy_list = new StringBuilder("SELECT  B.stock_symbol, B.NumShares, B.Date, B.price")
 				.append(" FROM Buy_Stock B ").append("WHERE B.MarketID = '")
 				.append(market_account).append("' AND B.archived = 0");
 		DbClient.getInstance().runQuery(new RetrievalQuery(get_buy_list.toString()) {
@@ -133,9 +133,13 @@ public class TransactionHistoryPage {
 				try {
 					do{
 						String curr_result;
-						curr_result = result.getString(1);
+						curr_result = "Stock: " +result.getString(1);
 						curr_result += ", ";
-						curr_result += result.getString(2);
+						curr_result += "Num Shares:"+ result.getString(2);
+						curr_result += ", ";
+						curr_result += "Date:" + result.getString(3);
+						curr_result += ", ";
+						curr_result += "Price: " + result.getString(4);
 						buy_list.add(curr_result);
 					}while(result.next()) ;
 					TransactionHistoryPage.set_buy(buy_list);
@@ -151,7 +155,7 @@ public class TransactionHistoryPage {
 	
 	private static void initialize_sell() {
 		//get sell list
-				StringBuilder get_sell_list = new StringBuilder("SELECT  S.stock_symbol, S.NumShares, S.Date")
+				StringBuilder get_sell_list = new StringBuilder("SELECT  S.stock_symbol, S.NumShares, S.Date, S.Profit")
 						.append(" FROM Sell_Stock S, stock_account SA ").append(" WHERE SA.Username = '").append(user).append("'")
 						.append(" AND SA.AccountID  = S.StockID");
 				DbClient.getInstance().runQuery(new RetrievalQuery(get_sell_list.toString()) {
@@ -172,9 +176,13 @@ public class TransactionHistoryPage {
 						try {
 							do {
 								String curr_result;
-								curr_result = result.getString(1);
+								curr_result = "Stock: " + result.getString(1);
 								curr_result += ", ";
-								curr_result += result.getString(2);
+								curr_result += "Num Shares: " +result.getString(2);
+								curr_result += ", ";
+								curr_result += "Date: " + result.getString(3);
+								curr_result += ", ";
+								curr_result += "Profit: " + result.getString(4);
 								sell_list.add(curr_result);
 							}while(result.next());
 							TransactionHistoryPage.set_sell(sell_list);
