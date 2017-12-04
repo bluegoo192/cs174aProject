@@ -182,7 +182,7 @@ public class BuyStocksPage {
 							System.out.println("SUBMITTING TO BUY_STOCK");
 							// Update Buy_Stock and stock_account
 							PreparedStatement statement = DbClient.getInstance().getMainConnection().prepareStatement(
-									"INSERT INTO Buy_Stock VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+									"x");
 							statement.setString(1, Integer.toString(StarsRUs.global_buy+1));
 							statement.setInt(2, quantity); 
 							statement.setString(3, symbol);
@@ -250,9 +250,7 @@ public class BuyStocksPage {
 				int q = quantity; // so we can edit from within inner class
 				double commission = DbClient.getInstance().commission;
 				try {
-					System.out.println("IN TRY STATEMENT");
 					while (result.next() && q > 0) {
-						System.out.println("IN WHILE LOOP");
 						StarsRUs.global_sell++;
 						int currentSellId = StarsRUs.global_sell;
 
@@ -304,14 +302,11 @@ public class BuyStocksPage {
 			@Override
 			public void onComplete(ResultSet result) {
 				// TODO Auto-generated method stub
-				System.out.println("on complete");
 				try {
 					if(!result.next()) {
-						System.out.println("if");
 						JOptionPane.showMessageDialog(null, "YOU DO NOT OWN ANY STOCKS OF THIS SYMBOL", "Error Message", 0);
 						return;
 					}else {
-						System.out.println("else");
 						String MarketID = result.getString(4);
 						String StockID = result.getString(5);
 						Double curr_price = result.getDouble(6);
@@ -321,20 +316,16 @@ public class BuyStocksPage {
 						Vector<Double> buy_id_prices = new Vector<Double>();
 						Vector<Integer> buy_num_shares = new Vector<Integer>();
 						double profit = 0;
-						System.out.println(test_num);
 						//going through each value twice???
 						do {
 							//calculate profit here as well
-							System.out.println(result.getString(1) + ", " + result.getString(2) + ", " + result.getString(3) + ", " + result.getString(4) + ", " + result.getString(5) + ", " + result.getString(6) );
 							int curr = result.getInt(2);
-							System.out.println(curr + ", " + result.getString(1));
 							test_num -= curr;
 							buy_ids_to_use.add(result.getString(1));
 							buy_id_prices.add(result.getDouble(3));
 							buy_num_shares.add(result.getInt(2));
 							profit += curr_price*(curr) - (result.getInt(3)*curr);
 						}while(result.next());
-						System.out.println("TEST NUM " + test_num);
 						if(test_num > 0) {
 							JOptionPane.showMessageDialog(null, "ATTEMPT TO SELL MORE STOCKS THAN OWNED RESULTS IN FAILURE", "Error Message", 0);
 							return;

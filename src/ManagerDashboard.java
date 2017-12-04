@@ -349,15 +349,7 @@ public class ManagerDashboard{
 		}
 
 		public void build_frame(Vector<String> first_query, String commission, Vector<String> buy, Vector<String> sell, Vector<String> info) {
-			System.out.println(commission);
-			System.out.println(first_query.get(0));
-			System.out.println(info.get(0));
-			System.out.println(info.get(1));
-			System.out.println(info.get(2));
-			System.out.println(info.get(3));
-			System.out.println(info.get(4));
-			System.out.println(buy.get(0));
-			System.out.println(sell.get(0));
+		
 
 			JFrame frame2 = new JFrame("MONTHLY REPORT");
 			frame2.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
