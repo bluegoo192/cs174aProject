@@ -111,6 +111,7 @@ public class ManagerDashboard{
 					}
 				}
 			};
+			DbClient.getInstance().runQuery(getUsers);
 		}
 
 	}
