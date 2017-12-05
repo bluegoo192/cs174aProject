@@ -451,29 +451,12 @@ public class ManagerDashboard{
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
 
-			/*StringBuilder combine = new StringBuilder("SELECT M.Username, nested_shares.sum_shares FROM  (SELECT marketIDs.MarketID, SUM(COALESCE(Buy_Stock.NumShares, 0) +")
-					.append(" COALESCE(Sell_Stock.NumShares, 0)) as sum_shares, Buy_Stock.MarketID as ID ")
-					.append("FROM( SELECT DISTINCT(MarketID) FROM (SELECT MarketID FROM Buy_Stock WHERE archived=0 UNION SELECT MarketID FROM Sell_Stock) tmp ")
-					.append(") marketIDs")
-					.append(" LEFT JOIN Sell_Stock ON Sell_Stock.MarketID = marketIDs.MarketID ")
-					.append("LEFT JOIN Buy_Stock ON Buy_Stock.MarketID = marketIDs.MarketID")
-					.append(" GROUP BY Buy_Stock.MarketID HAVING sum_shares >= 1000) as nested_shares, Market_Account M")
-					.append(" WHERE nested_shares.ID = M.AccountID");
-					
-					*StringBuilder get_profits = new StringBuilder("SELECT S.Profit FROM Sell_Stock S,  Market_Account MA WHERE ")
-					.append("MA.Username = '").append(customer_report.getText()).append("' AND S.MarketID = MA.AccountID");		
-
-			System.out.println(get_profits.toString());
-			DbClient.getInstance().runQuery(new RetrievalQuery(get_profits.toString()) {
-
-
-						//get Accrue Interest
-						StringBuilder get_interest = new StringBuilder("SELECT AI.MoneyAdded FROM Accrue_Interest AI,  Market_Account MA WHERE ")
-								.append("MA.Username = '").append(customer_report.getText()).append("' AND AI.AccountID = MA.AccountID");	
-						DbClient.getInstance().runQuery(new RetrievalQuery(get_interest.toString()) {
-					*/
-			StringBuilder get_num_buy = new StringBuilder("SELECT M.Username FROM Buy_Stock BS, Sell_Stock SS, Market_Account M WHERE ")
-					.append("BS.MarketID = SS.MarketID AND M.AccountID = BS.MarketID GROUP BY M.Username HAVING (SUM(BS.numShares) + SUM(SS.numShares))> 1000");
+			
+			StringBuilder get_num_buy = new StringBuilder("SELECT M.Username, SUM(nested.shares) FROM ((SELECT BS.MarketID as ID, COALESCE(SUM(BS.numShares),0)") 
+					.append("as shares FROM Buy_Stock BS WHERE BS.archived = 0 GROUP BY BS.MarketID) UNION ALL (SELECT SS.MarketID as ID, COALESCE(SUM(SS.numShares),0)")
+					.append("as shares FROM Sell_Stock SS GROUP BY SS.MarketID )) as nested, Market_Account M WHERE M.AccountID = nested.ID GROUP BY nested.ID") 
+							.append(" HAVING SUM(nested.shares) >= 1000");
+			
 			DbClient.getInstance().runQuery(new RetrievalQuery(get_num_buy.toString()) {
 				@Override
 				public void onComplete(ResultSet result) {
@@ -482,10 +465,13 @@ public class ManagerDashboard{
 							JOptionPane.showMessageDialog(null, "NO ACTIVE CUSTOMERS", "Customer Message", 1);
 							return;
 						}else {
+							System.out.println(result.getString(1) + ", " + result.getString(2));
 							Vector<String> output_string = new Vector<String>();
 							do {
 								String curr_result;
 								curr_result = result.getString(1);
+								curr_result += ", ";
+								curr_result += result.getString(2);
 								System.out.println(curr_result);
 								output_string.add(curr_result);
 							}while(result.next());
