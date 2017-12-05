@@ -174,7 +174,7 @@ public class SignUpPage {
 			
 			
 			String account_id = Integer.toString(StarsRUs.global_mark);
-			StarsRUs.global_mark += 1;
+			StarsRUs.global_mark += 2;
 			StringBuilder addMarketAccount = new StringBuilder("INSERT INTO Market_Account VALUES( ")
 					.append("'").append(account_id).append("'").append(",").append("1000").append(",").append("'").append(username.getText()).append("'")
 					.append(",").append("1000").append(",").append("'").append(StarsRUs.global_date).append("'")
