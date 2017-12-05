@@ -179,7 +179,7 @@ public class DbClient {
 
 	private PreparedStatement getAdjustBalanceStatement(String accountID, long change) throws SQLException {
 		// new avg_daily_balance =
-		// (   (old_avg_daily_balance / <num days it was an average over>)
+		// (   (old_avg_daily_balance * <num days it was an average over>)
 		//   + (old_balance * <days balance was at old_balance>)  )
 		//  / (total days)
 		System.out.println(TODAY.toString());
@@ -187,7 +187,7 @@ public class DbClient {
 		PreparedStatement statement = mainConnection.prepareStatement(
 				"UPDATE Market_Account " +
 						"SET" +
-						" old_ADB = ( (old_ADB / DATEDIFF(last_changed, last_interest_accrual)) + (Balance * DATEDIFF(?, last_changed)) )" +
+						" old_ADB = ( (old_ADB * DATEDIFF(last_changed, last_interest_accrual)) + (Balance * DATEDIFF(?, last_changed)) )" +
 							"/ DATEDIFF(?, last_interest_accrual)," +
 						" Balance = Balance + ?," +
 						" last_changed = ? " +
@@ -200,10 +200,33 @@ public class DbClient {
 		return statement;
 	}
 
+	private PreparedStatement getAdjustBalanceStatementForUsername(String username, long change) throws SQLException {
+		// new avg_daily_balance =
+		// (   (old_avg_daily_balance * <num days it was an average over>)
+		//   + (old_balance * <days balance was at old_balance>)  )
+		//  / (total days)
+		System.out.println(TODAY.toString());
+
+		PreparedStatement statement = mainConnection.prepareStatement(
+				"UPDATE Market_Account " +
+						"SET" +
+						" old_ADB = ( (old_ADB * DATEDIFF(last_changed, last_interest_accrual)) + (Balance * DATEDIFF(?, last_changed)) )" +
+						"/ DATEDIFF(?, last_interest_accrual)," +
+						" Balance = Balance + ?," +
+						" last_changed = ? " +
+						" WHERE Username = ? ");
+		statement.setString(1, TODAY.toString());
+		statement.setString(2, TODAY.toString());
+		statement.setLong(3, change);
+		statement.setString(4, TODAY.toString());
+		statement.setString(5, username);
+		return statement;
+	}
+
 	public void accrueInterest(String username) throws SQLException {
 
 		/* Step 1: Update the average daily balance */
-		runQuery(new UpdateQuery(getAdjustBalanceStatement(username, 0)) {
+		runQuery(new UpdateQuery(getAdjustBalanceStatementForUsername(username, 0)) {
 			@Override
 			public void onComplete(int numRowsAffected) {
 
@@ -218,6 +241,7 @@ public class DbClient {
 							result.next();
 							String accountId = result.getString("AccountID");
 							double interest = result.getLong("old_ADB") * result.getDouble("interest_rate");
+							System.out.println("old ADB = "+result.getLong("old_ADB"));
 
 							/* Step 3: update market account and record transaction in Accrue_Interest */
 							PreparedStatement marketAccountStatement = mainConnection.prepareStatement("UPDATE Market_Account " +

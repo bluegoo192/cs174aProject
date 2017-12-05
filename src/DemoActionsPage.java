@@ -51,12 +51,12 @@ public class DemoActionsPage{
 		JButton closeMarket = new JButton("Close Market");
 		closeMarket.addActionListener(d.new CloseListener());
 
-		JButton accrueInterestForArthur = new JButton("Test accrue interest on as");
+		JButton accrueInterestForArthur = new JButton("Test accrue interest");
 		accrueInterestForArthur.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				try {
-					DbClient.getInstance().accrueInterest("as");
+					DbClient.getInstance().accrueInterest("accrue");
 				} catch (SQLException se) {
 					System.out.println("WTF");
 				}
