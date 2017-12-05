@@ -160,6 +160,7 @@ public class BuyStocksPage {
 						price = result.getDouble("price");
 						if (balance < (price * quantity) + DbClient.getInstance().commission) {
 							System.err.println("Can't afford purchase");
+							JOptionPane.showMessageDialog(null, "Can't afford purchase", "Error with Buy/Sell", 0);
 							return;
 						}
 						System.out.println("sf" + currentBuyId+"  "+marketId);

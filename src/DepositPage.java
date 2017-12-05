@@ -170,15 +170,7 @@ public class DepositPage {
 			//automatically generate withdraw id
 			String withdraw_id = Integer.toString(StarsRUs.global_withdraw);
 			StarsRUs.global_withdraw += 1;
-			
-			//add to withdraw table
-		/*	StringBuilder createWithdrawRow = new StringBuilder("INSERT INTO Withdraw ")
-					.append("(WithdrawID, AccountID, Username, Value, Date, OriginalBalance) ")
-					.append("VALUES ( ").append("'").append(withdraw_id).append("'").append(", ")
-					.append("'").append(account).append("'").append(", ").append("'").append(user).append("'").append(", ")
-					.append(withdraw_amount).append(", ").append("'").append(StarsRUs.global_date).append("'").append(",").append(beginning_balance).append(")");
-			DbClient.getInstance().runQuery(new UpdateQuery(createWithdrawRow.toString()));
-			*/
+
 			try {
 				DbClient.getInstance().adjustMarketAccountBalance(account,  withdraw_amount);
 			} catch (SQLException e) {

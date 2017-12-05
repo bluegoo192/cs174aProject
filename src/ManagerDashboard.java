@@ -328,6 +328,7 @@ public class ManagerDashboard{
 					try {
 						if(!result.next()) {
 							info.add("NO CUSTOMER INFO");
+							JOptionPane.showMessageDialog(null, "no accounts shown for given username", "Error with Monthly Statement", 0);
 							return;
 						}else {
 							info.add(result.getString(1).toString());
@@ -862,6 +863,13 @@ public class ManagerDashboard{
 			});
 
 
+			StringBuilder delete_interest = new StringBuilder("TRUNCATE TABLE Accrue_Interest");
+			DbClient.getInstance().runQuery(new UpdateQuery(delete_interest.toString()) {
+				@Override
+				public void onComplete(int numRowsAffected) {
+					System.out.println("Interest Table deleted");
+				}
+			});
 
 		}
 
