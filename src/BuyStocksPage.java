@@ -183,12 +183,8 @@ public class BuyStocksPage {
 							System.out.println("SUBMITTING TO BUY_STOCK");
 							// Update Buy_Stock and stock_account
 							PreparedStatement statement = DbClient.getInstance().getMainConnection().prepareStatement(
-<<<<<<< HEAD
-									"");
-=======
 									"INSERT INTO Buy_Stock VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
->>>>>>> 1058c3ef3defd50a74b2b7559f0ae3062b94be23
-							statement.setString(1, Integer.toString(StarsRUs.global_buy+1));
+							statement.setString(1, Integer.toString(StarsRUs.global_buy));
 							statement.setInt(2, quantity); 
 							statement.setString(3, symbol);
 							statement.setString(4, marketId);
@@ -348,9 +344,17 @@ public class BuyStocksPage {
 
 			private void add_to_sell_stocks(String MarketID, String StockID, Vector<String> buy_ids, Vector<Double> buy_prices, Vector<Integer> buy_num_shares, final int quantity, double curr_price, double profit) {
 				StarsRUs.global_sell++;
+				StarsRUs.global_sell++;
 				String sell_id = Integer.toString(StarsRUs.global_sell);
 				StarsRUs.global_sell++;
 
+				
+				try {
+					DbClient.getInstance().adjustMarketAccountBalance(MarketID, (long) ( (quantity * curr_price)-20));
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 
 				StringBuilder insert_sell_stocks = new StringBuilder("INSERT INTO Sell_Stock VALUES( '")
 						.append(sell_id).append("', ").append(quantity).append(", '").append(symbol).append("', '")
@@ -388,6 +392,8 @@ public class BuyStocksPage {
 							i++;
 							
 						}
+						
+						
 					}
 
 				});
