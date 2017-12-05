@@ -349,6 +349,11 @@ public class BuyStocksPage {
 
 				
 				double profit = (quantity * curr_price);
+				if (profit - 20 < 0) {
+					JOptionPane.showMessageDialog(null, "Can't afford sell", "Error with Buy/Sell", 0);
+					return;
+				}
+
 
 				for(int i=0; i < buy_ids.size(); i++){
 					profit -= buy_num_shares.get(i)*buy_prices.get(i);
