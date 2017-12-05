@@ -395,7 +395,8 @@ public class DbClient {
 					"	curr_sell_id INTEGER,"+
 					"	market_open BIT," +
 					"	PRIMARY KEY(setting_id)"+
-					")"
+					")",
+			"UPDATE Market_Account SET old_ADB = Balance WHERE old_ADB IS NULL"
 	};
 	
 	//there is only one row in the settings table and it is identified by setting_id = 1
