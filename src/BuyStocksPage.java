@@ -183,7 +183,11 @@ public class BuyStocksPage {
 							System.out.println("SUBMITTING TO BUY_STOCK");
 							// Update Buy_Stock and stock_account
 							PreparedStatement statement = DbClient.getInstance().getMainConnection().prepareStatement(
+<<<<<<< HEAD
 									"");
+=======
+									"INSERT INTO Buy_Stock VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+>>>>>>> 1058c3ef3defd50a74b2b7559f0ae3062b94be23
 							statement.setString(1, Integer.toString(StarsRUs.global_buy+1));
 							statement.setInt(2, quantity); 
 							statement.setString(3, symbol);
