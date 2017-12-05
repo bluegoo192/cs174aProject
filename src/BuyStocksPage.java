@@ -184,6 +184,7 @@ public class BuyStocksPage {
 							// Update Buy_Stock and stock_account
 							PreparedStatement statement = DbClient.getInstance().getMainConnection().prepareStatement(
 									"INSERT INTO Buy_Stock VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+							StarsRUs.global_buy++;
 							statement.setString(1, Integer.toString(StarsRUs.global_buy));
 							statement.setInt(2, quantity); 
 							statement.setString(3, symbol);
@@ -343,7 +344,6 @@ public class BuyStocksPage {
 			}
 
 			private void add_to_sell_stocks(String MarketID, String StockID, Vector<String> buy_ids, Vector<Double> buy_prices, Vector<Integer> buy_num_shares, final int quantity, double curr_price, double profit) {
-				StarsRUs.global_sell++;
 				StarsRUs.global_sell++;
 				String sell_id = Integer.toString(StarsRUs.global_sell);
 				StarsRUs.global_sell++;
