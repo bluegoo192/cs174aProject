@@ -293,7 +293,7 @@ public class BuyStocksPage {
 	private void sellStock2(String symbol, final int quantity) {
 		System.out.println("in stocks 2");
 		//first, check that there are buy_stock entries for this, and that there are enough stocks left to sell
-		StringBuilder check_buy_stocks = new StringBuilder("SELECT B.BuyID, B.numStillOwned, B.price, M.AccountID, S.AccountID, A.current_stock_price FROM Buy_Stock B, Market_Account M, stock_account S, Actor_Stock A ")
+		StringBuilder check_buy_stocks = new StringBuilder("SELECT B.BuyID, B.numStillOwned, B.price, M.AccountID, S.AccountID, A.current_stock_price, M.Balance FROM Buy_Stock B, Market_Account M, stock_account S, Actor_Stock A ")
 				.append("WHERE B.stock_symbol = '").append(symbol).append("'").append(" AND B.MarketID = M.AccountID AND ")
 				.append("M.Username = '").append(user).append("'").append(" AND S.Username = '").append(user).append("'")
 				.append(" AND A.stock_symbol = '").append(symbol).append("'").append(" AND S.stock_symbol = '").append(symbol).append("'");
@@ -317,7 +317,6 @@ public class BuyStocksPage {
 						Vector<String> buy_ids_to_use = new Vector<String>();
 						Vector<Double> buy_id_prices = new Vector<Double>();
 						Vector<Integer> buy_num_shares = new Vector<Integer>();
-						double profit = 0;
 						//going through each value twice???
 						do {
 							//calculate profit here as well
@@ -333,6 +332,12 @@ public class BuyStocksPage {
 						}
 						//they put in stocks they own, and they have enough to sell
 						//move onto adding to sell_stocks
+						double profit = (quantity * curr_price);
+						if (result.getDouble(7) + profit - 20 < 0) {
+							JOptionPane.showMessageDialog(null, "Can't afford sell", "Error with Buy/Sell", 0);
+							return;
+						}
+
 						add_to_sell_stocks(MarketID, StockID, buy_ids_to_use, buy_id_prices, buy_num_shares, quantity, curr_price);
 
 					}
@@ -349,10 +354,6 @@ public class BuyStocksPage {
 
 				
 				double profit = (quantity * curr_price);
-				if (profit - 20 < 0) {
-					JOptionPane.showMessageDialog(null, "Can't afford sell", "Error with Buy/Sell", 0);
-					return;
-				}
 
 
 				for(int i=0; i < buy_ids.size(); i++){
