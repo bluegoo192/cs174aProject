@@ -326,7 +326,6 @@ public class BuyStocksPage {
 							buy_ids_to_use.add(result.getString(1));
 							buy_id_prices.add(result.getDouble(3));
 							buy_num_shares.add(result.getInt(2));
-							profit += curr_price*(curr) - (result.getInt(3)*curr);
 						}while(result.next());
 						if(test_num > 0) {
 							JOptionPane.showMessageDialog(null, "ATTEMPT TO SELL MORE STOCKS THAN OWNED RESULTS IN FAILURE", "Error Message", 0);
@@ -334,7 +333,7 @@ public class BuyStocksPage {
 						}
 						//they put in stocks they own, and they have enough to sell
 						//move onto adding to sell_stocks
-						add_to_sell_stocks(MarketID, StockID, buy_ids_to_use, buy_id_prices, buy_num_shares, quantity, curr_price, profit);
+						add_to_sell_stocks(MarketID, StockID, buy_ids_to_use, buy_id_prices, buy_num_shares, quantity, curr_price);
 
 					}
 				} catch (SQLException e) {
@@ -343,12 +342,13 @@ public class BuyStocksPage {
 				}
 			}
 
-			private void add_to_sell_stocks(String MarketID, String StockID, Vector<String> buy_ids, Vector<Double> buy_prices, Vector<Integer> buy_num_shares, final int quantity, double curr_price, double profit) {
+			private void add_to_sell_stocks(String MarketID, String StockID, Vector<String> buy_ids, Vector<Double> buy_prices, Vector<Integer> buy_num_shares, final int quantity, double curr_price) {
 				StarsRUs.global_sell++;
 				String sell_id = Integer.toString(StarsRUs.global_sell);
 				StarsRUs.global_sell++;
 
 				
+				double profit = (quantity * curr_price)-20;
 				try {
 					DbClient.getInstance().adjustMarketAccountBalance(MarketID, (long) ( (quantity * curr_price)-20));
 				} catch (SQLException e) {
