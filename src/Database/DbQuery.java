@@ -22,7 +22,10 @@ public abstract class DbQuery {
     }
 
     public String getQuery() {
-        return this.query;
+        if (this.queryStatement != null) {
+            return this.queryStatement.toString();
+        }
+        return query;
     }
 
     public DbQuery setType(int type) {  // returns this for convenience
@@ -73,7 +76,7 @@ public abstract class DbQuery {
      * @return Whether or not to retry
      */
     public boolean onError(Exception e) {
-        System.out.println("Failed to execute:  "+query);
+        System.out.println("Failed to execute:  "+getQuery());
         e.printStackTrace();
         return true;
     }
