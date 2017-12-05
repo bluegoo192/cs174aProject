@@ -195,7 +195,7 @@ public class BuyStocksPage {
 							statement.setInt(8, quantity);
 							statement.setDouble(9, price);
 							statement.setInt(10, 0);
-							StarsRUs.global_buy++;
+							StarsRUs.global_buy += 10;
 							if (result2.next()) { // if they already have a stock account
 								//statement.setString(5, result2.getString("AccountID"));
 								DbClient.getInstance().runQuery(new UpdateQuery(statement) {
@@ -348,7 +348,12 @@ public class BuyStocksPage {
 				StarsRUs.global_sell++;
 
 				
-				double profit = (quantity * curr_price)-20;
+				double profit = (quantity * curr_price);
+				
+				for(int i=0; i < buy_ids.size(); i++){
+					profit -= buy_num_shares.get(i)*buy_prices.get(i);
+				}
+
 				try {
 					DbClient.getInstance().adjustMarketAccountBalance(MarketID, (long) ( (quantity * curr_price)-20));
 				} catch (SQLException e) {
