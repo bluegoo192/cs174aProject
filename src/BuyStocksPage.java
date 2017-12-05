@@ -349,7 +349,7 @@ public class BuyStocksPage {
 
 				
 				double profit = (quantity * curr_price);
-				
+
 				for(int i=0; i < buy_ids.size(); i++){
 					profit -= buy_num_shares.get(i)*buy_prices.get(i);
 				}
