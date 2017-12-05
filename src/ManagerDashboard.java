@@ -543,14 +543,9 @@ public class ManagerDashboard{
 			// TODO Auto-generated method stub
 
 			//join buy_stock and sell_stock
-			StringBuilder combine = new StringBuilder("SELECT M.Username, nested_query.total_earnings, C.State, C.TaxID FROM (SELECT marketIDs.MarketID, SUM(COALESCE(Sell_Stock.Profit, 0)")
-					.append("+ COALESCE(Accrue_Interest.MoneyAdded, 0)) as total_earnings ")
-					.append("FROM( SELECT DISTINCT(MarketID) FROM (SELECT MarketID FROM Sell_Stock UNION SELECT AccountID FROM Accrue_Interest) tmp ")
-					.append(") marketIDs ")
-					.append("LEFT JOIN Sell_Stock ON Sell_Stock.MarketID = marketIDs.MarketID ")
-					.append("LEFT JOIN Accrue_Interest ON Accrue_Interest.AccountID = marketIDs.MarketID")
-					.append(" GROUP BY Sell_Stock.MarketID HAVING total_earnings >= 10000) as nested_query, Market_Account M, Customers C ")
-					.append("WHERE C.Username = M.Username AND nested_query.MarketID = M.AccountID");
+			StringBuilder combine = new StringBuilder("SELECT M.Username, SUM(nested.profit) FROM ((SELECT SS.MarketID as ID, COALESCE(SUM(SS.Profit),0)") 
+					.append("as profit from Sell_Stock SS GROUP BY SS.MarketID) UNION ALL (SELECT AI.AccountID as ID, COALESCE(SUM(AI.MoneyAdded),0) as profit FROM Accrue_Interest AI GROUP BY AI.AccountID)) as nested, Market_Account M WHERE M.AccountID = nested.ID GROUP BY nested.ID HAVING SUM(nested.profit) >=10000");
+			
 			DbClient.getInstance().runQuery(new RetrievalQuery(combine.toString()) {
 				@Override
 				public void onComplete(ResultSet result) {
@@ -572,10 +567,6 @@ public class ManagerDashboard{
 							curr_result = result.getString(1);
 							curr_result += ", ";
 							curr_result += result.getString(2);
-							curr_result += ", ";
-							curr_result += result.getString(3);
-							curr_result += ", ";
-							curr_result += result.getString(4);
 							dter_list.add(curr_result);
 						}while(result.next());
 						build_dter_frame(dter_list);
